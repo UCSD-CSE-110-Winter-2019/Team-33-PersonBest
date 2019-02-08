@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 //import edu.ucsd.cse110.googlefitapp.StepCountActivity;
+import com.android.personbest.StepCountActivity;
 
 public class FitnessServiceFactory {
 

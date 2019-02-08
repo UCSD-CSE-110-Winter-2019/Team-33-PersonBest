@@ -13,7 +13,8 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-//import edu.ucsd.cse110.googlefitapp.StepCountActivity;
+//import edu.ucsd.cse110.googlefitapp;
+import com.android.personbest.StepCountActivity;
 
 public class GoogleFitAdapter implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
