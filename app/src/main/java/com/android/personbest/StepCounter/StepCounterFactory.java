@@ -1,12 +1,12 @@
 package com.android.personbest.StepCounter;
 
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.android.personbest.MainActivity;
 
 import java.util.HashMap;
 import java.util.Map;
+import android.support.annotation.NonNull;
 
 public class StepCounterFactory {
 
@@ -18,13 +18,13 @@ public class StepCounterFactory {
         blueprints.put(key, bluePrint);
     }
 
-    public static StepCounter create(String key, MainActivity activity) {
-        Log.i(TAG, String.format("creating StepCounter with key %s", key));
+    public static StepCounter create(String key, @NonNull MainActivity activity) {
+        Log.i(TAG, String.format("creating StepCounter with key %s on activity %s", key, blueprints.get(key)));
         return blueprints.get(key).create(activity);
     }
 
     public interface BluePrint {
-        StepCounter create(AppCompatActivity activity);
+        StepCounter create(@NonNull MainActivity activity);
     }
 }
 

@@ -8,8 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import android.widget.Toast;
 import com.android.personbest.StepCounter.*;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,27 +21,34 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private TextView textSteps;
+    private static final int GOAL_INIT = 10000;
+
+    private int goalNum = GOAL_INIT;
+
     private StepCounter stepCounter;
+
+    private TextView stepsTodayVal;
+    private TextView goalVal;
+    private TextView stepsLeftVal;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
-            @Override
-            public StepCounter create(MainActivity activity) {
-                return new StepCounterGoogleFit(activity);
-            }
-        });
+        stepsTodayVal = findViewById(R.id.stepsTodayVal);
+        goalVal = findViewById(R.id.goalVal);
+        stepsLeftVal = findViewById(R.id.stepsLeftVal);
+        progressBar = findViewById(R.id.progressBar);
 
-        textSteps = findViewById(R.id.textSteps);
+        goalVal.setText(String.valueOf(goalNum));
+        progressBar.setMax(goalNum);
+        progressBar.setMin(0);
 
-        String fitnessServiceKey = getIntent().getStringExtra(FITNESS_SERVICE_KEY);
-        stepCounter = StepCounterFactory.create(fitnessServiceKey, this);
+        fitnessServiceKey = FITNESS_SERVICE_KEY;
 
-        Button btnUpdateSteps = findViewById(R.id.buttonUpdateSteps);
+        Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
         btnUpdateSteps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,9 +56,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
+            @Override
+            public StepCounter create(MainActivity activity) {
+                System.err.println("Main Activity: " + String.valueOf(activity));
+                return new StepCounterGoogleFit(activity);
+            }
+        });
+        stepCounter = StepCounterFactory.create( fitnessServiceKey, this);
+
         stepCounter.setup();
     }
 
+    // for test
     public void setFitnessServiceKey(String fitnessServiceKey) {
         this.fitnessServiceKey = fitnessServiceKey;
     }
@@ -66,13 +86,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setStepCount(long stepCount) {
-        textSteps.setText(String.valueOf(stepCount));
+    public void setStepCount(int stepCount) {
+        stepsTodayVal.setText(String.valueOf(stepCount));
+        int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
+        stepsLeftVal.setText(String.valueOf(stepsToGoal));
+        progressBar.setProgress(stepCount);
         showEncouragement(stepCount);
     }
 
-    public void showEncouragement(long stepCount) {
-        long percentage = (long)Math.floor((double)stepCount/DAILY_RECOMMENDED_STEPS*100);
+    public void showEncouragement(int stepCount) {
+        long percentage = (int)Math.floor(stepCount * 100.0 / goalNum);
         if(percentage < 10) return;
 
         Context context = getApplicationContext();

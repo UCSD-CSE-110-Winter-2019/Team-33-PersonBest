@@ -3,7 +3,6 @@ package com.android.personbest.StepCounter;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.android.personbest.MainActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
@@ -13,6 +12,8 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import com.android.personbest.MainActivity;
 
 public class StepCounterGoogleFit implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
@@ -83,7 +84,7 @@ public class StepCounterGoogleFit implements StepCounter {
                             @Override
                             public void onSuccess(DataSet dataSet) {
                                 Log.d(TAG, dataSet.toString());
-                                long total =
+                                int total =
                                         dataSet.isEmpty()
                                                 ? 0
                                                 : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
