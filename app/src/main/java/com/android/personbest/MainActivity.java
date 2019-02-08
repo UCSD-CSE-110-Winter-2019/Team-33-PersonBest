@@ -15,18 +15,19 @@ import android.widget.Toast;
 import com.android.personbest.StepCounter.*;
 
 public class MainActivity extends AppCompatActivity {
-    private String fitnessServiceKey = "GOOGLE_FIT";
 
-    public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
-
-    private static final String TAG = "MainActivity";
-
+    // FIXME hardcoded goal
     private static final int GOAL_INIT = 10000;
 
-    private int goalNum = GOAL_INIT;
+    // Const static member
+    public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
+    private static final String TAG = "MainActivity";
 
+    private String fitnessServiceKey;
+    private int goalNum = GOAL_INIT;
     private StepCounter stepCounter;
 
+    // UI-related members
     private TextView stepsTodayVal;
     private TextView goalVal;
     private TextView stepsLeftVal;
@@ -37,17 +38,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Setup UI
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
         goalVal = findViewById(R.id.goalVal);
         stepsLeftVal = findViewById(R.id.stepsLeftVal);
         progressBar = findViewById(R.id.progressBar);
-
         goalVal.setText(String.valueOf(goalNum));
         progressBar.setMax(goalNum);
         progressBar.setMin(0);
-
-        fitnessServiceKey = FITNESS_SERVICE_KEY;
-
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
         btnUpdateSteps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        // Set key and counter
+        fitnessServiceKey = FITNESS_SERVICE_KEY;
         StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
             @Override
             public StepCounter create(MainActivity activity) {
@@ -65,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         stepCounter = StepCounterFactory.create( fitnessServiceKey, this);
-
         stepCounter.setup();
     }
 
