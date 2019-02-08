@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Person Best</string>
+    <string name="steps_today_text">Steps Today</string>
+    <string name="steps_left_text">Steps Left:</string>
+    <string name="goal_text">Goal:</string>
+    <string name="btn_update_steps">Update Steps</string>
 </resources>

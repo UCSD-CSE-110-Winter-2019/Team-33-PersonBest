@@ -7,12 +7,81 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/stepsTodayText"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:text="@string/steps_today_text"
+        app:layout_constraintBottom_toBottomOf="@+id/progressBar"
+        app:layout_constraintStart_toEndOf="@+id/goalText"
+        app:layout_constraintTop_toTopOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="0.37" />
+
+    <TextView
+        android:id="@+id/goalText"
+        android:layout_width="wrap_content"
+        android:layout_height="15dp"
+        android:layout_marginStart="120dp"
+        android:text="@string/goal_text"
+        app:layout_constraintBaseline_toBaselineOf="@+id/goalVal"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/stepsLeftText"
+        android:layout_width="wrap_content"
+        android:layout_height="15dp"
+        android:text="@string/steps_left_text"
+        app:layout_constraintBaseline_toBaselineOf="@+id/stepsLeftVal"
+        app:layout_constraintEnd_toEndOf="@+id/goalText"
+        app:layout_constraintStart_toEndOf="@+id/goalText" />
+
+    <TextView
+        android:id="@+id/stepsTodayVal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@+id/stepsTodayText"
+        app:layout_constraintTop_toBottomOf="@+id/stepsTodayText" />
+
+    <TextView
+        android:id="@+id/goalVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/goalText2"
+        app:layout_constraintStart_toEndOf="@+id/goalText"
+        app:layout_constraintTop_toBottomOf="@+id/stepsTodayText" />
+
+    <TextView
+        android:id="@+id/stepsLeftVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@+id/stepsLeftText"
+        app:layout_constraintTop_toBottomOf="@+id/goalVal" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="0dp"
+        android:layout_height="478dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnUpdateSteps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_update_steps"
+        tools:layout_editor_absoluteX="130dp"
+        tools:layout_editor_absoluteY="419dp" />
 
 </android.support.constraint.ConstraintLayout>
