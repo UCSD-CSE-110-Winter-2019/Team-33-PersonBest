@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     // FIXME hardcoded goal
     private static final int GOAL_INIT = 10000;
+    private static final int STEP_INIT = 0;
 
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         goalVal = findViewById(R.id.goalVal);
         stepsLeftVal = findViewById(R.id.stepsLeftVal);
         progressBar = findViewById(R.id.progressBar);
+        stepsTodayVal.setText(String.valueOf(STEP_INIT));
         goalVal.setText(String.valueOf(goalNum));
         progressBar.setMax(goalNum);
         progressBar.setMin(0);
@@ -90,6 +92,18 @@ public class MainActivity extends AppCompatActivity {
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setProgress(stepCount);
         showEncouragement(stepCount);
+    }
+
+    public void setGoal(int goalNum) {
+        this.goalNum = goalNum;
+        this.goalVal.setText(String.valueOf(goalNum));
+
+        // changing goal will also change progress
+        int stepCount = Integer.valueOf(this.stepsTodayVal.getText().toString());
+        int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
+        stepsLeftVal.setText(String.valueOf(stepsToGoal));
+        progressBar.setMax(goalNum);
+        progressBar.setProgress(stepCount);
     }
 
     public void showEncouragement(int stepCount) {
