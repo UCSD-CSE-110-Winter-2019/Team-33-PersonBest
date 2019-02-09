@@ -46,8 +46,10 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
         goalVal.setText(String.valueOf(goalNum));
+        stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
         progressBar.setMax(goalNum);
         progressBar.setMin(0);
+        progressBar.setProgress(0);
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
         btnUpdateSteps.setOnClickListener(new View.OnClickListener() {
             @Override
