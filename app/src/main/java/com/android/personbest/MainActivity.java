@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     // FIXME hardcoded goal
     private static final int GOAL_INIT = 10000;
     private static final int STEP_INIT = 0;
+    private static final long FIVE_SEC = 5000;
+    private static final long MILLISECONDS_IN_A_MINUTE = 60000;
 
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
@@ -45,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView stepsTodayVal;
     private TextView goalVal;
     private TextView stepsLeftVal;
+    private TextView plannedTimeElapsedLabel;
+    private TextView plannedTimeValue;
+    private TextView plannedMPHLabel;
+    private TextView plannedMPHValue;
     private ProgressBar progressBar;
 
     private class StepUpdate extends AsyncTask<String, String, String> {
@@ -55,12 +61,26 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            publishProgress(resp);
+            try {
+                while (true) {
+                    Thread.sleep(FIVE_SEC);
+                    publishProgress(resp);
+                }
+            }
+            catch(Exception e) {
+
+            }
             return resp;
         }
 
         @Override
-        protected void onProgressUpdate(String... result) { stepCounter.updateStepCount(); }
+        protected void onProgressUpdate(String... result) {
+            stepCounter.updateStepCount();
+            if(plannedTimeValue.getVisibility() == View.VISIBLE) {
+                long timeDiff = (System.currentTimeMillis() - timer) / MILLISECONDS_IN_A_MINUTE;
+                plannedTimeValue.setText(String.valueOf(timeDiff));
+            }
+        }
 
         @Override
         protected void onPostExecute(String result) {}
@@ -75,6 +95,16 @@ public class MainActivity extends AppCompatActivity {
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
         goalVal = findViewById(R.id.goalVal);
         stepsLeftVal = findViewById(R.id.stepsLeftVal);
+
+        plannedTimeElapsedLabel = findViewById(R.id.currentTimeElapsed);
+        plannedTimeElapsedLabel.setVisibility(View.INVISIBLE);
+        plannedTimeValue = findViewById(R.id.timeValue);
+        plannedTimeValue.setVisibility(View.INVISIBLE);
+        plannedMPHLabel = findViewById(R.id.averageMPH);
+        plannedMPHLabel.setVisibility(View.INVISIBLE);
+        plannedMPHValue = findViewById(R.id.speedValue);
+        plannedMPHValue.setVisibility(View.INVISIBLE);
+
         progressBar = findViewById(R.id.progressBar);
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
         goalVal.setText(String.valueOf(goalNum));
@@ -89,11 +119,17 @@ public class MainActivity extends AppCompatActivity {
         startStopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                plannedExercise = !plannedExercise;
                 if(plannedExercise) {
                     startStopBtn.setText("    End Walk/Run    ");
                     startStopBtn.setBackgroundColor(Color.RED);
                     timer = System.currentTimeMillis();
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString());
+
+                    plannedTimeElapsedLabel.setVisibility(View.VISIBLE);
+                    plannedTimeValue.setVisibility(View.VISIBLE);
+                    plannedMPHLabel.setVisibility(View.VISIBLE);
+                    plannedMPHValue.setVisibility(View.VISIBLE);
                 }
                 else {
                     startStopBtn.setText("  Start Walk/Run  ");
@@ -102,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
                     launchSummary(timer, plannedSteps);
                 }
-                plannedExercise = !plannedExercise;
             }
         });
 
