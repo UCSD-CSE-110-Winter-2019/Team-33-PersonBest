@@ -14,21 +14,21 @@ public class SetUpActivity extends AppCompatActivity {
         public static final String DATA_TYPE = "data type";
         public static final String VALUE = "value";
     }
-    private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + MainActivity.DataBaseEntry.DATABASE + " (" + MainActivity.DataBaseEntry._ID + " INTEGER PRIMARY KEY," + MainActivity.DataBaseEntry.DATA_TYPE + " TEXT," + MainActivity.DataBaseEntry.VALUE + " TEXT)";
-    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + MainActivity.DataBaseEntry.DATABASE;
+    private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + SetUpActivity.DataBaseEntry.DATABASE + " (" + SetUpActivity.DataBaseEntry._ID + " INTEGER PRIMARY KEY," + SetUpActivity.DataBaseEntry.DATA_TYPE + " TEXT," + SetUpActivity.DataBaseEntry.VALUE + " TEXT)";
+    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + SetUpActivity.DataBaseEntry.DATABASE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_set_up);
     }
 
     public double calculateStrideLength(){
         editText = (EditText)findViewById(R.id.height);
         double height = Double.parseDouble(editText.getText().toString());
         ContentValues values = new ContentValues();
-        values.put(MainActivity.DataBaseEntry.DATA_TYPE, "height");
-        values.put(MainActivity.DataBaseEntry.VALUE, Double.parseDouble(editText.getText().toString()));
+        values.put(SetUpActivity.DataBaseEntry.DATA_TYPE, "height");
+        values.put(SetUpActivity.DataBaseEntry.VALUE, Double.parseDouble(editText.getText().toString()));
         return 0.414*height;
     }
 }
