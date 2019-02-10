@@ -19,7 +19,6 @@ public class SetupActivity extends AppCompatActivity {
     private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + DataBaseEntry.DATABASE + " (" + DataBaseEntry._ID + " INTEGER PRIMARY KEY," + DataBaseEntry.DATA_TYPE + " TEXT," + DataBaseEntry.VALUE + " TEXT)";
     private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + DataBaseEntry.DATABASE;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.setup_activity);
