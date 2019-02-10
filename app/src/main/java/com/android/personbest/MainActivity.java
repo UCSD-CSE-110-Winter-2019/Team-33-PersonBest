@@ -79,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
             if(plannedTimeValue.getVisibility() == View.VISIBLE) {
                 long timeDiff = (System.currentTimeMillis() - timer) / MILLISECONDS_IN_A_MINUTE;
                 plannedTimeValue.setText(String.valueOf(timeDiff));
+
+                int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
+                plannedStepValue.setText(String.valueOf(stepDiff));
             }
         }
 
@@ -181,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setProgress(stepCount);
-        showEncouragement(stepCount);
+        //showEncouragement(stepCount);
     }
 
     public void setGoal(int goalNum) {
