@@ -47,9 +47,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView stepsTodayVal;
     private TextView goalVal;
     private TextView stepsLeftVal;
-    private TextView plannedTimeElapsedLabel;
+    private TextView columns;
     private TextView plannedTimeValue;
-    private TextView plannedMPHLabel;
+    private TextView plannedStepValue;
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
 
@@ -95,15 +95,11 @@ public class MainActivity extends AppCompatActivity {
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
         goalVal = findViewById(R.id.goalVal);
         stepsLeftVal = findViewById(R.id.stepsLeftVal);
-
-        plannedTimeElapsedLabel = findViewById(R.id.currentTimeElapsed);
-        plannedTimeElapsedLabel.setVisibility(View.INVISIBLE);
+        columns = findViewById(R.id.plannedColumns);
         plannedTimeValue = findViewById(R.id.timeValue);
-        plannedTimeValue.setVisibility(View.INVISIBLE);
-        plannedMPHLabel = findViewById(R.id.averageMPH);
-        plannedMPHLabel.setVisibility(View.INVISIBLE);
-        plannedMPHValue = findViewById(R.id.speedValue);
-        plannedMPHValue.setVisibility(View.INVISIBLE);
+        plannedStepValue = findViewById(R.id.stepValue);
+        plannedMPHValue = findViewById(R.id.mphValue);
+        setPlannedExerciseStatsVisibility(false);
 
         progressBar = findViewById(R.id.progressBar);
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
@@ -126,14 +122,12 @@ public class MainActivity extends AppCompatActivity {
                     timer = System.currentTimeMillis();
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString());
 
-                    plannedTimeElapsedLabel.setVisibility(View.VISIBLE);
-                    plannedTimeValue.setVisibility(View.VISIBLE);
-                    plannedMPHLabel.setVisibility(View.VISIBLE);
-                    plannedMPHValue.setVisibility(View.VISIBLE);
+                    setPlannedExerciseStatsVisibility(true);
                 }
                 else {
                     startStopBtn.setText("  Start Walk/Run  ");
                     startStopBtn.setBackgroundColor(Color.GREEN);
+                    setPlannedExerciseStatsVisibility(false);
                     timer = System.currentTimeMillis() - timer;
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
                     launchSummary(timer, plannedSteps);
@@ -209,5 +203,20 @@ public class MainActivity extends AppCompatActivity {
         Context context = getApplicationContext();
         CharSequence text = "Good job! You're already at " + percentage + "% of the daily recommended number of steps.";
         Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+    }
+
+    public void setPlannedExerciseStatsVisibility(boolean visible) {
+        if(visible) {
+            columns.setVisibility(View.VISIBLE);
+            plannedTimeValue.setVisibility(View.VISIBLE);
+            plannedStepValue.setVisibility(View.VISIBLE);
+            plannedMPHValue.setVisibility(View.VISIBLE);
+        }
+        else {
+            columns.setVisibility(View.INVISIBLE);
+            plannedTimeValue.setVisibility(View.INVISIBLE);
+            plannedStepValue.setVisibility(View.INVISIBLE);
+            plannedMPHValue.setVisibility(View.INVISIBLE);
+        }
     }
 }
