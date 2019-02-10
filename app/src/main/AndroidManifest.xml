@@ -9,7 +9,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+<<<<<<< HEAD
+        <activity android:name=".SetUpActivity"></activity>
+        <activity android:name=".MainActivity">
+=======
         <activity android:name=".SetupActivity">
+>>>>>>> 6fa1d0b29a6bf4b009b3151380c571cc045633d3
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
