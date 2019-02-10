@@ -27,11 +27,11 @@ public class PlannedExerciseSummary extends AppCompatActivity {
 
         Intent intent = getIntent();
         int stepsTaken = intent.getIntExtra("stepsTaken", 0);
-        long timeElapsed = intent.getIntExtra("timeElapsed", 0);
+        long timeElapsed = intent.getLongExtra("timeElapsed", 0);
 
         displaySteps.setText("Steps Taken: " + stepsTaken);
         displayTime.setText("Minutes Elapsed: " + (timeElapsed / MILLISECONDS_IN_A_MINUTE));
-        displayMph.setText("MPH = 0");
+        displayMph.setText("MPH: 0");
 
         button = findViewById(R.id.goBack);
         button.setOnClickListener(new View.OnClickListener() {

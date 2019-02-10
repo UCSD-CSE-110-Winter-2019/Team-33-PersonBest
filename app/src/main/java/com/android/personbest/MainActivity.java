@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     // FIXME hardcoded goal
     private static final int GOAL_INIT = 10000;
     private static final int STEP_INIT = 0;
+    private static final long FIVE_SEC = 5000;
+    private static final long MILLISECONDS_IN_A_MINUTE = 60000;
 
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
@@ -45,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView stepsTodayVal;
     private TextView goalVal;
     private TextView stepsLeftVal;
+    private TextView columns;
+    private TextView plannedTimeValue;
+    private TextView plannedStepValue;
+    private TextView plannedMPHValue;
     private ProgressBar progressBar;
 
     private class StepUpdate extends AsyncTask<String, String, String> {
@@ -55,12 +61,29 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            publishProgress(resp);
+            try {
+                while (true) {
+                    Thread.sleep(FIVE_SEC);
+                    publishProgress(resp);
+                }
+            }
+            catch(Exception e) {
+
+            }
             return resp;
         }
 
         @Override
-        protected void onProgressUpdate(String... result) { stepCounter.updateStepCount(); }
+        protected void onProgressUpdate(String... result) {
+            stepCounter.updateStepCount();
+            if(plannedTimeValue.getVisibility() == View.VISIBLE) {
+                long timeDiff = (System.currentTimeMillis() - timer) / MILLISECONDS_IN_A_MINUTE;
+                plannedTimeValue.setText(String.valueOf(timeDiff));
+
+                int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
+                plannedStepValue.setText(String.valueOf(stepDiff));
+            }
+        }
 
         @Override
         protected void onPostExecute(String result) {}
@@ -75,6 +98,12 @@ public class MainActivity extends AppCompatActivity {
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
         goalVal = findViewById(R.id.goalVal);
         stepsLeftVal = findViewById(R.id.stepsLeftVal);
+        columns = findViewById(R.id.plannedColumns);
+        plannedTimeValue = findViewById(R.id.timeValue);
+        plannedStepValue = findViewById(R.id.stepValue);
+        plannedMPHValue = findViewById(R.id.mphValue);
+        setPlannedExerciseStatsVisibility(false);
+
         progressBar = findViewById(R.id.progressBar);
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
         goalVal.setText(String.valueOf(goalNum));
@@ -89,20 +118,23 @@ public class MainActivity extends AppCompatActivity {
         startStopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                plannedExercise = !plannedExercise;
                 if(plannedExercise) {
                     startStopBtn.setText("    End Walk/Run    ");
                     startStopBtn.setBackgroundColor(Color.RED);
                     timer = System.currentTimeMillis();
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString());
+
+                    setPlannedExerciseStatsVisibility(true);
                 }
                 else {
                     startStopBtn.setText("  Start Walk/Run  ");
                     startStopBtn.setBackgroundColor(Color.GREEN);
+                    setPlannedExerciseStatsVisibility(false);
                     timer = System.currentTimeMillis() - timer;
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
                     launchSummary(timer, plannedSteps);
                 }
-                plannedExercise = !plannedExercise;
             }
         });
 
@@ -152,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setProgress(stepCount);
-        showEncouragement(stepCount);
+        //showEncouragement(stepCount);
     }
 
     public void setGoal(int goalNum) {
@@ -174,5 +206,20 @@ public class MainActivity extends AppCompatActivity {
         Context context = getApplicationContext();
         CharSequence text = "Good job! You're already at " + percentage + "% of the daily recommended number of steps.";
         Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+    }
+
+    public void setPlannedExerciseStatsVisibility(boolean visible) {
+        if(visible) {
+            columns.setVisibility(View.VISIBLE);
+            plannedTimeValue.setVisibility(View.VISIBLE);
+            plannedStepValue.setVisibility(View.VISIBLE);
+            plannedMPHValue.setVisibility(View.VISIBLE);
+        }
+        else {
+            columns.setVisibility(View.INVISIBLE);
+            plannedTimeValue.setVisibility(View.INVISIBLE);
+            plannedStepValue.setVisibility(View.INVISIBLE);
+            plannedMPHValue.setVisibility(View.INVISIBLE);
+        }
     }
 }
