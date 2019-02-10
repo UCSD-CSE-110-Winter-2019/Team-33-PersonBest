@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Persona Best</string>
+    <string name="heightLabel">Height</string>
 </resources>
