@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText editText;
 
     public static class DataBaseEntry implements BaseColumns {
-        public static final String DATABASE = "database";
+        public st statatic final String DATABASE = "database";
         public static final String DATA_TYPE = "data type";
         public static final String VALUE = "value";
     }
