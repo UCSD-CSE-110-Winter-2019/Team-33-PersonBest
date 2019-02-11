@@ -159,8 +159,17 @@ public class MainActivity extends AppCompatActivity {
                 return new StepCounterGoogleFit(activity);
             }
         });
+
         stepCounter = StepCounterFactory.create( fitnessServiceKey, this);
         stepCounter.setup();
+
+        Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
+        btnUpdateSteps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stepCounter.updateStepCount();
+            }
+        });
 
         // Run Async Task on UI Thread
         StepUpdate runner = new StepUpdate();
