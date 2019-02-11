@@ -52,15 +52,14 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setProgress(0);
 
         // Set key and counter
-        fitnessServiceKey = getIntent().getStringExtra(FITNESS_SERVICE_KEY);
-        /*StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
+        StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
             @Override
             public StepCounter create(MainActivity activity) {
-                System.err.println("Main Activity: " + String.valueOf(activity));
                 return new StepCounterGoogleFit(activity);
             }
-        });*/
-        stepCounter = StepCounterFactory.create( fitnessServiceKey, this);
+        });
+        fitnessServiceKey = getIntent().getStringExtra(FITNESS_SERVICE_KEY);
+        stepCounter = StepCounterFactory.create(fitnessServiceKey, this);
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
         btnUpdateSteps.setOnClickListener(new View.OnClickListener() {
             @Override
