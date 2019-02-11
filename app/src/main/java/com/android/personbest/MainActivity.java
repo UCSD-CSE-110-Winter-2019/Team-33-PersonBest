@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     // FIXME hardcoded goal
     private static final int GOAL_INIT = 1000;
     private static final int STEP_INIT = 0;
-    private static final long UPDATE_INTERVAL = 10000;
+    private static final long UPDATE_INTERVAL = 1000;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
     private static final long MILLISECONDS_IN_A_SECOND = 1000;
 
@@ -53,14 +53,15 @@ public class MainActivity extends AppCompatActivity {
 
     private class StepUpdate extends AsyncTask<String, String, String> {
         private String resp = "";
-
         @Override
         protected void onPreExecute() {}
 
         @Override
         protected String doInBackground(String... params) {
+            int loops = 2;
             try {
-                while (true) {
+                while (loops >= 0) {
+                    loops--;
                     Thread.sleep(UPDATE_INTERVAL);
                     publishProgress(resp);
                 }
