@@ -160,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        fitnessServiceKey = getIntent().getStringExtra(FITNESS_SERVICE_KEY);
         stepCounter = StepCounterFactory.create( fitnessServiceKey, this);
         stepCounter.setup();
 
