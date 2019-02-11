@@ -12,17 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class SetupActivity extends AppCompatActivity {
+public class SetUpActivity extends AppCompatActivity {
     private EditText editText;
     private Button saveButton;
-
-    public static class DataBaseEntry implements BaseColumns {
-        public static final String DATABASE = "database";
-        public static final String DATA_TYPE = "data type";
-        public static final String VALUE = "value";
-    }
-    private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " + DataBaseEntry.DATABASE + " (" + DataBaseEntry._ID + " INTEGER PRIMARY KEY," + DataBaseEntry.DATA_TYPE + " TEXT," + DataBaseEntry.VALUE + " TEXT)";
-    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + DataBaseEntry.DATABASE;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,9 +38,6 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     public float calculateStrideLength(float height) {
-            ContentValues values = new ContentValues();
-            //values.put(DataBaseEntry.DATA_TYPE, "height");
-            //values.put(DataBaseEntry.VALUE, Float.parseFloat(editText.getText().toString()));
             return (float)(0.414 * height);
     }
 
@@ -73,6 +62,6 @@ public class SetupActivity extends AppCompatActivity {
 
 
         editor.apply();
-        Toast.makeText(SetupActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+        Toast.makeText(SetUpActivity.this, "Saved", Toast.LENGTH_SHORT).show();
     }
 }
