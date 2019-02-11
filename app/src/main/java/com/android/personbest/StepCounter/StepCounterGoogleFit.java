@@ -7,13 +7,21 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
-import com.google.android.gms.fitness.data.DataSet;
-import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.data.*;
+import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.android.personbest.MainActivity;
+import com.google.android.gms.tasks.Task;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static java.text.DateFormat.getDateInstance;
 
 public class StepCounterGoogleFit implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
@@ -38,6 +46,7 @@ public class StepCounterGoogleFit implements StepCounter {
                     GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
                     GoogleSignIn.getLastSignedInAccount(activity),
                     fitnessOptions);
+            retrieveStepCount();
         } else {
             updateStepCount();
             startRecording();
@@ -107,4 +116,82 @@ public class StepCounterGoogleFit implements StepCounter {
     public int getRequestCode() {
         return GOOGLE_FIT_PERMISSIONS_REQUEST_CODE;
     }
+
+
+    public void retrieveStepCount(){
+        GoogleSignInAccount lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(activity);
+        if (lastSignedInAccount == null) {
+            return;
+        }
+
+        // Setting a start and end date using a range of 1 week before this moment.
+        Calendar cal = Calendar.getInstance();
+        Date now = new Date();
+        cal.setTime(now);
+        long endTime = cal.getTimeInMillis();
+        //TODO How much data we want to retrieve ?
+        cal.add(Calendar.WEEK_OF_YEAR, -1);
+        long startTime = cal.getTimeInMillis();
+
+        java.text.DateFormat dateFormat = getDateInstance();
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+
+        DataReadRequest readRequest =
+                new DataReadRequest.Builder()
+                        // The data request can specify multiple data types to return, effectively
+                        // combining multiple data queries into one call.
+                        // In this example, it's very unlikely that the request is for several hundred
+                        // datapoints each consisting of a few steps and a timestamp.  The more likely
+                        // scenario is wanting to see how many steps were walked per day, for 7 days.
+                        .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                        // Analogous to a "Group By" in SQL, defines how data should be aggregated.
+                        // bucketByTime allows for a time span, whereas bucketBySession would allow
+                        // bucketing by "sessions", which would need to be defined in code.
+                        .bucketByTime(1, TimeUnit.DAYS)
+                        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                        .build();
+
+        //Retrieve data from google fit
+        Task<DataReadResponse> response = Fitness.getHistoryClient(activity, GoogleSignIn.getLastSignedInAccount(activity)).readData(readRequest);
+        List<DataSet> dataSets = response.getResult().getDataSets();
+
+        //TODO Update our local dataset from such response?
+    }
+
+    /**
+     * This method is used to insert data for each day onto the google
+     */
+    public void insertStepCount(){
+        // Set a start and end time for our data, using a start time of 1 hour before this moment.
+        Calendar cal = Calendar.getInstance();
+        Date now = new Date();
+        cal.setTime(now);
+        long endTime = cal.getTimeInMillis();
+        cal.add(Calendar.HOUR_OF_DAY, -1);
+        long startTime = cal.getTimeInMillis();
+
+        // Create a data source
+        DataSource dataSource =
+                new DataSource.Builder()
+                        .setAppPackageName(activity)
+                        .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                        .setStreamName(TAG + " - step count")
+                        .setType(DataSource.TYPE_RAW)
+                        .build();
+
+        // Create a data set
+        int stepCountDelta = 950;
+        DataSet dataSet = DataSet.create(dataSource);
+        // For each data point, specify a start time, end time, and the data value -- in this case,
+        // the number of new steps.
+        DataPoint dataPoint =
+                dataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+        dataPoint.getValue(Field.FIELD_STEPS).setInt(stepCountDelta);
+        dataSet.add(dataPoint);
+
+        Task<Void> response = Fitness.getHistoryClient(activity, GoogleSignIn.getLastSignedInAccount(activity)).insertData(dataSet);
+    }
+
+
 }

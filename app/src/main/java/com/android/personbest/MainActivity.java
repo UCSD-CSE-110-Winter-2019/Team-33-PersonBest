@@ -50,6 +50,17 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setMax(goalNum);
         progressBar.setMin(0);
         progressBar.setProgress(0);
+
+        // Set key and counter
+        fitnessServiceKey = getIntent().getStringExtra(FITNESS_SERVICE_KEY);
+        /*StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
+            @Override
+            public StepCounter create(MainActivity activity) {
+                System.err.println("Main Activity: " + String.valueOf(activity));
+                return new StepCounterGoogleFit(activity);
+            }
+        });*/
+        stepCounter = StepCounterFactory.create( fitnessServiceKey, this);
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
         btnUpdateSteps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,18 +68,8 @@ public class MainActivity extends AppCompatActivity {
                 stepCounter.updateStepCount();
             }
         });
-
-        // Set key and counter
-        fitnessServiceKey = FITNESS_SERVICE_KEY;
-        StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
-            @Override
-            public StepCounter create(MainActivity activity) {
-                System.err.println("Main Activity: " + String.valueOf(activity));
-                return new StepCounterGoogleFit(activity);
-            }
-        });
-        stepCounter = StepCounterFactory.create( fitnessServiceKey, this);
         stepCounter.setup();
+        //System.err.println(fitnessServiceKey);
     }
 
     // for test
