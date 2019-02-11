@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
+    lintOptions {
+        warningsAsErrors = true
+        abortOnError false
+    }
     compileSdkVersion 28
     testOptions.unitTests.includeAndroidResources = true
     defaultConfig {
