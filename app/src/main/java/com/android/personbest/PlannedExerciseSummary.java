@@ -10,11 +10,12 @@ import android.widget.TextView;
 public class PlannedExerciseSummary extends AppCompatActivity {
 
     public static final long MILLISECONDS_IN_A_MINUTE = 60000;
-    public static final long STEPS_IN_A_MILE = 0;
+    public static final long MILLISECONDS_IN_A_SECOND = 1000;
     private TextView displaySteps;
     private TextView displayTime;
     private TextView displayMph;
     private Button button;
+    private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +28,11 @@ public class PlannedExerciseSummary extends AppCompatActivity {
 
         Intent intent = getIntent();
         int stepsTaken = intent.getIntExtra("stepsTaken", 0);
-        long timeElapsed = intent.getLongExtra("timeElapsed", 0);
+        long timeElapsed = intent.getLongExtra("timeElapsed", 0) / MILLISECONDS_IN_A_SECOND;
 
         displaySteps.setText("Steps Taken: " + stepsTaken);
         displayTime.setText("Minutes Elapsed: " + (timeElapsed / MILLISECONDS_IN_A_MINUTE));
-        displayMph.setText("MPH: 0");
+        displayMph.setText("MPH: " + intentionalWalkUtils.velocity(72, stepsTaken, timeElapsed));
 
         button = findViewById(R.id.goBack);
         button.setOnClickListener(new View.OnClickListener() {

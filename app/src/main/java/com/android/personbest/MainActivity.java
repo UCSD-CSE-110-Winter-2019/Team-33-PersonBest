@@ -15,22 +15,15 @@ import android.widget.TextView;
 
 import android.widget.Toast;
 import com.android.personbest.StepCounter.*;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.data.Session;
-import com.google.android.gms.tasks.Task;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
     // FIXME hardcoded goal
     private static final int GOAL_INIT = 10000;
     private static final int STEP_INIT = 0;
-    private static final long FIVE_SEC = 5000;
+    private static final long UPDATE_INTERVAL = 10000;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
+    private static final long MILLISECONDS_IN_A_SECOND = 1000;
 
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
@@ -42,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private long timer;
     private int plannedSteps;
     private StepCounter stepCounter;
+    private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
 
     // UI-related members
     private TextView stepsTodayVal;
@@ -63,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             try {
                 while (true) {
-                    Thread.sleep(FIVE_SEC);
+                    Thread.sleep(UPDATE_INTERVAL);
                     publishProgress(resp);
                 }
             }
@@ -77,11 +71,14 @@ public class MainActivity extends AppCompatActivity {
         protected void onProgressUpdate(String... result) {
             stepCounter.updateStepCount();
             if(plannedTimeValue.getVisibility() == View.VISIBLE) {
-                long timeDiff = (System.currentTimeMillis() - timer) / MILLISECONDS_IN_A_MINUTE;
-                plannedTimeValue.setText(String.valueOf(timeDiff));
+                long timeDiff = (System.currentTimeMillis() - timer);
+                plannedTimeValue.setText(String.valueOf(timeDiff / MILLISECONDS_IN_A_MINUTE));
 
                 int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
                 plannedStepValue.setText(String.valueOf(stepDiff));
+
+                double currMph = intentionalWalkUtils.velocity(72, stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
+                plannedMPHValue.setText(String.valueOf(currMph));
             }
         }
 
