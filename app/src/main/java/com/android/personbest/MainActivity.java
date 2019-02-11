@@ -3,6 +3,7 @@ package com.android.personbest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,8 +30,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
 
+    // private variables
     private String fitnessServiceKey;
-    private int goalNum = GOAL_INIT;
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+    private int goalNum;
     private boolean plannedExercise = false;
     private long timer;
     private int plannedSteps;
@@ -77,9 +81,10 @@ public class MainActivity extends AppCompatActivity {
                 int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
                 plannedStepValue.setText(String.valueOf(stepDiff));
 
-                double currMph = intentionalWalkUtils.velocity(72, stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
+                double currMph = intentionalWalkUtils.velocity(sp.getInt("Height", 0), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
                 plannedMPHValue.setText(String.valueOf(currMph));
             }
+            stepsLeftVal.setText(String.valueOf(goalNum - Integer.parseInt(stepsTodayVal.getText().toString())));
         }
 
         @Override
@@ -103,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
-        goalVal.setText(String.valueOf(goalNum));
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
         progressBar.setMax(goalNum);
         progressBar.setMin(0);
@@ -134,6 +138,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Check if this is the first time launching app
+        sp = getPreferences(Context.MODE_PRIVATE);
+        editor = sp.edit();
+        if(sp.getAll().isEmpty()) {
+            startActivity(new Intent(this, SetUpActivity.class));
+        }
+        goalNum = sp.getInt("Current Goal", 5000);
+        goalVal.setText(String.valueOf(goalNum));
+        stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
 
         // Set Up Google Fitness
         fitnessServiceKey = FITNESS_SERVICE_KEY;

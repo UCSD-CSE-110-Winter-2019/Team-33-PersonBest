@@ -15,6 +15,7 @@ public class IntentionalWalkUtils {
         if(timeInSeconds == 0)
             return 0;
         double distanceInMile = strideLength(height) * numSteps / FEET_ONE_MILE;
-        return distanceInMile / (timeInSeconds / 3600.0);
+        double val = distanceInMile / (timeInSeconds / 3600.0);
+        return Math.round(val * 10) / 10;
     }
 }
