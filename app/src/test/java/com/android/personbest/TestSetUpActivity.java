@@ -15,6 +15,6 @@ public class TestSetUpActivity {
         SetUpActivity activity = Robolectric.setupActivity(SetUpActivity.class);
         EditText isVisible = activity.findViewById(R.id.height);
         isVisible.setText("185");
-        assertEquals(isVisible.getText(), 185);
+        assertEquals(Integer.parseInt(isVisible.getText().toString()), 185);
     }
 }
