@@ -22,13 +22,14 @@ public class SetUpActivity extends AppCompatActivity {
 
         initViews();
         initPreferences();
-        if (saveButton != null)
+        if (saveButton != null) {
             saveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     save();
                 }
             });
+        }
 
     }
 
