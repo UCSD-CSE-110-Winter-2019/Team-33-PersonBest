@@ -33,6 +33,14 @@ public class StepCounterGoogleFit implements StepCounter {
         this.activity = activity;
     }
 
+    public int getYesterdaySteps(){
+        return 0;
+    }
+
+    public List<IStatistics> getLastWeekSteps(){
+        return null;
+    }
+
 
     public void setup() {
         FitnessOptions fitnessOptions = FitnessOptions.builder()

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.android.personbest.StepCounter.IStatistics;
+//import com.android.personbest.StepCounter.Statistics;
 import com.android.personbest.StepCounter.StepCounter;
 import com.android.personbest.StepCounter.StepCounterFactory;
 //import org.apache.tools.ant.Main;
@@ -16,6 +18,8 @@ import org.robolectric.RuntimeEnvironment;
 
 //import edu.ucsd.cse110.googlefitapp.fitness.FitnessService;
 //import edu.ucsd.cse110.googlefitapp.fitness.FitnessServiceFactory;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -78,6 +82,15 @@ public class TestStepCount {
             System.out.println(TAG + "updateStepCount");
             stepCountActivity.setStepCount(nextStepCount);
             System.out.println(nextStepCount);
+        }
+
+        public int getYesterdaySteps(){
+            return 0;
+        }
+
+        @Override
+        public List<IStatistics> getLastWeekSteps() {
+            return null;
         }
     }
 }
