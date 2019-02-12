@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.android.personbest.StepCounter.IStatistics;
 import com.android.personbest.StepCounter.Statistics;
 import com.android.personbest.StepCounter.StepCounter;
 import com.android.personbest.StepCounter.StepCounterFactory;
@@ -88,7 +89,7 @@ public class TestStepCount {
         }
 
         @Override
-        public List<Statistics> getLastWeekSteps() {
+        public List<IStatistics> getLastWeekSteps() {
             return null;
         }
     }

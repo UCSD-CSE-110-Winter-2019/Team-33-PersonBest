@@ -7,5 +7,5 @@ public interface StepCounter {
     void setup();
     void updateStepCount();
     int getYesterdaySteps();
-    List<Statistics> getLastWeekSteps();
+    List<IStatistics> getLastWeekSteps();
 }

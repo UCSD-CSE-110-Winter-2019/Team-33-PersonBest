@@ -37,7 +37,7 @@ public class StepCounterGoogleFit implements StepCounter {
         return 0;
     }
 
-    public List<Statistics> getLastWeekSteps(){
+    public List<IStatistics> getLastWeekSteps(){
         return null;
     }
 

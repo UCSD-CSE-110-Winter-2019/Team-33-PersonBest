@@ -1,6 +1,6 @@
 package com.android.personbest.StepCounter;
 
-public interface Statistics {
+public interface IStatistics {
     //TODO Design Stats
     int getGoal();
     String getStats();
