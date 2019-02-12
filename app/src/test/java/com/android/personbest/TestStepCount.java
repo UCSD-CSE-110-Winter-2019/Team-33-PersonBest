@@ -5,7 +5,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.personbest.StepCounter.IStatistics;
-import com.android.personbest.StepCounter.Statistics;
+//import com.android.personbest.StepCounter.Statistics;
 import com.android.personbest.StepCounter.StepCounter;
 import com.android.personbest.StepCounter.StepCounterFactory;
 //import org.apache.tools.ant.Main;
