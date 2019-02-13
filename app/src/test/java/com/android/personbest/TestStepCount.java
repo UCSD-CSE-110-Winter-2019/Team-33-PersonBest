@@ -8,6 +8,7 @@ import com.android.personbest.StepCounter.IStatistics;
 //import com.android.personbest.StepCounter.Statistics;
 import com.android.personbest.StepCounter.StepCounter;
 import com.android.personbest.StepCounter.StepCounterFactory;
+import com.android.personbest.StepCounter.StepCounterGoogleFit;
 //import org.apache.tools.ant.Main;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,12 +60,11 @@ public class TestStepCount {
         assertEquals("1337", textSteps.getText().toString());
     }
 
-    private class TestFitnessService implements StepCounter {
+    private class TestFitnessService extends StepCounterGoogleFit {
         private static final String TAG = "[TestFitnessService]: ";
-        private MainActivity stepCountActivity;
 
         public TestFitnessService(MainActivity stepCountActivity) {
-            this.stepCountActivity = stepCountActivity;
+            super(stepCountActivity);
         }
 
         @Override
@@ -80,7 +80,7 @@ public class TestStepCount {
         @Override
         public void updateStepCount() {
             System.out.println(TAG + "updateStepCount");
-            stepCountActivity.setStepCount(nextStepCount);
+            activity.setStepCount(nextStepCount);
             System.out.println(nextStepCount);
         }
 

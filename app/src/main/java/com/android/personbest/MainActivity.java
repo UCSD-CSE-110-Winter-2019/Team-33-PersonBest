@@ -165,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if(sp.getAll().isEmpty()) {
             startActivity(new Intent(this, SetUpActivity.class));
         }
+
+
         goalNum = sp.getInt("Current Goal", 5000);
         goalVal.setText(String.valueOf(goalNum));
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
@@ -180,6 +182,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
 
         fitnessServiceKey = getIntent().getStringExtra(FITNESS_SERVICE_KEY);
+        //System.out.println("Debug");
+        if (fitnessServiceKey == null ){
+            fitnessServiceKey = FITNESS_SERVICE_KEY;
+        }
         stepCounter = (StepCounterGoogleFit) StepCounterFactory.create( fitnessServiceKey, this);
         stepCounter.setup();
         stepCounter.addObserver(this);
