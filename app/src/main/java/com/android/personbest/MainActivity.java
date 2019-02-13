@@ -17,7 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.android.personbest.StepCounter.*;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Observable;
+import java.util.Observer;
+
+public class MainActivity extends AppCompatActivity implements Observer {
 
     // FIXME hardcoded goal
     private static final int GOAL_INIT = 1000;
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean plannedExercise = false;
     private long timer;
     private int plannedSteps;
-    private StepCounter stepCounter;
+    private StepCounterGoogleFit stepCounter;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
 
     // UI-related members
@@ -51,7 +54,23 @@ public class MainActivity extends AppCompatActivity {
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
 
-    private class StepUpdate extends AsyncTask<String, String, String> {
+
+    public void update(Observable o, Object arg){
+        stepCounter.updateStepCount();
+        if(plannedTimeValue.getVisibility() == View.VISIBLE) {
+            long timeDiff = (System.currentTimeMillis() - timer);
+            plannedTimeValue.setText(String.valueOf(timeDiff / MILLISECONDS_IN_A_MINUTE));
+
+            int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
+            plannedStepValue.setText(String.valueOf(stepDiff));
+
+            double currMph = intentionalWalkUtils.velocity(sp.getInt("Height", 0), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
+            plannedMPHValue.setText(String.valueOf(currMph));
+        }
+        stepsLeftVal.setText(String.valueOf(goalNum - Integer.parseInt(stepsTodayVal.getText().toString())));
+    }
+
+    /*private class StepUpdate extends AsyncTask<String, String, String> {
         private String resp = "";
         @Override
         protected void onPreExecute() {}
@@ -90,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {}
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,8 +180,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fitnessServiceKey = getIntent().getStringExtra(FITNESS_SERVICE_KEY);
-        stepCounter = StepCounterFactory.create( fitnessServiceKey, this);
+        stepCounter = (StepCounterGoogleFit) StepCounterFactory.create( fitnessServiceKey, this);
         stepCounter.setup();
+        stepCounter.addObserver(this);
 
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
         btnUpdateSteps.setOnClickListener(new View.OnClickListener() {
@@ -173,8 +193,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Run Async Task on UI Thread
-        StepUpdate runner = new StepUpdate();
-        runner.execute(startStopBtn.getText().toString());
+        // StepUpdate runner = new StepUpdate();
+        // runner.execute(startStopBtn.getText().toString());
     }
 
     public void launchSummary(long timeElapsed, int stepsTaken) {

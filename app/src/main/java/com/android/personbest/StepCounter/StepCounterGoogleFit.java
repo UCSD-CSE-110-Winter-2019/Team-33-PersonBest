@@ -19,11 +19,12 @@ import com.google.android.gms.tasks.Task;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
 import static java.text.DateFormat.getDateInstance;
 
-public class StepCounterGoogleFit implements StepCounter {
+public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     private final String TAG = "GoogleFitAdapter";
 
@@ -107,6 +108,7 @@ public class StepCounterGoogleFit implements StepCounter {
                                                 : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
 
                                 activity.setStepCount(total);
+                                notifyObservers(total);
                                 Log.d(TAG, "Total steps: " + total);
                             }
                         })
