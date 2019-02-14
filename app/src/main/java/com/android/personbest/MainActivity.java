@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private boolean plannedExercise = false;
     private long timer;
     private int plannedSteps;
+    private int incidentSteps;
     private StepCounterGoogleFit stepCounter;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
 
