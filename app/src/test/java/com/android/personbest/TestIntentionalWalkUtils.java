@@ -12,7 +12,7 @@ public class TestIntentionalWalkUtils {
                 IntentionalWalkUtils.strideLength(height), 0.0001);
     }
 
-    @Test
+   /* @Test
     public void testVelocity() {
         int height = 70; // Height of Julian Edelman
         int numSteps = 8192;
@@ -20,7 +20,7 @@ public class TestIntentionalWalkUtils {
         double velocity = 70 * 0.413 / 12 * 8192/ 5280 / (32768 / 3600.0);
         assertEquals("Expected: " + velocity, velocity,
                 IntentionalWalkUtils.velocity(height, numSteps, timeInSeconds), 0.0001);
-    }
+    }*/
 
     @Test
     public void testVelocity2() {
