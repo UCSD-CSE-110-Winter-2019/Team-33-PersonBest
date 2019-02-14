@@ -23,9 +23,8 @@ import java.util.Observer;
 public class MainActivity extends AppCompatActivity implements Observer {
 
     // FIXME hardcoded goal
-    private static final int GOAL_INIT = 1000;
+    private static final int GOAL_INIT = 5000;
     private static final int STEP_INIT = 0;
-    private static final long UPDATE_INTERVAL = 1000;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
     private static final long MILLISECONDS_IN_A_SECOND = 1000;
 
@@ -53,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedStepValue;
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
-
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -152,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     startStopBtn.setBackgroundColor(Color.RED);
                     timer = System.currentTimeMillis();
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString());
-
                     setPlannedExerciseStatsVisibility(true);
                 }
                 else {
@@ -194,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         stepCounter = (StepCounterGoogleFit) StepCounterFactory.create( fitnessServiceKey, this);
         stepCounter.setup();
         stepCounter.addObserver(this);
+        stepCounter.beginUpdates();
 
         // Update Button
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);

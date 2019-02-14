@@ -20,6 +20,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import static java.text.DateFormat.getDateInstance;
@@ -27,11 +29,26 @@ import static java.text.DateFormat.getDateInstance;
 public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     private final String TAG = "GoogleFitAdapter";
+    private static final long UPDATE_INTERVAL = 1000;
 
     private MainActivity activity;
+    private TimerTask updateSteps;
+    private Timer t;
 
     public StepCounterGoogleFit(MainActivity activity) {
         this.activity = activity;
+    }
+
+    public void beginUpdates() {
+        updateSteps = new TimerTask() {
+            @Override
+            public void run() {
+                setChanged();
+                notifyObservers();
+            }
+        };
+        t = new Timer();
+        t.schedule(updateSteps, 0, UPDATE_INTERVAL);
     }
 
     public int getYesterdaySteps(){
@@ -41,7 +58,6 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
     public List<IStatistics> getLastWeekSteps(){
         return null;
     }
-
 
     public void setup() {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
@@ -84,7 +100,6 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
                 });
     }
 
-
     /**
      * Reads the current daily step total, computed from midnight of the current day on the device's
      * current timezone.
@@ -121,12 +136,10 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
                         });
     }
 
-
     @Override
     public int getRequestCode() {
         return GOOGLE_FIT_PERMISSIONS_REQUEST_CODE;
     }
-
 
     public void retrieveStepCount(){
         GoogleSignInAccount lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(activity);
@@ -202,6 +215,4 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
 
         Task<Void> response = Fitness.getHistoryClient(activity, GoogleSignIn.getLastSignedInAccount(activity)).insertData(dataSet);
     }
-
-
 }
