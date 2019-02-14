@@ -172,7 +172,7 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
     /**
      * This method is used to insert data for each day onto the google
      */
-    public void insertStepCount(){
+    public void insertStepCount() {
         // Set a start and end time for our data, using a start time of 1 hour before this moment.
         Calendar cal = Calendar.getInstance();
         Date now = new Date();
