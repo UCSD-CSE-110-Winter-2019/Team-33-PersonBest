@@ -20,7 +20,7 @@ import com.android.personbest.StepCounter.*;
 public class MainActivity extends AppCompatActivity {
 
     // FIXME hardcoded goal
-    private static final int GOAL_INIT = 1000;
+    private static final int GOAL_INIT = 10000;
     private static final int STEP_INIT = 0;
     private static final long UPDATE_INTERVAL = 10000;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
