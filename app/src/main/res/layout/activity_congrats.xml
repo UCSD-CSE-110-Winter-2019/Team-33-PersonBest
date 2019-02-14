@@ -10,7 +10,7 @@
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="395dp"
-            android:layout_height="310dp" android:layout_marginTop="8dp"
+            android:layout_height="wrap_content" android:layout_marginTop="8dp"
             app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
@@ -19,5 +19,20 @@
                 android:text="Congratulation, do you want to set a new goal ?"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/textView" android:textSize="25sp"/>
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_margin="20dp">
+            <Button
+                    android:text="Not Yet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:id="@+id/button3" android:layout_weight="1"
+                    android:layout_marginLeft="10dp"/>
+            <Button
+                    android:text="Yes !!"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:id="@+id/button4" android:layout_weight="1"
+                    android:layout_marginLeft="10dp"/>
+        </LinearLayout>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
