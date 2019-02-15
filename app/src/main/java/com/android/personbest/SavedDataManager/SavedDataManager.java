@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface SavedDataManager {
     int getYesterdaySteps(int day);
+    int getYesterdayGoal(int day);
     List<IStatistics> getLastWeekSteps(int day);
 }

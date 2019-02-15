@@ -20,12 +20,19 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     public SavedDataManagerSharedPreference(Activity activity) {
         this.activity = activity;
     }
+
     public int getYesterdaySteps(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         IDate iDate = new IDate(day);
         Integer yesterday = iDate.getYesterDay();
-        int totalSteps = sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
-        return totalSteps;
+        return sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
+    }
+
+    public int getYesterdayGoal(int day){
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+        IDate iDate = new IDate(day);
+        Integer yesterday = iDate.getYesterDay();
+        return sp.getInt(yesterday.toString() + "_Goal", DEFAULT_GOAL);
     }
 
     public List<IStatistics> getLastWeekSteps(int day){

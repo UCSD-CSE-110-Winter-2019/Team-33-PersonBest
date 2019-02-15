@@ -1,11 +1,14 @@
 package com.android.personbest;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,8 +18,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import android.widget.Toast;
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Observable;
 import java.util.Observer;
@@ -44,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private int totalIntentionalSteps;
     private StepCounterGoogleFit stepCounter;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
+    private SavedDataManager savedDataManager;
+    private int today;
 
     // UI-related members
     private TextView stepsTodayVal;
@@ -102,9 +111,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
         progressBar = findViewById(R.id.progressBar);
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
-        progressBar.setMax(goalNum);
+        progressBar.setMax(GOAL_INIT);
         progressBar.setMin(0);
         progressBar.setProgress(0);
+        savedDataManager = new SavedDataManagerSharedPreference(this);
+
         final Button startStopBtn = findViewById(R.id.startStop);
         startStopBtn.setText("  Start Walk/Run  ");
         startStopBtn.setTextColor(Color.BLACK);
@@ -175,16 +186,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
         btnUpdateSteps.setEnabled(false);
         btnUpdateSteps.setVisibility(View.INVISIBLE);
+
+        checkYesterdayGoalReach();
+        today = ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1;
     }
 
-    public void launchSummary(long timeElapsed, int stepsTaken) {
-        Intent intent = new Intent(this, PlannedExerciseSummary.class);
-        intent.putExtra("timeElapsed", timeElapsed);
-        intent.putExtra("stepsTaken", stepsTaken);
-        startActivity(intent);
-    }
-
-    // for test
+   // for test
     public void setFitnessServiceKey(String fitnessServiceKey) {
         this.fitnessServiceKey = fitnessServiceKey;
     }
@@ -201,12 +208,58 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
+    protected void checkYesterdayGoalReach() {
+        int lastDayPromptedYesterdayGoal = sp.getInt("last_day_prompted_yesterday_goal",today);;
+
+        int yesterdayGoal = savedDataManager.getYesterdayGoal(today);
+        int yesterdaySteps = savedDataManager.getYesterdaySteps(today);
+
+        if(lastDayPromptedYesterdayGoal != today && yesterdayGoal <= yesterdaySteps) {
+            goalReached(true);
+            editor.putInt("last_day_prompted_yesterday_goal",today);
+            editor.apply();
+        }
+    }
+
     public void setStepCount(int stepCount) {
         stepsTodayVal.setText(String.valueOf(stepCount));
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setProgress(stepCount);
-        //showEncouragement(stepCount);
+        if(stepsToGoal == 0) {
+            int lastDayPromptedGoal = sp.getInt("last_day_prompted_goal",today);
+            if(lastDayPromptedGoal != today) {
+                this.goalReached(false);
+                editor.putInt("last_day_prompted_goal",today);
+                editor.apply();
+            }
+        }
+    }
+
+    public void goalReached(boolean isYesterday) {
+        String title = "You Reached the Goal";
+        if(isYesterday) title += " Yesterday";
+        Context context = getApplicationContext();
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(context);
+        }
+        builder.setTitle(title)
+                .setMessage("Congratulations! Do you want to set a new step goal?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     public void setGoal(int goalNum) {
@@ -223,13 +276,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         progressBar.setProgress(stepCount);
     }
 
-    public void showEncouragement(int stepCount) {
-        long percentage = (int)Math.floor(stepCount * 100.0 / goalNum);
-        if(percentage < 10) return;
-
-        Context context = getApplicationContext();
-        CharSequence text = "Good job! You're already at " + percentage + "% of the daily recommended number of steps.";
-        Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+    public void setToday(int date) {
+        if(date < 0 || date >= 7) this.today = date;
     }
 
     public void setPlannedExerciseStatsVisibility(boolean visible) {
@@ -248,9 +296,16 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void launchProgressChart(View view) {
-//        Intent intent = new Intent(this, ProgressChart.class);
-//        startActivity(intent);
-        Intent intent = new Intent(this, EmptyProgressChart.class);
+        Intent intent = new Intent(this, ProgressChart.class);
         startActivity(intent);
     }
+
+    public void launchSummary(long timeElapsed, int stepsTaken) {
+        Intent intent = new Intent(this, PlannedExerciseSummary.class);
+        intent.putExtra("timeElapsed", timeElapsed);
+        intent.putExtra("stepsTaken", stepsTaken);
+        startActivity(intent);
+    }
+
+
 }
