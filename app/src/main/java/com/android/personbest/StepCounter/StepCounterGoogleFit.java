@@ -38,7 +38,7 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
     private static final long UPDATE_INTERVAL = 1000;
     private SharedPreferences sp;
 
-    private MainActivity activity;
+    protected MainActivity activity;
     private TimerTask updateSteps;
     private Timer t;
 

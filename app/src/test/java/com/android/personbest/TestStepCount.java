@@ -45,8 +45,8 @@ public class TestStepCount {
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
-        activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
 
+        activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         textSteps = activity.findViewById(R.id.stepsTodayVal);
         btnUpdateSteps = activity.findViewById(R.id.btnUpdateSteps);
         nextStepCount = 1337;
@@ -54,7 +54,6 @@ public class TestStepCount {
 
     @Test
     public void testUpdateStepsButton() {
-        //assertEquals("steps will be shown here", textSteps.getText().toString());
         //System.out.println("Test is running here");
         btnUpdateSteps.performClick();
         assertEquals("1337", textSteps.getText().toString());
@@ -65,6 +64,10 @@ public class TestStepCount {
 
         public TestFitnessService(MainActivity stepCountActivity) {
             super(stepCountActivity);
+            if (stepCountActivity == null ){
+                System.out.println("Pass in NULL Activity");
+            }
+            System.out.println("Constructor");
         }
 
         @Override
@@ -80,8 +83,7 @@ public class TestStepCount {
         @Override
         public void updateStepCount() {
             System.out.println(TAG + "updateStepCount");
-            activity.setStepCount(nextStepCount);
-            System.out.println(nextStepCount);
+            this.activity.setStepCount(nextStepCount);
         }
 
         public int getYesterdaySteps(){
