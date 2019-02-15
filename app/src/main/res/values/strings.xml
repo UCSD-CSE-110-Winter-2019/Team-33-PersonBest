@@ -4,6 +4,7 @@
     <string name="steps_left_text">Steps Left:</string>
     <string name="goal_text">Goal:</string>
     <string name="btn_update_steps">Update Steps</string>
+    <string name="btn_launch_progress_chart">Progress Chart</string>
     <string name="title_activity_progress_chart">ProgressChart</string>
     <string name="step_counter_parcel_key">STEP_COUNTER_PARCEL</string>
     <string name="large_text">

@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.android.personbest.MainActivity;
 import com.google.android.gms.tasks.Task;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.text.DateFormat.getDateInstance;
 
-public class StepCounterGoogleFit extends Observable implements StepCounter {
+public class StepCounterGoogleFit extends Observable implements StepCounter, Serializable {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     private final int DEFAULT_STEPS = 0;
     private final int DEFAULT_GOAL = 5000;
