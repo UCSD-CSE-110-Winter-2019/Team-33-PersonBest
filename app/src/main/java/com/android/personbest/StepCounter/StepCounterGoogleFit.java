@@ -181,24 +181,16 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
     }
 
 
-    public int getYesterdaySteps(){
-        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
-        Date now = new Date();
-        int day = now.getDay();
-        Integer yesterday = this.getYesterday(day);
+    public int getYesterdaySteps(int day){
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+        IDate iDate = new IDate(day);
+        Integer yesterday = iDate.getYesterDay();
         int totalSteps = sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
         return totalSteps;
     }
 
-    private int getYesterday(int day){
-        if (day == 0) return 6;
-        else return day - 1;
-    }
-
-    public List<IStatistics> getLastWeekSteps(){
-        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
-        Date now = new Date();
-        int day = now.getDay();
+    public List<IStatistics> getLastWeekSteps(int day){
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         List<IStatistics> result = new ArrayList<>();
         for (Integer d = 0; d <= day; d++){
             int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);

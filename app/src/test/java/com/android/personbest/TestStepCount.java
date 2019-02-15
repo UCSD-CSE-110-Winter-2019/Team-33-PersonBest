@@ -1,9 +1,12 @@
 package com.android.personbest;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.android.personbest.StepCounter.IDate;
 import com.android.personbest.StepCounter.IStatistics;
 //import com.android.personbest.StepCounter.Statistics;
 import com.android.personbest.StepCounter.StepCounter;
@@ -59,15 +62,23 @@ public class TestStepCount {
         assertEquals("1337", textSteps.getText().toString());
     }
 
+    @Test
+    public void testGetYesterday(){
+        IDate iDate = new IDate(5);
+        int day = iDate.getDay();
+        SharedPreferences sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt("4_TotalSteps",1000);
+        editor.apply();
+        StepCounterGoogleFit stepCounter = (StepCounterGoogleFit) activity.getStepCounter();
+        assertEquals(stepCounter.getYesterdaySteps(day),1000);
+    }
+
     private class TestFitnessService extends StepCounterGoogleFit {
         private static final String TAG = "[TestFitnessService]: ";
 
         public TestFitnessService(MainActivity stepCountActivity) {
             super(stepCountActivity);
-            if (stepCountActivity == null ){
-                System.out.println("Pass in NULL Activity");
-            }
-            System.out.println("Constructor");
         }
 
         @Override
@@ -86,13 +97,16 @@ public class TestStepCount {
             this.activity.setStepCount(nextStepCount);
         }
 
-        public int getYesterdaySteps(){
-            return 0;
-        }
+    }
 
-        @Override
-        public List<IStatistics> getLastWeekSteps() {
-            return null;
+    private class MockDate {
+        private int day;
+
+        public MockDate(int day){
+            this.day = day;
+        }
+        public int getDay(){
+            return this.day;
         }
     }
 }

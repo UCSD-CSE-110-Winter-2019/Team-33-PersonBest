@@ -80,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
     }
 
+    public StepCounter getStepCounter(){
+        return this.stepCounter;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
