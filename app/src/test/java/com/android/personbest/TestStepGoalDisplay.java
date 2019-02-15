@@ -1,17 +1,24 @@
 package com.android.personbest;
 
+import android.content.Intent;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import com.android.personbest.StepCounter.StepCounter;
+import com.android.personbest.StepCounter.StepCounterFactory;
+import com.android.personbest.StepCounter.StepCounterGoogleFit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)
 public class TestStepGoalDisplay {
+
+    private static final String TEST_SERVICE = "TEST_SERVICE";
 
     private MainActivity mainActivity;
     private TextView goalText;
@@ -21,7 +28,20 @@ public class TestStepGoalDisplay {
 
     @Before
     public void setup() {
-        mainActivity = Robolectric.setupActivity(MainActivity.class);
+
+        StepCounterFactory.put(TEST_SERVICE, new StepCounterFactory.BluePrint() {
+            @Override
+            public StepCounter create(MainActivity stepCountActivity) {
+                return new StepCounterGoogleFit(stepCountActivity);
+            }
+        });
+
+        Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
+        intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
+        //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
+        mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+
+        //mainActivity = Robolectric.setupActivity(MainActivity.class);
         goalText = mainActivity.findViewById(R.id.goalText);
         goalVal = mainActivity.findViewById(R.id.goalVal);
         progressBar = mainActivity.findViewById(R.id.progressBar);
@@ -48,6 +68,7 @@ public class TestStepGoalDisplay {
         this.mainActivity.setStepCount(testStepCount);
         assertEquals(testStepCount, progressBar.getProgress());
     }
+
 
 
 }
