@@ -9,12 +9,6 @@
         android:layout_height="match_parent"
         tools:context=".ProgressChart">
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="@string/large_text"/>
-
     <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/progressChart"
             android:layout_width="0dp"

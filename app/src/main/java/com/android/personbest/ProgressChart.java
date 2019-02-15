@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
 import com.android.personbest.StepCounter.StepCounter;
@@ -26,10 +28,9 @@ import java.util.Locale;
 
 public class ProgressChart extends AppCompatActivity {
     private List<BarEntry> entries;
-    private StepCounter stepCounter;
+    private SavedDataManager savedDataManager;
     private int date;
     private BarChart progressChart;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class ProgressChart extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         entries = new ArrayList<>();
-        stepCounter = (StepCounter) getIntent().getSerializableExtra(this.getApplicationContext().getString(R.string.step_counter_parcel_key));
+        savedDataManager = new SavedDataManagerSharedPreference(this);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

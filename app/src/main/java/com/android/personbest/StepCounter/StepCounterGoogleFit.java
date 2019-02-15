@@ -31,10 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 import static java.text.DateFormat.getDateInstance;
 
-public class StepCounterGoogleFit extends Observable implements StepCounter, Serializable {
+public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
-    private final int DEFAULT_STEPS = 0;
-    private final int DEFAULT_GOAL = 5000;
     private final String TAG = "GoogleFitAdapter";
     private static final long UPDATE_INTERVAL = 1000;
     private SharedPreferences sp;
@@ -182,26 +180,5 @@ public class StepCounterGoogleFit extends Observable implements StepCounter, Ser
     }
 
 
-    public int getYesterdaySteps(int day){
-        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        IDate iDate = new IDate(day);
-        Integer yesterday = iDate.getYesterDay();
-        int totalSteps = sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
-        return totalSteps;
-    }
 
-    public List<IStatistics> getLastWeekSteps(int day){
-        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        List<IStatistics> result = new ArrayList<>();
-        for (Integer d = 0; d <= day; d++){
-            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
-            int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
-            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,"");
-            result.add(dailyStat);
-        }
-
-        return result;
-
-    }
 }

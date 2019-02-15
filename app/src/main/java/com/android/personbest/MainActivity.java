@@ -249,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchProgressChart(View view) {
         Intent intent = new Intent(this, ProgressChart.class);
-        intent.putExtra(getString(R.string.step_counter_parcel_key), stepCounter);
         startActivity(intent);
     }
 }
