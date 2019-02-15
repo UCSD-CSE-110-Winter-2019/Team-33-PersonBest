@@ -17,9 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.android.personbest.StepCounter.*;
 
-import java.time.DayOfWeek;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -133,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
 
         // Check if this is the first time launching app
-        sp = getPreferences(Context.MODE_PRIVATE);
+        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
         editor = sp.edit();
         if(sp.getAll().isEmpty()) {
             startActivity(new Intent(this, SetUpActivity.class));
@@ -209,6 +207,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void setGoal(int goalNum) {
         this.goalNum = goalNum;
+        editor.putInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_Goal", goalNum);
+        editor.apply();
         this.goalVal.setText(String.valueOf(goalNum));
 
         // changing goal will also change progress
