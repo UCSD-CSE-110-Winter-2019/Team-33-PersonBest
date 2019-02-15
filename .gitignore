@@ -39,3 +39,7 @@ output.json
 /.idea/workspace.xml
 /build
 /captures
+
+# ignore unncessary idea files
+.idea/misc.xml
+.idea/codeStyles/codeStyleConfig.xml
