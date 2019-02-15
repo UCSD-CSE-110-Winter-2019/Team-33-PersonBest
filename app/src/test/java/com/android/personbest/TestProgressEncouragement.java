@@ -13,4 +13,9 @@ public class TestProgressEncouragement {
         assertEquals(true, progressEncouragement.progressMade(2,1));
         assertEquals(false, progressEncouragement.progressMade(1,2));
     }
+
+    @Test
+    public void testToastMessage() {
+
+    }
 }
