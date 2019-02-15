@@ -248,7 +248,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void launchProgressChart(View view) {
-        Intent intent = new Intent(this, ProgressChart.class);
+//        Intent intent = new Intent(this, ProgressChart.class);
+//        startActivity(intent);
+        Intent intent = new Intent(this, EmptyProgressChart.class);
         startActivity(intent);
     }
 }
