@@ -6,10 +6,10 @@ public class DailyStat implements IStatistics {
     private int intentionalSteps;
     private String stats;
 
-    public DailyStat(int goal, String stats) {
+    public DailyStat(int goal, int totalSteps, int intentionalSteps, String stats) {
         this.goal = goal;
-        this.totalSteps = 0;
-        this.intentionalSteps = 0;
+        this.totalSteps = totalSteps;
+        this.intentionalSteps = intentionalSteps;
         this.stats = stats;
     }
 
