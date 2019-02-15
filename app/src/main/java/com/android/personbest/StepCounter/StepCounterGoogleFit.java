@@ -1,5 +1,7 @@
 package com.android.personbest.StepCounter;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.service.autofill.Dataset;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -30,8 +32,11 @@ import static java.text.DateFormat.getDateInstance;
 
 public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
+    private final int DEFAULT_STEPS = 0;
+    private final int DEFAULT_GOAL = 5000;
     private final String TAG = "GoogleFitAdapter";
     private static final long UPDATE_INTERVAL = 1000;
+    private SharedPreferences sp;
 
     private MainActivity activity;
     private TimerTask updateSteps;
@@ -177,40 +182,34 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
 
 
     public int getYesterdaySteps(){
+        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
+        Date now = new Date();
+        int day = now.getDay();
+        Integer yesterday = this.getYesterday(day);
+        int totalSteps = sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
+        return totalSteps;
+    }
 
-        //Set the start time to be midnight
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0); //anything 0 - 23
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        long endTime = cal.getTimeInMillis();
-        cal.add(Calendar.DATE, -1);
-        long startTime = cal.getTimeInMillis();
-
-        // Retrieve steps account
-        List<Integer> steps = this.retrieveStepCount(startTime,endTime);
-        if (steps == null){
-            return -1;
-        }
-        else{
-            return steps.get(0);
-        }
-
+    private int getYesterday(int day){
+        if (day == 0) return 6;
+        else return day - 1;
     }
 
     public List<IStatistics> getLastWeekSteps(){
-
-        Calendar cal = Calendar.getInstance();
+        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
         Date now = new Date();
-        long endTime = cal.getTimeInMillis();
-        int dayOfWeek = now.getDay();
-        cal.add(Calendar.DATE, dayOfWeek);
-        cal.set(Calendar.HOUR_OF_DAY, 0); //anything 0 - 23
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        long startTime = cal.getTimeInMillis();
-        // Retrieve steps account
-        List<Integer> steps = this.retrieveStepCount(startTime,endTime);
-        return null;
+        int day = now.getDay();
+        List<IStatistics> result = new ArrayList<>();
+        for (Integer d = 0; d <= day; d++){
+            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
+            int intentionalSteps = sp.getInt(d.toString()+"_IntenionalSteps",DEFAULT_STEPS);
+            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
+            DailyStat dailyStat = new DailyStat(goal,"");
+            //TODO Add intentionalSteps and totalSteps to dailyStat
+            result.add(dailyStat);
+        }
+
+        return result;
+
     }
 }

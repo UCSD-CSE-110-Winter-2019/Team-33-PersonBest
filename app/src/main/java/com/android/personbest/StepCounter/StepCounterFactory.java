@@ -1,5 +1,6 @@
 package com.android.personbest.StepCounter;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.personbest.MainActivity;
