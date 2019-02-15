@@ -17,6 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.android.personbest.StepCounter.*;
 
+import java.time.DayOfWeek;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -40,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private boolean plannedExercise = false;
     private long timer;
     private int plannedSteps;
-    private int incidentSteps;
+    private int totalIntentionalSteps;
     private StepCounterGoogleFit stepCounter;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
 
@@ -59,17 +62,20 @@ public class MainActivity extends AppCompatActivity implements Observer {
             @Override
             public void run() {
                 stepCounter.updateStepCount();
+                int totalSoFar = Integer.parseInt(stepsTodayVal.getText().toString());
+                editor.putInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_TotalSteps", totalSoFar);
+                editor.apply();
                 if(plannedTimeValue.getVisibility() == View.VISIBLE) {
                     long timeDiff = (System.currentTimeMillis() - timer);
                     plannedTimeValue.setText(String.valueOf(timeDiff / MILLISECONDS_IN_A_MINUTE));
 
-                    int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
+                    int stepDiff = totalSoFar - plannedSteps;
                     plannedStepValue.setText(String.valueOf(stepDiff));
 
                     double currMph = intentionalWalkUtils.velocity(sp.getInt("Height", 0), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
                     plannedMPHValue.setText(String.valueOf(currMph));
                 }
-                int left = goalNum - Integer.parseInt(stepsTodayVal.getText().toString());
+                int left = goalNum - totalSoFar;
                 if(left > 0) stepsLeftVal.setText(String.valueOf(left));
                 else stepsLeftVal.setText("0");
             }
@@ -118,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     setPlannedExerciseStatsVisibility(false);
                     timer = System.currentTimeMillis() - timer;
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
+                    totalIntentionalSteps = sp.getInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_IntentionalSteps", 0) + plannedSteps;
+                    editor.putInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_IntentionalSteps", totalIntentionalSteps);
+                    editor.apply();
                     launchSummary(timer, plannedSteps);
                 }
             }
@@ -131,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
         goalNum = sp.getInt("Current Goal", 5000);
+        editor.putInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_Goal", goalNum);
         goalVal.setText(String.valueOf(goalNum));
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
 
@@ -163,10 +173,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
         btnUpdateSteps.setEnabled(false);
         btnUpdateSteps.setVisibility(View.INVISIBLE);
-
-        // Run Async Task on UI Thread
-        // StepUpdate runner = new StepUpdate();
-        // runner.execute(startStopBtn.getText().toString());
     }
 
     public void launchSummary(long timeElapsed, int stepsTaken) {

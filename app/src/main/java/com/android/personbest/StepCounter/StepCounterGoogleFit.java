@@ -204,8 +204,7 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
             int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
             int intentionalSteps = sp.getInt(d.toString()+"_IntenionalSteps",DEFAULT_STEPS);
             int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-            DailyStat dailyStat = new DailyStat(goal,"");
-            //TODO Add intentionalSteps and totalSteps to dailyStat
+            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,"");
             result.add(dailyStat);
         }
 
