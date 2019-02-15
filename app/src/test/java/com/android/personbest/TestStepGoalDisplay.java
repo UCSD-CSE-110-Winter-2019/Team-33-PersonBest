@@ -38,7 +38,6 @@ public class TestStepGoalDisplay {
 
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
-        //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
         mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
 
         //mainActivity = Robolectric.setupActivity(MainActivity.class);
