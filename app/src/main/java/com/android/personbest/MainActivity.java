@@ -56,19 +56,26 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ProgressBar progressBar;
 
 
-    public void update(Observable o, Object arg){
-        stepCounter.updateStepCount();
-        if(plannedTimeValue.getVisibility() == View.VISIBLE) {
-            long timeDiff = (System.currentTimeMillis() - timer);
-            plannedTimeValue.setText(String.valueOf(timeDiff / MILLISECONDS_IN_A_MINUTE));
+    public void update(Observable o, Object arg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stepCounter.updateStepCount();
+                if(plannedTimeValue.getVisibility() == View.VISIBLE) {
+                    long timeDiff = (System.currentTimeMillis() - timer);
+                    plannedTimeValue.setText(String.valueOf(timeDiff / MILLISECONDS_IN_A_MINUTE));
 
-            int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
-            plannedStepValue.setText(String.valueOf(stepDiff));
+                    int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
+                    plannedStepValue.setText(String.valueOf(stepDiff));
 
-            double currMph = intentionalWalkUtils.velocity(sp.getInt("Height", 0), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
-            plannedMPHValue.setText(String.valueOf(currMph));
-        }
-        stepsLeftVal.setText(String.valueOf(goalNum - Integer.parseInt(stepsTodayVal.getText().toString())));
+                    double currMph = intentionalWalkUtils.velocity(sp.getInt("Height", 0), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
+                    plannedMPHValue.setText(String.valueOf(currMph));
+                }
+                int left = goalNum - Integer.parseInt(stepsTodayVal.getText().toString());
+                if(left > 0) stepsLeftVal.setText(String.valueOf(left));
+                else stepsLeftVal.setText("0");
+            }
+        });
     }
 
     /*private class StepUpdate extends AsyncTask<String, String, String> {
@@ -167,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
             startActivity(new Intent(this, SetUpActivity.class));
         }
 
-
         goalNum = sp.getInt("Current Goal", 5000);
         goalVal.setText(String.valueOf(goalNum));
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
@@ -183,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
 
         fitnessServiceKey = getIntent().getStringExtra(FITNESS_SERVICE_KEY);
-        //System.out.println("Debug");
         if (fitnessServiceKey == null ){
             fitnessServiceKey = FITNESS_SERVICE_KEY;
         }
@@ -191,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         stepCounter.setup();
         stepCounter.addObserver(this);
 
+        // Update Button
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
         btnUpdateSteps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,6 +204,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 stepCounter.updateStepCount();
             }
         });
+        btnUpdateSteps.setEnabled(false);
+        btnUpdateSteps.setVisibility(View.INVISIBLE);
 
         // Run Async Task on UI Thread
         // StepUpdate runner = new StepUpdate();
