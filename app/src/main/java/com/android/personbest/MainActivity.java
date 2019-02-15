@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             startActivity(new Intent(this, SetUpActivity.class));
         }
 
-        goalNum = sp.getInt("Current Goal", 5000);
+        goalNum = sp.getInt("Current Goal", GOAL_INIT);
         editor.putInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_Goal", goalNum);
         goalVal.setText(String.valueOf(goalNum));
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
