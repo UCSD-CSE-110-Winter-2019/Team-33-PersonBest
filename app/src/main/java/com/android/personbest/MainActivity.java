@@ -59,8 +59,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
+            int loops = 2;
             try {
-                while (true) {
+                while (loops >= 0) {
+                    loops--;
                     Thread.sleep(UPDATE_INTERVAL);
                     publishProgress(resp);
                 }
