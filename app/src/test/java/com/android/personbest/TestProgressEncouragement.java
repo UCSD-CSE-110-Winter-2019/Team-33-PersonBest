@@ -1,17 +1,16 @@
 package com.android.personbest;
 
 import org.junit.Test;
+import org.robolectric.shadows.ShadowToast;
 
 import static org.junit.Assert.assertEquals;
 
 public class TestProgressEncouragement {
-    private MainActivity mainActivity;
-    //private ProgressEncouragementActivity progressEncouragementActivity;
-    @Test
-    public void testProgressMade() {
-    }
 
     @Test
-    public void testDisplayEncouragement() {
+    public void testProgressMade() {
+        ProgressEncouragement progressEncouragement = new ProgressEncouragement();
+        assertEquals(true, progressEncouragement.progressMade(2,1));
+        assertEquals(false, progressEncouragement.progressMade(1,2));
     }
 }
