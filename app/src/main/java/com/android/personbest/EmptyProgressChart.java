@@ -12,9 +12,15 @@ import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LegendEntry;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.security.InvalidParameterException;
 import java.time.DayOfWeek;
@@ -53,28 +59,47 @@ public class EmptyProgressChart extends AppCompatActivity {
     }
 
     public void setBarChart() {
-        progressChart.invalidate();
         entries.clear();
         List<IStatistics> stepStats = new ArrayList<>();//stepCounter.getLastWeekSteps(date);
         ArrayList<String> xAxis = new ArrayList<>();
+        ArrayList<LegendEntry> legendEntries = new ArrayList<>();
+        xAxis.add("");
 
         stepStats.add(new DailyStat(5000, 8226, 3255, null));
-        stepStats.add(new DailyStat(5000, 2542, 3752, null));
+        stepStats.add(new DailyStat(5000, 6260, 3752, null));
         stepStats.add(new DailyStat(5000, 1939, 882, null));
         stepStats.add(new DailyStat(5000, 3755, 3078, null));
-        stepStats.add(new DailyStat(5000, 2188, 3673, null));
-        stepStats.add(new DailyStat(5000, 6731, 9225, null));
+        stepStats.add(new DailyStat(5000, 4530, 3673, null));
+        stepStats.add(new DailyStat(5000, 9934, 9225, null));
         stepStats.add(new DailyStat(5000, 7633, 6706, null));
 
-        int i = 0;
+        int i = 0, j = 6;
         for (IStatistics stat : stepStats) {
             i += 1;
-            entries.add(new BarEntry(i,stat.getIntentionalWalk()));
-            xAxis.add(DayOfWeek.of(i).getDisplayName(TextStyle.SHORT, Locale.JAPAN));
+            j = j % 7;
+            float[] tempArr = new float[2];
+            tempArr[0] = stat.getIncidentWalk();
+            tempArr[1] = stat.getIntentionalWalk();
+            //tempArr[2] = stat.getGoal();
+            entries.add(new BarEntry(i, tempArr));
+            xAxis.add(DayOfWeek.of(++j).getDisplayName(TextStyle.SHORT, Locale.US));
         }
         BarDataSet stepDataSet = new BarDataSet(entries, "Steps Current Week");
-        stepDataSet.setColor(Color.rgb(123, 144, 210));
+        stepDataSet.setColors(Color.rgb(0, 92, 175), Color.rgb(123, 144, 210));
         BarData stepData = new BarData(stepDataSet);
+        legendEntries.add(new LegendEntry("Incidental Walk", Legend.LegendForm.DEFAULT,
+                Float.NaN, Float.NaN, null, Color.rgb(0, 92, 175)));
+        legendEntries.add(new LegendEntry("Intentional Walk", Legend.LegendForm.DEFAULT,
+                Float.NaN, Float.NaN, null, Color.rgb(123, 144, 210)));
+
         progressChart.setData(stepData);
+        progressChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xAxis));
+        progressChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        LimitLine l = new LimitLine(5000);
+        l.setLabel("Goal");
+        l.setLineColor(Color.rgb(0, 0, 0));
+        progressChart.getAxisLeft().addLimitLine(l);
+        progressChart.getLegend().setCustom(legendEntries);
+        progressChart.invalidate();
     }
 }

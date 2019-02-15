@@ -1,5 +1,6 @@
 package com.android.personbest;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -13,9 +14,11 @@ import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
 import com.android.personbest.StepCounter.StepCounter;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
 import java.security.InvalidParameterException;
 import java.time.DayOfWeek;
@@ -43,12 +46,14 @@ public class ProgressChart extends AppCompatActivity {
         entries = new ArrayList<>();
         savedDataManager = new SavedDataManagerSharedPreference(this);
 
+        final Activity self = this;
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                ((ProgressChart) self).setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -66,28 +71,33 @@ public class ProgressChart extends AppCompatActivity {
     }
 
     public void setBarChart() {
-        progressChart.invalidate();
         entries.clear();
         List<IStatistics> stepStats = new ArrayList<>();//stepCounter.getLastWeekSteps(date);
         ArrayList<String> xAxis = new ArrayList<>();
 
         stepStats.add(new DailyStat(5000, 8226, 3255, null));
-        stepStats.add(new DailyStat(5000, 2542, 3752, null));
+        stepStats.add(new DailyStat(5000, 6260, 3752, null));
         stepStats.add(new DailyStat(5000, 1939, 882, null));
         stepStats.add(new DailyStat(5000, 3755, 3078, null));
-        stepStats.add(new DailyStat(5000, 2188, 3673, null));
-        stepStats.add(new DailyStat(5000, 6731, 9225, null));
+        stepStats.add(new DailyStat(5000, 4530, 3673, null));
+        stepStats.add(new DailyStat(5000, 9934, 9225, null));
         stepStats.add(new DailyStat(5000, 7633, 6706, null));
 
         int i = 0;
         for (IStatistics stat : stepStats) {
             i += 1;
-            entries.add(new BarEntry(stat.getIntentionalWalk(), i));
-            xAxis.add(DayOfWeek.of(i).getDisplayName(TextStyle.SHORT, Locale.JAPAN));
+            float[] tempArr = new float[2];
+            tempArr[0] = stat.getIncidentWalk();
+            tempArr[1] = stat.getIntentionalWalk();
+            entries.add(new BarEntry(i, tempArr));
+            xAxis.add(DayOfWeek.of(i).getDisplayName(TextStyle.FULL, Locale.JAPAN));
         }
         BarDataSet stepDataSet = new BarDataSet(entries, "Steps Current Week");
-        stepDataSet.setColor(Color.rgb(123, 144, 210));
+        stepDataSet.setColors(Color.rgb(0, 92, 175), Color.rgb(123, 144, 210));
         BarData stepData = new BarData(stepDataSet);
         progressChart.setData(stepData);
+        progressChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xAxis));
+        progressChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        progressChart.invalidate();
     }
 }
