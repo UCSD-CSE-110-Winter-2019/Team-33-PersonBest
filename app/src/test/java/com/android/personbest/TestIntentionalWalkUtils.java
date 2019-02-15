@@ -18,6 +18,7 @@ public class TestIntentionalWalkUtils {
         int numSteps = 8192;
         long timeInSeconds = 32768L;
         double velocity = 70 * 0.413 / 12 * 8192/ 5280 / (32768 / 3600.0);
+        velocity = Math.round(velocity * 10) / (double)10;
         assertEquals("Expected: " + velocity, velocity,
                 IntentionalWalkUtils.velocity(height, numSteps, timeInSeconds), 0.0001);
     }

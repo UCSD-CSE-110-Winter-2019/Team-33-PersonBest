@@ -24,7 +24,7 @@ public class PlannedExerciseSummary extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planned_exercise_summary);
-        sp = getPreferences(Context.MODE_PRIVATE);
+        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
 
         displaySteps = findViewById(R.id.stepsTaken);
         displayTime = findViewById(R.id.timeElapsed);
