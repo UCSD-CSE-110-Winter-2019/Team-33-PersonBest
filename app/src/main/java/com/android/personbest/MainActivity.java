@@ -23,9 +23,8 @@ import java.util.Observer;
 public class MainActivity extends AppCompatActivity implements Observer {
 
     // FIXME hardcoded goal
-    private static final int GOAL_INIT = 1000;
+    private static final int GOAL_INIT = 5000;
     private static final int STEP_INIT = 0;
-    private static final long UPDATE_INTERVAL = 1000;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
     private static final long MILLISECONDS_IN_A_SECOND = 1000;
 
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
 
-
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
             @Override
@@ -77,47 +75,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
     }
-
-    /*private class StepUpdate extends AsyncTask<String, String, String> {
-        private String resp = "";
-        @Override
-        protected void onPreExecute() {}
-
-        @Override
-        protected String doInBackground(String... params) {
-            int loops = 2;
-            try {
-                while (loops >= 0) {
-                    loops--;
-                    Thread.sleep(UPDATE_INTERVAL);
-                    publishProgress(resp);
-                }
-            }
-            catch(Exception e) {
-
-            }
-            return resp;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... result) {
-            stepCounter.updateStepCount();
-            if(plannedTimeValue.getVisibility() == View.VISIBLE) {
-                long timeDiff = (System.currentTimeMillis() - timer);
-                plannedTimeValue.setText(String.valueOf(timeDiff / MILLISECONDS_IN_A_MINUTE));
-
-                int stepDiff = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
-                plannedStepValue.setText(String.valueOf(stepDiff));
-
-                double currMph = intentionalWalkUtils.velocity(sp.getInt("Height", 0), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
-                plannedMPHValue.setText(String.valueOf(currMph));
-            }
-            stepsLeftVal.setText(String.valueOf(goalNum - Integer.parseInt(stepsTodayVal.getText().toString())));
-        }
-
-        @Override
-        protected void onPostExecute(String result) {}
-    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     startStopBtn.setBackgroundColor(Color.RED);
                     timer = System.currentTimeMillis();
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString());
-
                     setPlannedExerciseStatsVisibility(true);
                 }
                 else {
@@ -195,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         stepCounter = (StepCounterGoogleFit) StepCounterFactory.create( fitnessServiceKey, this);
         stepCounter.setup();
         stepCounter.addObserver(this);
+        stepCounter.beginUpdates();
 
         // Update Button
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
