@@ -34,7 +34,12 @@ output.json
 .gradle
 /.idea/caches/build_file_checksums.ser
 /.idea/libraries
+/.idea/caches/gradle_models.ser
 /.idea/modules.xml
 /.idea/workspace.xml
 /build
 /captures
+
+# ignore unncessary idea files
+.idea/misc.xml
+.idea/codeStyles/codeStyleConfig.xml

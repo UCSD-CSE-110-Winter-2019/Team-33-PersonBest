@@ -22,7 +22,7 @@ public class SetUpActivity extends AppCompatActivity {
         saveButton = findViewById(R.id.save_button);
         editText = findViewById(R.id.height);
 
-        sp = getPreferences(Context.MODE_PRIVATE);
+        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
         editor = sp.edit();
         editor.putInt("Current Goal", 5000);
 
