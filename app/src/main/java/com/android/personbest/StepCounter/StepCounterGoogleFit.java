@@ -1,5 +1,8 @@
 package com.android.personbest.StepCounter;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.service.autofill.Dataset;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -16,29 +19,43 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.android.personbest.MainActivity;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import static java.text.DateFormat.getDateInstance;
 
-public class StepCounterGoogleFit implements StepCounter {
+public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
+    private final int DEFAULT_STEPS = 0;
+    private final int DEFAULT_GOAL = 5000;
     private final String TAG = "GoogleFitAdapter";
+    private static final long UPDATE_INTERVAL = 1000;
+    private SharedPreferences sp;
 
-    private MainActivity activity;
+    protected MainActivity activity;
+    private TimerTask updateSteps;
+    private Timer t;
 
     public StepCounterGoogleFit(MainActivity activity) {
         this.activity = activity;
     }
 
-    public int getYesterdaySteps(){
-        return 0;
-    }
-
-    public List<IStatistics> getLastWeekSteps(){
-        return null;
+    public void beginUpdates() {
+        updateSteps = new TimerTask() {
+            @Override
+            public void run() {
+                setChanged();
+                notifyObservers();
+            }
+        };
+        t = new Timer();
+        t.schedule(updateSteps, 0, UPDATE_INTERVAL);
     }
 
 
@@ -54,7 +71,7 @@ public class StepCounterGoogleFit implements StepCounter {
                     GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
                     GoogleSignIn.getLastSignedInAccount(activity),
                     fitnessOptions);
-            retrieveStepCount();
+            //TODO Retrieve steps count here?
         } else {
             updateStepCount();
             startRecording();
@@ -83,7 +100,6 @@ public class StepCounterGoogleFit implements StepCounter {
                 });
     }
 
-
     /**
      * Reads the current daily step total, computed from midnight of the current day on the device's
      * current timezone.
@@ -107,6 +123,7 @@ public class StepCounterGoogleFit implements StepCounter {
                                                 : dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
 
                                 activity.setStepCount(total);
+                                notifyObservers(total);
                                 Log.d(TAG, "Total steps: " + total);
                             }
                         })
@@ -119,27 +136,17 @@ public class StepCounterGoogleFit implements StepCounter {
                         });
     }
 
-
     @Override
     public int getRequestCode() {
         return GOOGLE_FIT_PERMISSIONS_REQUEST_CODE;
     }
 
+    public List<Integer> retrieveStepCount(long startTime, long endTime){
 
-    public void retrieveStepCount(){
         GoogleSignInAccount lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(activity);
         if (lastSignedInAccount == null) {
-            return;
+            return null;
         }
-
-        // Setting a start and end date using a range of 1 week before this moment.
-        Calendar cal = Calendar.getInstance();
-        Date now = new Date();
-        cal.setTime(now);
-        long endTime = cal.getTimeInMillis();
-        //TODO How much data we want to retrieve ?
-        cal.add(Calendar.WEEK_OF_YEAR, -1);
-        long startTime = cal.getTimeInMillis();
 
         java.text.DateFormat dateFormat = getDateInstance();
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
@@ -163,43 +170,37 @@ public class StepCounterGoogleFit implements StepCounter {
         //Retrieve data from google fit
         Task<DataReadResponse> response = Fitness.getHistoryClient(activity, GoogleSignIn.getLastSignedInAccount(activity)).readData(readRequest);
         List<DataSet> dataSets = response.getResult().getDataSets();
-
-        //TODO Update our local dataset from such response?
-    }
-
-    /**
-     * This method is used to insert data for each day onto the google
-     */
-    public void insertStepCount(){
-        // Set a start and end time for our data, using a start time of 1 hour before this moment.
-        Calendar cal = Calendar.getInstance();
-        Date now = new Date();
-        cal.setTime(now);
-        long endTime = cal.getTimeInMillis();
-        cal.add(Calendar.HOUR_OF_DAY, -1);
-        long startTime = cal.getTimeInMillis();
-
-        // Create a data source
-        DataSource dataSource =
-                new DataSource.Builder()
-                        .setAppPackageName(activity)
-                        .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
-                        .setStreamName(TAG + " - step count")
-                        .setType(DataSource.TYPE_RAW)
-                        .build();
-
-        // Create a data set
-        int stepCountDelta = 950;
-        DataSet dataSet = DataSet.create(dataSource);
-        // For each data point, specify a start time, end time, and the data value -- in this case,
-        // the number of new steps.
-        DataPoint dataPoint =
-                dataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
-        dataPoint.getValue(Field.FIELD_STEPS).setInt(stepCountDelta);
-        dataSet.add(dataPoint);
-
-        Task<Void> response = Fitness.getHistoryClient(activity, GoogleSignIn.getLastSignedInAccount(activity)).insertData(dataSet);
+        List<Integer> result = new ArrayList<>();
+        for (DataSet d: dataSets){
+            int total = d.isEmpty()
+                    ? 0
+                    : d.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
+            result.add(total);
+        }
+        return result;
     }
 
 
+    public int getYesterdaySteps(int day){
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+        IDate iDate = new IDate(day);
+        Integer yesterday = iDate.getYesterDay();
+        int totalSteps = sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
+        return totalSteps;
+    }
+
+    public List<IStatistics> getLastWeekSteps(int day){
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+        List<IStatistics> result = new ArrayList<>();
+        for (Integer d = 0; d <= day; d++){
+            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
+            int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
+            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
+            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,"");
+            result.add(dailyStat);
+        }
+
+        return result;
+
+    }
 }
