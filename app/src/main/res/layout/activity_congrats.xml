@@ -26,12 +26,12 @@
             <Button
                     android:text="Not Yet"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/button3" android:layout_weight="1"
+                    android:layout_height="wrap_content" android:id="@+id/congrats_notyet" android:layout_weight="1"
                     android:layout_marginLeft="10dp"/>
             <Button
                     android:text="Yes !!"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/button4" android:layout_weight="1"
+                    android:layout_height="wrap_content" android:id="@+id/congrats_yes" android:layout_weight="1"
                     android:layout_marginLeft="10dp"/>
         </LinearLayout>
     </LinearLayout>

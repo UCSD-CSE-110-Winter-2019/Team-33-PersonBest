@@ -63,7 +63,7 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     private void cancelPressed() {
-
+        finish();
     }
 
 

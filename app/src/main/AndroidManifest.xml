@@ -10,13 +10,14 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity android:name=".CongratsActivity">
-        </activity>
-        <activity android:name=".SetGoalActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".SetGoalActivity">
+
         </activity>
         <activity android:name=".SetUpActivity">
         </activity>
