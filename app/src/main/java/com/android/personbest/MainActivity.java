@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedTimeValue = findViewById(R.id.timeValue);
         plannedStepValue = findViewById(R.id.stepValue);
         plannedMPHValue = findViewById(R.id.mphValue);
-        //setGoalButton = findViewById(R.id.main_setgoal);
+        /setGoalButton = findViewById(R.id.main_setgoal);
         setPlannedExerciseStatsVisibility(false);
 
         progressBar = findViewById(R.id.progressBar);
