@@ -5,6 +5,7 @@
 package com.android.personbest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -63,11 +64,13 @@ public class SetGoalActivity extends AppCompatActivity {
 
     private void acceptPressed() {
         save(stepGoal);
+        goBack();
     }
 
     private void setPressed() {
         final String steps = editText.getText().toString();
         save(Integer.parseInt(steps));
+        goBack();
     }
 
     private void cancelPressed() {
@@ -80,6 +83,12 @@ public class SetGoalActivity extends AppCompatActivity {
 
         editor.putInt("Current Goal", stepNumber);
         editor.apply();
+    }
+
+    public void goBack() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
 }

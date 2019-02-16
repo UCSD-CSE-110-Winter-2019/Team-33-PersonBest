@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedStepValue;
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
+    private Button setGoalButton;
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        final Activity self = this;
 
         // Setup UI
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
@@ -97,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedTimeValue = findViewById(R.id.timeValue);
         plannedStepValue = findViewById(R.id.stepValue);
         plannedMPHValue = findViewById(R.id.mphValue);
+        setGoalButton = findViewById(R.id.main_setgoal);
         setPlannedExerciseStatsVisibility(false);
 
         progressBar = findViewById(R.id.progressBar);
@@ -131,6 +134,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     editor.apply();
                     launchSummary(timer, plannedSteps);
                 }
+            }
+        });
+        setGoalButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(self, CongratsActivity.class);
+                self.startActivity(intent);
             }
         });
 
