@@ -4,19 +4,25 @@
 
 package com.android.personbest;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SetGoalActivity extends AppCompatActivity {
 
     Button cancelButton;
     Button acceptButton;
     Button setButton;
+    EditText editText;
+
     TextView goalRecommandation;
-    int stepGoal = 555;
+    Long stepGoal = 555L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +54,7 @@ public class SetGoalActivity extends AppCompatActivity {
                 acceptPressed();
             }
         });
+        editText = findViewById(R.id.goal_edit_text);
 
         goalRecommandation = findViewById(R.id.recommanded_goal);
         goalRecommandation.setText(stepGoal + "");
@@ -55,16 +62,25 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     private void acceptPressed() {
-
+        save(stepGoal);
     }
 
     private void setPressed() {
-
+        final String steps = editText.getText().toString();
+        save(Long.parseLong(steps));
     }
 
     private void cancelPressed() {
         finish();
     }
 
+    public void save(Long stepNumber) {
+        SharedPreferences sharedPref = getSharedPreferences("goal", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+
+        editor.putLong("stepNumber", stepNumber);
+        editor.apply();
+    }
 
 }
