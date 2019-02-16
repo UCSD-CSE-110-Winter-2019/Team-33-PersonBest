@@ -29,7 +29,7 @@ public class SetGoalActivityTest {
     public void save() {
         final int input = 777;
         int output = 0;
-        SharedPreferences sharedPreferences = setGoalActivity.getApplicationContext().getSharedPreferences("user_goal", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = setGoalActivity.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
 
         setGoalActivity.save(777);
         output = sharedPreferences.getInt("Current Goal", 0);

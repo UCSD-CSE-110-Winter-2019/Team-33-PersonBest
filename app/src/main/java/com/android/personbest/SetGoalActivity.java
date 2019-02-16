@@ -30,6 +30,7 @@ public class SetGoalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_goal);
 
+        initGoal();
         initViews();
     }
 
@@ -77,8 +78,25 @@ public class SetGoalActivity extends AppCompatActivity {
         finish();
     }
 
+    public void initGoal() {
+        int steps = 0;
+        SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
+
+        steps = sharedPreferences.getInt("Current Goal", 0);
+        steps += 500;
+        setGoal(steps);
+    }
+
+    public void setGoal(int num) {
+        this.stepGoal = num;
+    }
+
+    public int getGoal() {
+        return this.stepGoal;
+    }
+
     public void save(int stepNumber) {
-        SharedPreferences sharedPref = getSharedPreferences("user_goal", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("user_data", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         editor.putInt("Current Goal", stepNumber);

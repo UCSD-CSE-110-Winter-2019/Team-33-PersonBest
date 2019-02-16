@@ -188,6 +188,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
         this.initGoal();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("State", "OnStart");
+        initGoal();
+    }
+
     public void launchSummary(long timeElapsed, int stepsTaken) {
         Intent intent = new Intent(this, PlannedExerciseSummary.class);
         intent.putExtra("timeElapsed", timeElapsed);
