@@ -22,7 +22,7 @@ public class SetGoalActivity extends AppCompatActivity {
     EditText editText;
 
     TextView goalRecommandation;
-    Long stepGoal = 555L;
+    int stepGoal = 555;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,19 +67,18 @@ public class SetGoalActivity extends AppCompatActivity {
 
     private void setPressed() {
         final String steps = editText.getText().toString();
-        save(Long.parseLong(steps));
+        save(Integer.parseInt(steps));
     }
 
     private void cancelPressed() {
         finish();
     }
 
-    public void save(Long stepNumber) {
+    public void save(int stepNumber) {
         SharedPreferences sharedPref = getSharedPreferences("user_goal", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
-
-        editor.putLong("stepNumber", stepNumber);
+        editor.putInt("Current Goal", stepNumber);
         editor.apply();
     }
 

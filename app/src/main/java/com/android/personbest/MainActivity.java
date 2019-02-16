@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
         btnUpdateSteps.setEnabled(false);
         btnUpdateSteps.setVisibility(View.INVISIBLE);
+        this.initGoal();
     }
 
     public void launchSummary(long timeElapsed, int stepsTaken) {
@@ -245,5 +246,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
             plannedStepValue.setVisibility(View.INVISIBLE);
             plannedMPHValue.setVisibility(View.INVISIBLE);
         }
+    }
+
+    // Following methods are for init from sharedPreference
+    public void initGoal() {
+        SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
+
+        this.goalNum = sharedPreferences.getInt("Current Goal", GOAL_INIT);
+        this.setGoal(this.goalNum);
     }
 }

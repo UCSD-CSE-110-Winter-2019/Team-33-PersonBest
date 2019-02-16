@@ -26,12 +26,12 @@ public class SetGoalActivityTest {
     }
     @Test
     public void save() {
-        final long input = 777L;
-        long outpout = 0L;
+        final int input = 777;
+        int output = 0;
         SharedPreferences sharedPreferences = mActivity.getApplicationContext().getSharedPreferences("user_goal", MODE_PRIVATE);
 
-        mActivity.save(777L);
-        outpout = sharedPreferences.getLong("stepNumber", 0L);
-        assertEquals(input, outpout);
+        mActivity.save(777);
+        output = sharedPreferences.getInt("stepNumber", 0);
+        assertEquals(input, output);
     }
 }
