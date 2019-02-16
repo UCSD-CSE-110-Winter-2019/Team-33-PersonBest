@@ -43,8 +43,7 @@ public class CongratsActivity extends AppCompatActivity {
     }
 
     void notYetButtonPressed () {
-        //un comment this line when you merge
-        // finish();
+        finish();
     }
 
 }
