@@ -75,7 +75,7 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     public void save(Long stepNumber) {
-        SharedPreferences sharedPref = getSharedPreferences("goal", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("user_goal", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
 
