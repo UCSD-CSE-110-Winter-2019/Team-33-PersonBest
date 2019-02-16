@@ -278,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void setToday(int date) {
         if(date < 0 || date >= 7) this.today = date;
+        else throw new IllegalArgumentException("Wrong date format");
     }
 
     public void setPlannedExerciseStatsVisibility(boolean visible) {
