@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedStepValue;
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
+    private Button setGoalButton;
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedTimeValue = findViewById(R.id.timeValue);
         plannedStepValue = findViewById(R.id.stepValue);
         plannedMPHValue = findViewById(R.id.mphValue);
+        setGoalButton = findViewById(R.id.main_setgoal);
         setPlannedExerciseStatsVisibility(false);
 
         progressBar = findViewById(R.id.progressBar);
@@ -131,6 +133,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     editor.apply();
                     launchSummary(timer, plannedSteps);
                 }
+            }
+        });
+        setGoalButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Inten
             }
         });
 
@@ -245,5 +253,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
             plannedStepValue.setVisibility(View.INVISIBLE);
             plannedMPHValue.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public void setGoalPressed() {
+
     }
 }
