@@ -33,6 +33,5 @@ public class SetGoalActivityTest {
         mActivity.save(777L);
         outpout = sharedPreferences.getLong("stepNumber", 0L);
         assertEquals(input, outpout);
-
     }
 }
