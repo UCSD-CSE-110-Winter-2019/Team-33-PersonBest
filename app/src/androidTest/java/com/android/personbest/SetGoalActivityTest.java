@@ -36,4 +36,15 @@ public class SetGoalActivityTest {
         assertEquals(input, output);
     }
 
+    @Test
+    public void initGoal() {
+        int goal1;
+        int goal2;
+        SharedPreferences sharedPreferences = setGoalActivity.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
+
+        setGoalActivity.initGoal();
+        goal1 = sharedPreferences.getInt("Current Goal", 0) + 500;
+        goal2 = setGoalActivity.getGoal();
+        assertEquals(goal1, goal2);
+    }
 }
