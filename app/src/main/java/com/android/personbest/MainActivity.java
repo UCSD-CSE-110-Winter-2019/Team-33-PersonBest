@@ -99,11 +99,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedTimeValue = findViewById(R.id.timeValue);
         plannedStepValue = findViewById(R.id.stepValue);
         plannedMPHValue = findViewById(R.id.mphValue);
-<<<<<<< HEAD
-        setGoalButton = findViewById(R.id.main_setgoal);
-=======
-        //setGoalButton = findViewById(R.id.main_setgoal);
->>>>>>> 9fb2b02390d98de7ec4bc36acb69e57994552eca
         setPlannedExerciseStatsVisibility(false);
 
         progressBar = findViewById(R.id.progressBar);
@@ -140,22 +135,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 }
             }
         });
-<<<<<<< HEAD
-        setGoalButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(self, CongratsActivity.class);
-                self.startActivity(intent);
-            }
-        });
-=======
-        /*setGoalButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Inten
-            }
-        });*/
->>>>>>> 9fb2b02390d98de7ec4bc36acb69e57994552eca
 
         // Check if this is the first time launching app
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
@@ -198,14 +177,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
         btnUpdateSteps.setEnabled(false);
         btnUpdateSteps.setVisibility(View.INVISIBLE);
-        this.initGoal();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         Log.d("State", "OnStart");
-        initGoal();
+        //initGoal();
     }
 
     public void launchSummary(long timeElapsed, int stepsTaken) {
@@ -280,18 +258,5 @@ public class MainActivity extends AppCompatActivity implements Observer {
             plannedStepValue.setVisibility(View.INVISIBLE);
             plannedMPHValue.setVisibility(View.INVISIBLE);
         }
-    }
-
-<<<<<<< HEAD
-    // Following methods are for init from sharedPreference
-    public void initGoal() {
-        SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
-
-        this.goalNum = sharedPreferences.getInt("Current Goal", GOAL_INIT);
-        this.setGoal(this.goalNum);
-=======
-    public void setGoalPressed() {
-
->>>>>>> 9fb2b02390d98de7ec4bc36acb69e57994552eca
     }
 }
