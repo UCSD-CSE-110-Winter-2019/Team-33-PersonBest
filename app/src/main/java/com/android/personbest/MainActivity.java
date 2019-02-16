@@ -224,6 +224,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         progressBar.setProgress(stepCount);
     }
 
+    public int getGoal() {
+        return this.goalNum;
+    }
+
     public void showEncouragement(int stepCount) {
         long percentage = (int)Math.floor(stepCount * 100.0 / goalNum);
         if(percentage < 10) return;
