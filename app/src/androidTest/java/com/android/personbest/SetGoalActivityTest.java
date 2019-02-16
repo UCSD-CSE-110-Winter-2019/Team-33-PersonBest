@@ -18,17 +18,14 @@ import static org.junit.Assert.*;
 public class SetGoalActivityTest {
     @Rule
     public ActivityTestRule<SetGoalActivity> setGoalActivityTestRule = new ActivityTestRule<SetGoalActivity>(SetGoalActivity.class);
-    public ActivityTestRule<MainActivity> mainActivityTestRule = new ActivityTestRule<MainActivity>(MainActivity.class);
 
     private SetGoalActivity setGoalActivity = null;
-    private MainActivity mainActivity = null;
 
     @Before
     public void setUp() throws Exception {
         setGoalActivity = setGoalActivityTestRule.getActivity();
-        mainActivity = mainActivityTestRule.getActivity();
     }
-   /* @Test
+    @Test
     public void save() {
         final int input = 777;
         int output = 0;
@@ -37,6 +34,6 @@ public class SetGoalActivityTest {
         setGoalActivity.save(777);
         output = sharedPreferences.getInt("Current Goal", 0);
         assertEquals(input, output);
-    }*/
-   
+    }
+
 }
