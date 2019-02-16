@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedTimeValue = findViewById(R.id.timeValue);
         plannedStepValue = findViewById(R.id.stepValue);
         plannedMPHValue = findViewById(R.id.mphValue);
-        setGoalButton = findViewById(R.id.main_setgoal);
+        //setGoalButton = findViewById(R.id.main_setgoal);
         setPlannedExerciseStatsVisibility(false);
 
         progressBar = findViewById(R.id.progressBar);
@@ -135,12 +135,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 }
             }
         });
-        setGoalButton.setOnClickListener(new View.OnClickListener() {
+        /*setGoalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Inten
             }
-        });
+        });*/
 
         // Check if this is the first time launching app
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
