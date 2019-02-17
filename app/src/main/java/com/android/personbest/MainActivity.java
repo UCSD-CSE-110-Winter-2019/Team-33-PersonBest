@@ -19,6 +19,7 @@ import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
 import com.android.personbest.Timer.ITimer;
+import com.android.personbest.Timer.TimerMock;
 import com.android.personbest.Timer.TimerSystem;
 
 import java.time.ZonedDateTime;
@@ -52,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ITimer theTimer;
     private ProgressEncouragement progressEncouragement;
     private String today;
+    private Integer todayInt;
+
+    private boolean NDEBUG = true;
 
     // UI-related members
     private TextView stepsTodayVal;
@@ -62,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedStepValue;
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
+
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -193,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
 
         today = sd.getTodayString();
+        todayInt = Calendar.DAY_OF_WEEK;
 
         // yesterday
         // only once since data of yesterday never changes today
@@ -210,6 +216,33 @@ public class MainActivity extends AppCompatActivity implements Observer {
             checkSubGoalReach();
         }
 
+//        addMockData();
+    }
+
+
+    public void addMockData() {
+        editor.clear(); // panic
+
+        int caseTesting = 1;
+        NDEBUG = false;
+        todayInt = 3;
+
+        theTimer = new TimerMock(22);
+
+        switch (caseTesting) {
+            case 1: // today goal met -> display goal
+                break;
+            case 2: // yesterday goal met but not displayed -> display yesterday goal
+                break;
+            case 3: // yesterday sub goal met but not goal met and not displayed
+                break;
+            case 4: // yesterday goal met but not displayed
+                break;
+            case 5:
+                break;
+        }
+
+        editor.apply();
     }
 
     @Override
@@ -248,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // has made progress?
     public void checkSubGoalReach() {
         int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
-        int yesterdaySteps = sd.getYesterdaySteps(Calendar.DAY_OF_WEEK);
+        int yesterdaySteps = sd.getYesterdaySteps(todayInt);
 
         if(!sd.isShownSubGoal(today) &&
                 !sd.isShownGoal(today) &&
@@ -263,8 +296,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdayGoalReach() {
         String yesterday = sd.getYesterdayString();
 
-        int yesterdaySteps = sd.getStepsDaysBefore(Calendar.DAY_OF_WEEK, 1);
-        int yesterdayGoal = sd.getGoalDaysBefore(Calendar.DAY_OF_WEEK, 1);
+        int yesterdaySteps = sd.getStepsDaysBefore(todayInt, 1);
+        int yesterdayGoal = sd.getGoalDaysBefore(todayInt, 1);
 
         if(!sd.isShownYesterdayGoal(today) &&
                 !sd.isShownGoal(yesterday) &&
@@ -279,8 +312,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdaySubGoalReach() {
         String yesterday = sd.getYesterdayString();
 
-        int yesterdaySteps = sd.getYesterdaySteps(Calendar.DAY_OF_WEEK);
-        int dayBeforeYesterdaySteps = sd.getStepsDaysBefore(Calendar.DAY_OF_WEEK, 2);
+        int yesterdaySteps = sd.getYesterdaySteps(todayInt);
+        int dayBeforeYesterdaySteps = sd.getStepsDaysBefore(todayInt, 2);
 
         if(!sd.isShownYesterdaySubGoal(today) &&
                 !sd.isShownSubGoal(yesterday) &&
@@ -319,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setProgress(stepCount);
+        if(NDEBUG) todayInt = Calendar.DAY_OF_WEEK;
         if(stepsToGoal == 0) goalReach();
     }
 
