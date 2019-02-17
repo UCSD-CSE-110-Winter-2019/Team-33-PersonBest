@@ -97,8 +97,7 @@ public class TestStepCount {
             assertEquals(i.getGoal(), 4000);
             assertEquals(i.getIncidentWalk(),1000);
             assertEquals(i.getIntentionalWalk(),2000);
-            // TODO add test on that
-            // assertEquals(i.getStats(),"MPH: 2.1");
+            assertEquals(i.getStats(),"MPH: 2.1");
         }
 
     }

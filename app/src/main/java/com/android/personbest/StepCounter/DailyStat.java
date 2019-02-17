@@ -22,7 +22,7 @@ public class DailyStat implements IStatistics {
 
     public String getStats() {
         //Float distance = this.hours * this.averageMPH;
-        String stats = "MPH: " + timeWalked.toString();
+        String stats = "MPH: " + averageMPH.toString();
         return stats;
     }
 
