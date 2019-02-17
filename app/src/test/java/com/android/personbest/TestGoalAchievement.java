@@ -115,7 +115,7 @@ public class TestGoalAchievement {
         activity.setGoal(GOAL_INIT);
         activity.setStepCount(GOAL_INIT+1);
         AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
-        assertNull(alertDialog);
+        assertNull("Expected: null \n Got: " + alertDialog.toString(), alertDialog);
     }
 
     @Test
