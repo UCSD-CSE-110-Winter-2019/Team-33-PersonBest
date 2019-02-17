@@ -41,7 +41,7 @@ public class SetGoalActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SetGoalActivity.this.cancelPressed();
+                SetGoalActivity.this.goBack();
             }
         });
         setButton.setOnClickListener(new View.OnClickListener() {
@@ -80,10 +80,6 @@ public class SetGoalActivity extends AppCompatActivity {
         }
     }
 
-    private void cancelPressed() {
-        finish();
-    }
-
     public void initGoal() {
         int steps = 0;
         SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
@@ -112,9 +108,10 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     public void goBack() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        finish();
+//        Intent intent = new Intent(this, MainActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        startActivity(intent);
     }
 
 }
