@@ -2,10 +2,8 @@ package com.android.personbest.SavedDataManager;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
-import com.android.personbest.MainActivity;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.DateCalendar;
 import com.android.personbest.StepCounter.IDate;
@@ -36,7 +34,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     public int getYesterdaySteps(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         IDate iDate = new DateCalendar(day);
-        Integer yesterday = iDate.getYesterDay();
+        Integer yesterday = iDate.getYesterday();
         return sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
     }
 
@@ -46,7 +44,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         Integer targetDay = today;
         while(days-->0) {
             IDate iDate = new DateCalendar(targetDay);
-            targetDay = iDate.getYesterDay();
+            targetDay = iDate.getYesterday();
         }
         return sp.getInt(targetDay.toString() + "_TotalSteps",DEFAULT_STEPS);
     }
@@ -54,7 +52,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     public int getYesterdayGoal(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         IDate iDate = new DateCalendar(day);
-        Integer yesterday = iDate.getYesterDay();
+        Integer yesterday = iDate.getYesterday();
         return sp.getInt(yesterday.toString() + "_Goal", DEFAULT_GOAL);
     }
 
@@ -63,7 +61,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         Integer targetDay = today;
         while(days-->0) {
             IDate iDate = new DateCalendar(targetDay);
-            targetDay = iDate.getYesterDay();
+            targetDay = iDate.getYesterday();
         }
         return sp.getInt(targetDay.toString() + "_Goal",DEFAULT_GOAL);
     }
@@ -71,7 +69,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     public List<IStatistics> getLastWeekSteps(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         List<IStatistics> result = new ArrayList<>();
-        for (Integer d = 0; d <= day; d++){
+        for (Integer d = 1; d <= day; d++){
             int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
             int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
             int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
@@ -85,19 +83,12 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
 
     }
 
-    public String getTodayString() {
-       return DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now());
-    }
-
-    public String getYesterdayString() {
-        return DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now().plusDays(-1));
-    }
 
     public boolean isShownGoal(String today) {
        return sp.getString("last_day_prompted_goal","").equals(today);
     }
     public void setShownGoal(String today){
-        Log.e(TAG,"Set day " + today + " to be last-day-shown-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-shown-goal ");
         editor.putString("last_day_prompted_goal",today);
         editor.apply();
     }
@@ -106,7 +97,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getString("last_day_prompted_sub_goal","").equals(today);
     }
     public void setShownSubGoal(String today){
-        Log.e(TAG,"Set day " + today + " to be last-day-shown-sub-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-shown-sub-goal ");
         editor.putString("last_day_prompted_sub_goal",today);
         editor.apply();
     }
@@ -116,7 +107,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     public void setCheckedYesterdayGoal(String today) {
-        Log.e(TAG,"Set day " + today + " to be last-day-checked-yesterday-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-checked-yesterday-goal ");
         editor.putString("last_day_checked_yesterday_goal",today);
         editor.apply();
     }
@@ -125,7 +116,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getString("last_day_prompted_yesterday_goal","").equals(today);
     }
     public void setShownYesterdayGoal(String today) {
-        Log.e(TAG,"Set day " + today + " to be last-day-shown-yesterday-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-prompted-yesterday-goal ");
         editor.putString("last_day_prompted_yesterday_goal",today);
         editor.apply();
     }
@@ -135,7 +126,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     public void setCheckedYesterdaySubGoal(String today) {
-        Log.e(TAG,"Set day " + today + " to be last-day-checked-yesterday-sub-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-checked-yesterday-sub-goal ");
         editor.putString("last_day_checked_yesterday_sub_goal",today);
         editor.apply();
     }
@@ -144,7 +135,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getString("last_day_prompted_yesterday_sub_goal","").equals(today);
     }
     public void setShownYesterdaySubGoal(String today) {
-        Log.e(TAG,"Set day " + today + " to be last-day-shown-yesterday-sub-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-shown-yesterday-sub-goal ");
         editor.putString("last_day_prompted_yesterday_sub_goal",today);
         editor.apply();
     }
