@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         editor.putInt("Current Goal",GOAL_INIT);
         editor.apply();
 
-        int caseTesting = 3;
+        int caseTesting = 4;
         NDEBUG = false;
         todayInt = 3;
         String yesterday = sd.getYesterdayString();
@@ -249,9 +249,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 editor.apply();
                 break;
             case 4: // today goal not met but sub goal met after 8 pm -> show toady sub goal
-                break;
-            case 5: // sub goal met after 8 pm
                 theTimer = new TimerMock(22);
+                sd.setShownGoal(yesterday); // today not shown goal yet
+                sd.setShownSubGoal(yesterday); // today not shown sub goal yet
+                setStepCount(10);
+                setGoal(10000);
                 break;
         }
     }
@@ -304,6 +306,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         if(!sd.isShownSubGoal(today) &&
                 !sd.isShownGoal(today) &&
+                todaySteps < goalNum &&
                 progressEncouragement.progressMade(todaySteps, yesterdaySteps)) {
             sd.setShownSubGoal(today);
             progressEncouragement.showEncouragementMessage(todaySteps,yesterdaySteps);
