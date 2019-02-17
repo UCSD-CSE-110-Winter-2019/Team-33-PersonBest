@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
             @Override
             public StepCounter create(MainActivity activity) {
-                System.err.println("Main Activity: " + String.valueOf(activity));
                 return new StepCounterGoogleFit(activity);
             }
         });
@@ -199,11 +198,22 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         today = DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now());
 
-        checkYesterdayGoalReach();
-        checkYesterdaySubGoalReach();
+        // yesterday
+        if(!(sp.getString("last_day_checked_yesterday_goal", today)).equals(today)) {
+            editor.putString("last_day_checked_yesterday_goal",today);
+            editor.apply();
+            checkYesterdayGoalReach();
+        }
+        if(!(sp.getString("last_day_checked_yesterday_sub_goal", today)).equals(today)) {
+            editor.putString("last_day_checked_yesterday_sub_goal",today);
+            editor.apply();
+            checkYesterdaySubGoalReach();
+        }
+
         if(theTimer.isLateToday()) {
             checkSubGoalReach();
         }
+
     }
 
     @Override
@@ -211,11 +221,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         super.onResume();
         if(theTimer.isLateToday()) {
             checkSubGoalReach();
-        }
-        if(!(sp.getString("last_day_checked_yesterday_sub_goal", today)).equals(today)) {
-            editor.putString("last_day_checked_yesterday_sub_goal",today);
-            editor.apply();
-            checkYesterdaySubGoalReach();
         }
     }
 
@@ -229,21 +234,25 @@ public class MainActivity extends AppCompatActivity implements Observer {
         } else {
             Log.e(TAG, "ERROR, google fit result code: " + resultCode);
         }
+        goalNum = sp.getInt("Current Goal",goalNum);
+        setGoal(goalNum);
     }
 
     // goal is reached but should we display the message?
     public void goalReach() {
-        String lastDayPromptedGoal = sp.getString("last_day_prompted_goal",today);
+        String lastDayPromptedGoal = sp.getString("last_day_prompted_goal","");
         if(!lastDayPromptedGoal.equals(today)) {
             editor.putString("last_day_prompted_goal",today);
             editor.apply();
-
+            Log.e(TAG, "Prompted goal on: " + today);
             goalReached(false);
         }
     }
 
+    // has prompted?
+    // has made progress?
     public void checkSubGoalReach() {
-        String lastDaySubGoalPrompted = sp.getString("last_day_prompt_sub_goal",today);
+        String lastDaySubGoalPrompted = sp.getString("last_day_prompt_sub_goal","");
         int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
         int yesterdaySteps = savedDataManager.getYesterdaySteps(Calendar.DAY_OF_WEEK);
         if(!lastDaySubGoalPrompted.equals(today) &&
@@ -254,16 +263,19 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
-
     // check if goal reached yesterday
-    // need to be called only once when per day
+    // need to be called only once per day
     protected void checkYesterdayGoalReach() {
-        String lastDayPromptedYesterdayGoal = sp.getString("last_day_prompted_yesterday_goal",today);;
+        String lastDayPromptedYesterdayGoal = sp.getString("last_day_prompted_yesterday_goal","");;
+        String lastDayPromptedGoal = sp.getString("last_day_prompted_goal","");;
+        String yesterday = DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now().plusDays(-1));
 
-        int yesterdayGoal = savedDataManager.getYesterdayGoal(Calendar.DAY_OF_WEEK);
-        int yesterdaySteps = savedDataManager.getYesterdaySteps(Calendar.DAY_OF_WEEK);
+        int yesterdaySteps = savedDataManager.getStepsDaysBefore(Calendar.DAY_OF_WEEK, 1);
+        int yesterdayGoal = savedDataManager.getGoalDaysBefore(Calendar.DAY_OF_WEEK, 1);
 
-        if(!lastDayPromptedYesterdayGoal.equals(today) && yesterdayGoal <= yesterdaySteps) {
+        if(!lastDayPromptedYesterdayGoal.equals(today) &&
+                !lastDayPromptedGoal.equals(yesterday) &&
+                yesterdaySteps >= yesterdayGoal) {
             editor.putString("last_day_prompted_yesterday_goal",today);
             editor.apply();
             goalReached(true);
@@ -273,32 +285,29 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // check if sub goal reached yesterday
     // need to be called only once per day
     protected void checkYesterdaySubGoalReach() {
-        String lastDayPromptedYesterdayGoal = sp.getString("last_day_prompted_yesterday_goal",today);;
-        String lastDayPromptedGoal = sp.getString("last_day_prompted_goal",today);;
+        String lastDayPromptedYesterdaySubGoal = sp.getString("last_day_prompted_yesterday_sub_goal","");;
+        String lastDayPromptedSubGoal = sp.getString("last_day_prompted_sub_goal","");;
         String yesterday = DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now().plusDays(-1));
 
         int yesterdaySteps = savedDataManager.getYesterdaySteps(Calendar.DAY_OF_WEEK);
         int dayBeforeYesterdaySteps = savedDataManager.getStepsDaysBefore(Calendar.DAY_OF_WEEK, 2);
 
-        if(!lastDayPromptedYesterdayGoal.equals(today) &&
-                !lastDayPromptedGoal.equals(yesterday) &&
+        if(!lastDayPromptedYesterdaySubGoal.equals(today) &&
+                !lastDayPromptedSubGoal.equals(yesterday) &&
                 progressEncouragement.progressMade(yesterdaySteps,dayBeforeYesterdaySteps)) {
-            editor.putString("last_day_prompted_yesterday_goal",today);
+            editor.putString("last_day_prompted_yesterday_sub_goal",today);
             editor.apply();
             progressEncouragement.showEncouragementMessage(yesterdaySteps,dayBeforeYesterdaySteps);
         }
     }
 
     protected void goalReached(boolean isYesterday) {
+        Log.d(TAG,"Goal reached");
+        Log.d(TAG,"Reached goal is yesterday's? " + isYesterday);
         String title = "You Reached the Goal";
         if(isYesterday) title += " Yesterday";
-        Context context = getApplicationContext();
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(context);
-        }
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
         builder.setTitle(title)
                 .setMessage("Congratulations! Do you want to set a new step goal?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -311,7 +320,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                         // do nothing
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
@@ -320,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setProgress(stepCount);
-        if(stepCount == 0) goalReach();
+        if(stepsToGoal == 0) goalReach();
     }
 
 
@@ -381,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
-        public StepCounter getStepCounter(){
+    public StepCounter getStepCounter(){
         return this.stepCounter;
     }
 
@@ -406,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchSetGoalActivity(View view) {
         Intent intent = new Intent(this, SetGoalActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,0);
     }
 
     public void launchSetGoalActivity() {
