@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        final Activity self = this;
 
         // Setup UI
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
@@ -98,7 +99,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedTimeValue = findViewById(R.id.timeValue);
         plannedStepValue = findViewById(R.id.stepValue);
         plannedMPHValue = findViewById(R.id.mphValue);
-        //setGoalButton = findViewById(R.id.main_setgoal);
         setPlannedExerciseStatsVisibility(false);
 
         progressBar = findViewById(R.id.progressBar);
@@ -135,12 +135,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 }
             }
         });
-        /*setGoalButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Inten
-            }
-        });*/
 
         // Check if this is the first time launching app
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
@@ -183,6 +177,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
         btnUpdateSteps.setEnabled(false);
         btnUpdateSteps.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("State", "OnStart");
+        //initGoal();
     }
 
     public void launchSummary(long timeElapsed, int stepsTaken) {
@@ -231,6 +232,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         progressBar.setProgress(stepCount);
     }
 
+    public int getGoal() {
+        return this.goalNum;
+    }
+
     public void showEncouragement(int stepCount) {
         long percentage = (int)Math.floor(stepCount * 100.0 / goalNum);
         if(percentage < 10) return;
@@ -255,7 +260,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
-    public void setGoalPressed() {
-
+    public void launchSetGoalActivity(View view) {
+        Intent intent = new Intent(this, SetGoalActivity.class);
+        startActivity(intent);
     }
 }

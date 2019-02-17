@@ -5,6 +5,7 @@
 package com.android.personbest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,13 +23,14 @@ public class SetGoalActivity extends AppCompatActivity {
     EditText editText;
 
     TextView goalRecommandation;
-    Long stepGoal = 555L;
+    int stepGoal = 555;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_goal);
 
+        initGoal();
         initViews();
     }
 
@@ -63,24 +65,56 @@ public class SetGoalActivity extends AppCompatActivity {
 
     private void acceptPressed() {
         save(stepGoal);
+        goBack();
     }
 
     private void setPressed() {
         final String steps = editText.getText().toString();
-        save(Long.parseLong(steps));
+        try {
+            save(Integer.parseInt(steps));
+            goBack();
+        } catch(NumberFormatException e) {
+            e.printStackTrace();
+            CharSequence text = "Invalid input, please try again.";
+            Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void cancelPressed() {
         finish();
     }
 
-    public void save(Long stepNumber) {
-        SharedPreferences sharedPref = getSharedPreferences("user_goal", Context.MODE_PRIVATE);
+    public void initGoal() {
+        int steps = 0;
+        SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
+
+        steps = sharedPreferences.getInt("Current Goal", 0);
+        // overflow check, will not change if overflow
+        long tmpSteps = (long) steps + 500;
+        if(tmpSteps == (int)tmpSteps) steps += 500;
+        setGoal(steps);
+    }
+
+    public void setGoal(int num) {
+        this.stepGoal = num;
+    }
+
+    public int getGoal() {
+        return this.stepGoal;
+    }
+
+    public void save(int stepNumber) {
+        SharedPreferences sharedPref = getSharedPreferences("user_data", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
-
-        editor.putLong("stepNumber", stepNumber);
+        editor.putInt("Current Goal", stepNumber);
         editor.apply();
+    }
+
+    public void goBack() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
 }
