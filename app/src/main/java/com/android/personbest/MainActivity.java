@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private boolean NDEBUG = true;
 
     // UI-related members
+
     private TextView stepsTodayVal;
     private TextView goalVal;
     private TextView stepsLeftVal;
