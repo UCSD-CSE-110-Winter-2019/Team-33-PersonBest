@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void showEncouragement(int stepCount) {
         long percentage = (int)Math.floor(stepCount * 100.0 / goalNum);
-        if(percentage < 10) return;
+        if(percentage < 10.0) return;
 
         Context context = getApplicationContext();
         CharSequence text = "Good job! You're already at " + percentage + "% of the daily recommended number of steps.";
