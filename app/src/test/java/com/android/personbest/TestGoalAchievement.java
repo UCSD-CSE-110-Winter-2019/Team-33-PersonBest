@@ -281,15 +281,14 @@ public class TestGoalAchievement {
     }
 
     @Test
+    public void testSubGoal() {
+
+    }
+
+    @Test
     public void testYesterdaySubGoalReachedNotDisplayed() {
 //        assertEquals("Good job! You're already at 13% of the daily recommended number of steps.",
 //                ShadowToast.getTextOfLatestToast());
-    }
-
-    @After
-    public void reset() {
-        editor.clear();
-        editor.apply();
     }
 
     private void setYesterdaySteps(int steps) {
