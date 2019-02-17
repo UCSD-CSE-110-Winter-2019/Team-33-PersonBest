@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -12,7 +11,6 @@ import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
-import com.android.personbest.StepCounter.StepCounter;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
@@ -21,7 +19,10 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.StackedValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.security.InvalidParameterException;
 import java.time.DayOfWeek;
@@ -74,11 +75,8 @@ public class ProgressChart extends AppCompatActivity {
     }
 
     public void setBarChart() {
-        entries.clear();
         List<IStatistics> stepStats = new ArrayList<>();//stepCounter.getLastWeekSteps(date);
-        ArrayList<String> xAxis = new ArrayList<>();
-        ArrayList<LegendEntry> legendEntries = new ArrayList<>();
-        xAxis.add("");
+
 
         stepStats.add(new DailyStat(5000, 8226, 3255, null));
         stepStats.add(new DailyStat(5000, 6260, 3752, null));
@@ -88,18 +86,20 @@ public class ProgressChart extends AppCompatActivity {
         stepStats.add(new DailyStat(5000, 9934, 9225, null));
         stepStats.add(new DailyStat(5000, 7633, 6706, null));
 
-        int i = 0, j = 6;
-        for (IStatistics stat : stepStats) {
-            i += 1;
-            j = j % 7;
-            float[] tempArr = new float[2];
-            tempArr[0] = stat.getIncidentWalk();
-            tempArr[1] = stat.getIntentionalWalk();
-            //tempArr[2] = stat.getGoal();
-            entries.add(new BarEntry(i, tempArr));
-            xAxis.add(DayOfWeek.of(++j).getDisplayName(TextStyle.SHORT, Locale.US));
+
+        ArrayList<String> xAxis = new ArrayList<>();
+        ArrayList<LegendEntry> legendEntries = new ArrayList<>();
+        xAxis.add("");
+        createBarEntries(stepStats);
+        int j = 6;
+        for(BarEntry be: entries) {
+            j = j % 7 + 1;
+            xAxis.add(DayOfWeek.of(j).getDisplayName(TextStyle.SHORT, Locale.US)/* + "\nIncidental Walk: " +
+                                                     be.getYVals()[0] + "\nIntentional Walk: " + be.getYVals()[1]*/);
         }
+
         BarDataSet stepDataSet = new BarDataSet(entries, "Steps Current Week");
+        //stepDataSet.setValueFormatter(new EnhancedStackedValueFormatter(null));
         stepDataSet.setColors(Color.rgb(0, 92, 175), Color.rgb(123, 144, 210));
         BarData stepData = new BarData(stepDataSet);
         legendEntries.add(new LegendEntry("Incidental Walk", Legend.LegendForm.DEFAULT,
@@ -115,6 +115,32 @@ public class ProgressChart extends AppCompatActivity {
         l.setLineColor(Color.rgb(0, 0, 0));
         progressChart.getAxisLeft().addLimitLine(l);
         progressChart.getLegend().setCustom(legendEntries);
+        progressChart.setTouchEnabled(false);
         progressChart.invalidate();
+    }
+
+    private void createBarEntries(List<IStatistics> stepStats) {
+        entries.clear();
+        int i = 0;
+        for (IStatistics stat : stepStats) {
+            i += 1;
+            float[] tempArr = new float[2];
+            tempArr[0] = stat.getIncidentWalk();
+            tempArr[1] = stat.getIntentionalWalk();
+            entries.add(new BarEntry(i, tempArr));
+        }
+    }
+
+    class EnhancedStackedValueFormatter extends StackedValueFormatter {
+        private String[] appendices;
+        public EnhancedStackedValueFormatter(String[] appendices) {
+            super(false, null, 0);
+            this.appendices = appendices;
+        }
+
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            return "null";
+        }
     }
 }
