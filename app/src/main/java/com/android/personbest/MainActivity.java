@@ -94,13 +94,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d("State", "OnStart");
-        //initGoal();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -162,6 +155,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         editor = sp.edit();
         if(sp.getAll().isEmpty()) {
             startActivity(new Intent(this, SetUpActivity.class));
+            editor.putInt("Current Goal",GOAL_INIT);
+            editor.apply();
         }
 
         goalNum = sp.getInt("Current Goal", 5000);
@@ -200,6 +195,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         today = sd.getTodayString();
         todayInt = Calendar.DAY_OF_WEEK;
 
+        addMockData(); // DEV
+
         // yesterday
         // only once since data of yesterday never changes today
         if(!sd.isCheckedYesterdayGoal(today)) {
@@ -216,33 +213,47 @@ public class MainActivity extends AppCompatActivity implements Observer {
             checkSubGoalReach();
         }
 
-//        addMockData();
     }
 
 
     public void addMockData() {
         editor.clear(); // panic
+        editor.putInt("Current Goal",GOAL_INIT);
+        editor.apply();
 
-        int caseTesting = 1;
+        int caseTesting = 3;
         NDEBUG = false;
         todayInt = 3;
-
-        theTimer = new TimerMock(22);
+        String yesterday = sd.getYesterdayString();
 
         switch (caseTesting) {
             case 1: // today goal met -> display goal
+                sd.setShownGoal(yesterday);
+                setStepCount(goalNum+1);
                 break;
             case 2: // yesterday goal met but not displayed -> display yesterday goal
+                sd.setShownGoal(today);
+                sd.setShownYesterdayGoal(yesterday);
+                editor.putInt("2_Goal",1);
+                editor.putInt("2_TotalSteps",10);
+                editor.apply();
                 break;
-            case 3: // yesterday sub goal met but not goal met and not displayed
+            case 3: // yesterday sub goal met but not displayed and no today goal met -> show yesterday sub goal
+                sd.setCheckedYesterdaySubGoal(yesterday); // today not checked yet
+                sd.setShownYesterdaySubGoal(yesterday); // today not shown yet
+                sd.setShownYesterdayGoal(yesterday); // today did not show yesterday goal
+                sd.setShownSubGoal(today); // yesterday did not show sub goal (time travel here)
+                editor.putInt("2_Goal",2147483647);
+                editor.putInt("2_TotalSteps",501);
+                editor.putInt("1_TotalSteps",1);
+                editor.apply();
                 break;
-            case 4: // yesterday goal met but not displayed
+            case 4: // today goal not met but sub goal met after 8 pm -> show toady sub goal
                 break;
-            case 5:
+            case 5: // sub goal met after 8 pm
+                theTimer = new TimerMock(22);
                 break;
         }
-
-        editor.apply();
     }
 
     @Override
@@ -251,6 +262,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if(theTimer.isLateToday()) {
             checkSubGoalReach();
         }
+        // update date
+        // FIXME
+        //if(todayInt != Calendar.DAY_OF_WEEK) {
+        //    todayInt = Calendar.DAY_OF_WEEK;
+        //    today = sd.getTodayString();
+        //}
     }
 
     @Override
@@ -263,6 +280,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         } else {
             Log.e(TAG, "ERROR, google fit result code: " + resultCode);
         }
+
+        // update goals
         goalNum = sp.getInt("Current Goal",goalNum);
         setGoal(goalNum);
     }
@@ -318,7 +337,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if(!sd.isShownYesterdaySubGoal(today) &&
                 !sd.isShownSubGoal(yesterday) &&
                 !sd.isShownYesterdayGoal(today) &&
-                !sd.isShownGoal(today) &&
                 progressEncouragement.progressMade(yesterdaySteps,dayBeforeYesterdaySteps)) {
             sd.setShownYesterdaySubGoal(today);
             progressEncouragement.showEncouragementMessage(yesterdaySteps,dayBeforeYesterdaySteps);
