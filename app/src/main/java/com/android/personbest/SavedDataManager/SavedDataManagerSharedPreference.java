@@ -47,6 +47,16 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getInt(yesterday.toString() + "_Goal", DEFAULT_GOAL);
     }
 
+    public int getGoalDaysBefore(int today, int days) {
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+        Integer targetDay = today;
+        while(days-->0) {
+            IDate iDate = new IDate(targetDay);
+            targetDay = iDate.getYesterDay();
+        }
+        return sp.getInt(targetDay.toString() + "_Goal",DEFAULT_GOAL);
+    }
+
     public List<IStatistics> getLastWeekSteps(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         List<IStatistics> result = new ArrayList<>();
