@@ -43,7 +43,7 @@
             android:layout_height="wrap_content" android:layout_margin="20dp">
 
         <TextView
-                android:text="You can also set your own goal:"
+                android:text="Set your own:"
                 android:layout_width="wrap_content"
                 android:layout_height="34dp" android:id="@+id/setup_goal_recomanded_text2"
                 android:textSize="25sp"
