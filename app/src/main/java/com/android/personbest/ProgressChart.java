@@ -33,6 +33,9 @@ public class ProgressChart extends AppCompatActivity {
     private SavedDataManager savedDataManager;
     private int date;
     private CombinedChart progressChart;
+    CombinedData data;
+    ArrayList<String> xAxisLabel;
+    ArrayList<String> stats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,42 +56,39 @@ public class ProgressChart extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                ((ProgressChart) self).setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1);
+                ((ProgressChart) self).setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue());
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         progressChart = findViewById(R.id.progressChart);
 
-        setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1);
+        setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue());
+    }
+
+    public void setManager(SavedDataManager manager) {
+        savedDataManager = manager;
     }
 
     public void setDate(int date) {
-        if (date < 0 || date >= 7)
+        if (date < 1 || date >= 8)
             throw new InvalidParameterException("Date expected between 0 and 6, but got" + date);
         this.date = date;
-        setBarChart();
+
+        List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(date);
+        setBarChart(stepStats);
     }
 
 
     // Some of the configuration ideas (like axis) used this tutorial
     // https://www.studytutorial.in/android-combined-line-and-bar-chart-using-mpandroid-library-android-tutorial
     // as reference
-    public void setBarChart() {
-        List<IStatistics> stepStats = new ArrayList<>();//stepCounter.getLastWeekSteps(date);
-
-        // FIXME
-        stepStats.add(new DailyStat(5000, 8226, 3255, String.format("S:3255\nT:1:30:02\nD:%.2fmi", 3255/2435f)));
-        stepStats.add(new DailyStat(5540, 6260, 3752, String.format("S:3752\nT:1:43:31\nD:%.2fmi", 3752/2435f)));
-        stepStats.add(new DailyStat(6000, 1939, 882, String.format("S:1939\nT:0:50:45\nD:%.2fmi", 882/2435f)));
-        stepStats.add(new DailyStat(6500, 3755, 3078, String.format("S:3078\nT:1:23:37\nD:%.2fmi", 3078/2435f)));
-        stepStats.add(new DailyStat(6875, 4530, 3673, String.format("S:3673\nT:1:39:40\nD:%.2fmi", 3673/2435f)));
-        stepStats.add(new DailyStat(7500, 9934, 9225, String.format("S:9225\nT:4:08:29\nD:%.2fmi", 9225/2435f)));
-        stepStats.add(new DailyStat(8500, 7633, 6706, String.format("S:6706\nT:3:01:57\nD:%.2fmi", 6706/2435f)));
+    public void setBarChart(List<IStatistics> stepStats) {
 
         createEntries(stepStats);
 
-        ArrayList<String> xAxisLabel = new ArrayList<>();
+        // Create Axis
+        xAxisLabel = new ArrayList<>();
         xAxisLabel.add("");
         int j = 6;
         for(BarEntry be: barEntries) {
@@ -96,13 +96,14 @@ public class ProgressChart extends AppCompatActivity {
             xAxisLabel.add(DayOfWeek.of(j).getDisplayName(TextStyle.SHORT, Locale.US));
         }
 
-        ArrayList<String> stats = new ArrayList<>();
+        // Add daily stats
+        stats = new ArrayList<>();
         for(IStatistics stat : stepStats) {
             stats.add(stat.getStats());
         }
 
         // Set data
-        CombinedData data = new CombinedData();
+        data = new CombinedData();
         data.setData(createBarData(stats.toArray(new String[stats.size()])));
         data.setData(createLineData());
 
@@ -183,7 +184,23 @@ public class ProgressChart extends AppCompatActivity {
         return new LineData(goalDataSet);
     }
 
-    class EnhancedStackedValueFormatter extends StackedValueFormatter {
+    public LineData getLineData() {
+        return data.getLineData();
+    }
+
+    public BarData getBarData() {
+        return data.getBarData();
+    }
+
+    public ArrayList<String> getXAxisLabel() {
+        return xAxisLabel;
+    }
+
+    public ArrayList<String> getDailyStats() {
+        return stats;
+    }
+
+    public static class EnhancedStackedValueFormatter extends StackedValueFormatter {
         private String[] appendices;
         public EnhancedStackedValueFormatter(String[] appendices) {
             super(false, null, 0);
