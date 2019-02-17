@@ -32,12 +32,6 @@ public class SavedDataManagerTest implements SavedDataManager {
     public int getGoalDaysBefore(int today, int days) {
         return -1;
     }
-    public String getTodayString() {
-        return null;
-    }
-    public String getYesterdayString() {
-        return null;
-    }
 
     public boolean isShownGoal(String today) {
         return false;
