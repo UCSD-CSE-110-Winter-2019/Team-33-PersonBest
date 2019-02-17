@@ -34,6 +34,8 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     private final int DEFAULT_STEPS = 0;
     private final int DEFAULT_GOAL = 5000;
+    private final long DEFAULT_TIME = 0L;
+    private final float DEFAULT_MPH = 0;
     private final String TAG = "GoogleFitAdapter";
     private static final long UPDATE_INTERVAL = 1000;
     private SharedPreferences sp;
@@ -196,7 +198,9 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
             int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
             int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
             int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,"");
+            long time  = sp.getLong(d.toString()+"_ExerciseTime",DEFAULT_TIME);
+            float averageMPH = sp.getFloat(d.toString()+"_AverageMPH",DEFAULT_MPH);
+            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps, time, averageMPH);
             result.add(dailyStat);
         }
 

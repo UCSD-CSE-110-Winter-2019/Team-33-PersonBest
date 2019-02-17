@@ -83,13 +83,15 @@ public class TestStepCount {
             editor.putInt(i.toString()+"_TotalSteps",3000);
             editor.putInt(i.toString()+"_IntentionalSteps",2000);
             editor.putInt(i.toString()+"_Goal",4000);
+            editor.putFloat(i.toString()+"_AverageMPH", (float) 2.1);
+            editor.putLong(i.toString()+"_ExerciseTime", 8908L)
             editor.apply();
         }
 
         IDate iDate =  new IDate(3);
         int day = iDate.getDay();
         StepCounterGoogleFit stepCounter = (StepCounterGoogleFit) activity.getStepCounter();
-        List<IStatistics> history = activity.getStepCounter().getLastWeekSteps(day);
+        List<IStatistics> history = stepCounter.getLastWeekSteps(day);
         assertEquals(history.size(),4);
         for ( IStatistics i: history){
             assertEquals(i.getGoal(), 4000);
