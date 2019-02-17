@@ -1,9 +1,9 @@
 package com.android.personbest;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.app.Dialog;
+import android.content.*;
+import android.widget.Button;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
 
 import java.util.Calendar;
@@ -56,6 +57,7 @@ public class TestGoalAchievement {
     private static final int NEXT_STEP_COUNT = 1337;
 
     private MainActivity activity;
+    private ShadowActivity shadowActivity;
     private SharedPreferences sp;
     private SavedDataManager sd;
     private SharedPreferences.Editor editor;
@@ -77,6 +79,7 @@ public class TestGoalAchievement {
         Intent intent = new Intent(application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        shadowActivity = Shadows.shadowOf(activity);
         //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
 
         sd = new SavedDataManagerSharedPreference(activity);
@@ -213,9 +216,77 @@ public class TestGoalAchievement {
                 shadowAlertDialog.getMessage());
     }
 
+    @Test
+    public void testTodayGoalReachedYesNavigation() {
+        sd.setShownGoal(PAY_DAY);
+        activity.setGoal(GOAL_INIT);
+        activity.setStepCount(GOAL_INIT+1);
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+
+        Button confirm = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        confirm.performClick();
+        Intent intent = shadowActivity.peekNextStartedActivityForResult().intent;
+        assertEquals(new ComponentName(activity, SetGoalActivity.class), intent.getComponent());
+    }
+
+    @Test
+    public void testTodayGoalReachedNoNavigation() {
+        sd.setShownGoal(PAY_DAY);
+        activity.setGoal(GOAL_INIT);
+        activity.setStepCount(GOAL_INIT+1);
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+
+        Button btn = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        btn.performClick();
+        Intent intent = shadowActivity.peekNextStartedActivityForResult().intent;
+        assertNotEquals(new ComponentName(activity, SetGoalActivity.class), intent.getComponent());
+    }
+
+    @Test
+    public void testYesterdayGoalReachedNotDisplayed() {
+        sd.setShownYesterdayGoal(PAY_DAY);
+        setYesterdayGoal(GOAL_INIT);
+        setYesterdaySteps(GOAL_INIT + 1);
+        activity.checkYesterdayGoalReach();
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+        assertNotNull(alertDialog);
+        ShadowAlertDialog shadowAlertDialog = Shadows.shadowOf(alertDialog);
+        assertEquals("You Reached the Goal Yesterday",
+                shadowAlertDialog.getTitle());
+        assertEquals("Congratulations! Do you want to set a new step goal?",
+                shadowAlertDialog.getMessage());
+    }
+
+    @Test
+    public void testYesterdayGoalReachedNotDisplayedAlreadyDisplayed() {
+        sd.setShownYesterdayGoal(TEST_DAY);
+        setYesterdayGoal(GOAL_INIT);
+        setYesterdaySteps(GOAL_INIT + 1);
+        activity.checkYesterdayGoalReach();
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+        assertNull(alertDialog);
+    }
+
+    @Test
+    public void testYesterdaySubGoalReachedNotDisplayed() {
+
+    }
+
     @After
     public void reset() {
         editor.clear();
+        editor.apply();
+    }
+
+    private void setYesterdaySteps(int steps) {
+        String yesterdayStepStr = mockDate.getYesterday() + "_TotalSteps";
+        editor.putInt(yesterdayStepStr, steps);
+        editor.apply();
+    }
+
+    private void setYesterdayGoal(int goal) {
+        String yesterdayGoalStr = mockDate.getYesterday() + "_Goal";
+        editor.putInt(yesterdayGoalStr, goal);
         editor.apply();
     }
 
