@@ -123,6 +123,9 @@ public class TestGoalAchievement {
     @Test
     public void testTodayGoalReachedPrompted() {
         sd.setShownGoal(TEST_DAY);
+        editor.putString("last_day_prompted_goal", TEST_DAY);
+        editor.apply();
+        Log.i(TAG,"Last day shown goal is: " + sp.getString("last_day_prompted_goal","Empty"));
         activity.setGoal(GOAL_INIT);
         activity.setStepCount(GOAL_INIT+1);
         AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
