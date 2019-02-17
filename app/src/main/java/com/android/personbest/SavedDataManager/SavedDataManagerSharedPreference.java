@@ -83,13 +83,6 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
 
     }
 
-    public String getTodayString() {
-       return DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now());
-    }
-
-    public String getYesterdayString() {
-        return DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now().plusDays(-1));
-    }
 
     public boolean isShownGoal(String today) {
        return sp.getString("last_day_prompted_goal","").equals(today);

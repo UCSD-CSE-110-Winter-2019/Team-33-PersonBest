@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
-        setToday(sd.getTodayString());
+        setToday(theTimer.getTodayString());
         todayInt = theDate.getDay();
 
         // yesterday
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // update date
         if(todayInt != theDate.getDay()) {
             todayInt = theDate.getDay();
-            setToday(sd.getTodayString());
+            setToday(theTimer.getTodayString());
         }
     }
 
@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // check if goal reached yesterday
     // need to be called only once per day
     protected void checkYesterdayGoalReach() {
-        String yesterday = sd.getYesterdayString();
+        String yesterday = theTimer.getYesterdayString();
 
         int yesterdaySteps = sd.getStepsDaysBefore(todayInt, 1);
         int yesterdayGoal = sd.getGoalDaysBefore(todayInt, 1);
@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // check if sub goal reached yesterday
     // need to be called only once per day
     protected void checkYesterdaySubGoalReach() {
-        String yesterday = sd.getYesterdayString();
+        String yesterday = theTimer.getYesterdayString();
 
         int yesterdaySteps = sd.getYesterdaySteps(todayInt);
         int dayBeforeYesterdaySteps = sd.getStepsDaysBefore(todayInt, 2);
@@ -369,9 +369,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
         this.today = today;
     }
 
+
     // for test
     public void setTimer(ITimer t) {
         this.theTimer = t;
+        setToday(theTimer.getTodayString());
     }
 
     public void setSavedDataManager(SavedDataManager sd) {
@@ -380,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void setTheDate(IDate d) {
         this.theDate = d;
+        todayInt = theDate.getDay();
     }
 
     public void setPlannedExerciseStatsVisibility(boolean visible) {
