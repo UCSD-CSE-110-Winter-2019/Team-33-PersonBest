@@ -42,6 +42,7 @@ import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowToast;
 
 import java.util.Calendar;
+import java.util.IllegalFormatException;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -49,6 +50,7 @@ import static org.robolectric.RuntimeEnvironment.application;
 
 @RunWith(RobolectricTestRunner.class)
 public class TestGoalAchievement {
+    private static final String TAG = "[TestGoalAchievement]";
     private static final String TEST_SERVICE = "TEST_SERVICE";
     private static final String TEST_DAY = "09/09/2019";
     private static final int TEST_DAY_INT = 3; // just random number
@@ -265,7 +267,9 @@ public class TestGoalAchievement {
     @Test
     public void testYesterdayGoalReachedNotDisplayedAlreadyDisplayed() {
         sd.setShownYesterdayGoal(TEST_DAY);
-        System.err.println("Last day checked yesterday goal is: " + sp.getString("last_day_checked_yesterday_goal","Empty"));
+        editor.putString("last_day_prompted_yesterday_goal", TEST_DAY);
+        editor.apply();
+        Log.i(TAG,"Last day shown yesterday goal is: " + sp.getString("last_day_prompted_yesterday_goal","Empty"));
         setYesterdayGoal(GOAL_INIT);
         setYesterdaySteps(GOAL_INIT + 1);
         activity.checkYesterdayGoalReach();
