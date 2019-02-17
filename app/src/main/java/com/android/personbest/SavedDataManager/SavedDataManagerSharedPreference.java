@@ -2,10 +2,8 @@ package com.android.personbest.SavedDataManager;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
-import com.android.personbest.MainActivity;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.DateCalendar;
 import com.android.personbest.StepCounter.IDate;
@@ -36,7 +34,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     public int getYesterdaySteps(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         IDate iDate = new DateCalendar(day);
-        Integer yesterday = iDate.getYesterDay();
+        Integer yesterday = iDate.getYesterday();
         return sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
     }
 
@@ -46,7 +44,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         Integer targetDay = today;
         while(days-->0) {
             IDate iDate = new DateCalendar(targetDay);
-            targetDay = iDate.getYesterDay();
+            targetDay = iDate.getYesterday();
         }
         return sp.getInt(targetDay.toString() + "_TotalSteps",DEFAULT_STEPS);
     }
@@ -54,7 +52,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     public int getYesterdayGoal(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         IDate iDate = new DateCalendar(day);
-        Integer yesterday = iDate.getYesterDay();
+        Integer yesterday = iDate.getYesterday();
         return sp.getInt(yesterday.toString() + "_Goal", DEFAULT_GOAL);
     }
 
@@ -63,7 +61,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         Integer targetDay = today;
         while(days-->0) {
             IDate iDate = new DateCalendar(targetDay);
-            targetDay = iDate.getYesterDay();
+            targetDay = iDate.getYesterday();
         }
         return sp.getInt(targetDay.toString() + "_Goal",DEFAULT_GOAL);
     }

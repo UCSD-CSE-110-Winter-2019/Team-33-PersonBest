@@ -1,14 +1,13 @@
 package com.android.personbest.StepCounter;
 
-import java.util.Date;
+import java.util.Calendar;
 
 public class DateCalendar implements IDate {
 
     private int day;
 
     public DateCalendar (){
-        Date now = new Date();
-        this.day = now.getDay();
+        this.day = -1;
     }
 
     public DateCalendar(int day){
@@ -16,7 +15,7 @@ public class DateCalendar implements IDate {
     }
 
     @Override
-    public int getYesterDay() {
+    public int getYesterday() {
         if (this.day == 0){
             return FINAL_DAY;
         }
@@ -27,6 +26,7 @@ public class DateCalendar implements IDate {
 
     @Override
     public int getDay() {
-        return this.day;
+        if(day == -1) return Calendar.DAY_OF_WEEK;
+        else return this.day;
     }
 }
