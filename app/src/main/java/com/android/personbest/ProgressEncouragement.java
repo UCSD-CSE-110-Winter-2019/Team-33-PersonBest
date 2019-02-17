@@ -29,6 +29,7 @@ public class ProgressEncouragement {
     }
 
     public boolean progressMade(int cur, int prev){
-        return cur>prev;
+        long curLong = (long) cur, prevLong = (long) prev;
+        return curLong>=(prevLong+500); // less than 500 steps is not a progress made
     }
 }

@@ -19,12 +19,15 @@ import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
+import com.android.personbest.Timer.ITimer;
+import com.android.personbest.Timer.TimerSystem;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Observable;
-import java.util.Observer;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements Observer {
 
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
+    private static final int DATE_STRING_LENGTH = 10;
 
     // private variables
     private String fitnessServiceKey;
@@ -49,7 +53,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private StepCounterGoogleFit stepCounter;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
     private SavedDataManager savedDataManager;
-    private int today;
+    private ITimer theTimer;
+    private ProgressEncouragement progressEncouragement;
+    private String today;
 
     // UI-related members
     private TextView stepsTodayVal;
@@ -118,6 +124,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         progressBar.setProgress(0);
 
         savedDataManager = new SavedDataManagerSharedPreference(this);
+        theTimer = new TimerSystem();
+        progressEncouragement = new ProgressEncouragement(this);
 
         final Button startStopBtn = findViewById(R.id.startStop);
         startStopBtn.setText("  Start Walk/Run  ");
@@ -189,8 +197,26 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
-        today = ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1;
+        today = DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now());
+
         checkYesterdayGoalReach();
+        checkYesterdaySubGoalReach();
+        if(theTimer.isLateToday()) {
+            checkSubGoalReach();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(theTimer.isLateToday()) {
+            checkSubGoalReach();
+        }
+        if(!(sp.getString("last_day_checked_yesterday_sub_goal", today)).equals(today)) {
+            editor.putString("last_day_checked_yesterday_sub_goal",today);
+            editor.apply();
+            checkYesterdaySubGoalReach();
+        }
     }
 
     @Override
@@ -205,20 +231,65 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
-    protected void checkYesterdayGoalReach() {
-        int lastDayPromptedYesterdayGoal = sp.getInt("last_day_prompted_yesterday_goal",today);;
-
-        int yesterdayGoal = savedDataManager.getYesterdayGoal(today);
-        int yesterdaySteps = savedDataManager.getYesterdaySteps(today);
-
-        if(lastDayPromptedYesterdayGoal != today && yesterdayGoal <= yesterdaySteps) {
-            goalReached(true);
-            editor.putInt("last_day_prompted_yesterday_goal",today);
+    // goal is reached but should we display the message?
+    public void goalReach() {
+        String lastDayPromptedGoal = sp.getString("last_day_prompted_goal",today);
+        if(!lastDayPromptedGoal.equals(today)) {
+            editor.putString("last_day_prompted_goal",today);
             editor.apply();
+
+            goalReached(false);
         }
     }
 
-    public void goalReached(boolean isYesterday) {
+    public void checkSubGoalReach() {
+        String lastDaySubGoalPrompted = sp.getString("last_day_prompt_sub_goal",today);
+        int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
+        int yesterdaySteps = savedDataManager.getYesterdaySteps(Calendar.DAY_OF_WEEK);
+        if(!lastDaySubGoalPrompted.equals(today) &&
+                progressEncouragement.progressMade(todaySteps,yesterdaySteps)) {
+            editor.putString("last_day_prompt_sub_goal",today);
+            editor.apply();
+            progressEncouragement.showEncouragementMessage(todaySteps,yesterdaySteps);
+        }
+    }
+
+
+    // check if goal reached yesterday
+    // need to be called only once when per day
+    protected void checkYesterdayGoalReach() {
+        String lastDayPromptedYesterdayGoal = sp.getString("last_day_prompted_yesterday_goal",today);;
+
+        int yesterdayGoal = savedDataManager.getYesterdayGoal(Calendar.DAY_OF_WEEK);
+        int yesterdaySteps = savedDataManager.getYesterdaySteps(Calendar.DAY_OF_WEEK);
+
+        if(!lastDayPromptedYesterdayGoal.equals(today) && yesterdayGoal <= yesterdaySteps) {
+            editor.putString("last_day_prompted_yesterday_goal",today);
+            editor.apply();
+            goalReached(true);
+        }
+    }
+
+    // check if sub goal reached yesterday
+    // need to be called only once per day
+    protected void checkYesterdaySubGoalReach() {
+        String lastDayPromptedYesterdayGoal = sp.getString("last_day_prompted_yesterday_goal",today);;
+        String lastDayPromptedGoal = sp.getString("last_day_prompted_goal",today);;
+        String yesterday = DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now().plusDays(-1));
+
+        int yesterdaySteps = savedDataManager.getYesterdaySteps(Calendar.DAY_OF_WEEK);
+        int dayBeforeYesterdaySteps = savedDataManager.getStepsDaysBefore(Calendar.DAY_OF_WEEK, 2);
+
+        if(!lastDayPromptedYesterdayGoal.equals(today) &&
+                !lastDayPromptedGoal.equals(yesterday) &&
+                progressEncouragement.progressMade(yesterdaySteps,dayBeforeYesterdaySteps)) {
+            editor.putString("last_day_prompted_yesterday_goal",today);
+            editor.apply();
+            progressEncouragement.showEncouragementMessage(yesterdaySteps,dayBeforeYesterdaySteps);
+        }
+    }
+
+    protected void goalReached(boolean isYesterday) {
         String title = "You Reached the Goal";
         if(isYesterday) title += " Yesterday";
         Context context = getApplicationContext();
@@ -235,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                        launchSetGoalActivity();
                     }
                 })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
                     }
@@ -249,14 +320,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setProgress(stepCount);
-        if(stepsToGoal == 0) {
-            int lastDayPromptedGoal = sp.getInt("last_day_prompted_goal",today);
-            if(lastDayPromptedGoal != today) {
-                this.goalReached(false);
-                editor.putInt("last_day_prompted_goal",today);
-                editor.apply();
-            }
-        }
+        if(stepCount == 0) goalReach();
     }
 
 
@@ -278,9 +342,28 @@ public class MainActivity extends AppCompatActivity implements Observer {
         return this.goalNum;
     }
 
-    public void setToday(int date) {
-        if(date < 0 || date >= 7) this.today = date;
-        else throw new IllegalArgumentException("Wrong date format");
+    // MM/dd/yyyy
+    public void setToday(String today) {
+        try {
+            if(today.length() != DATE_STRING_LENGTH) {
+                throw new IllegalArgumentException("Wrong date format");
+            }
+            int mm = Integer.parseInt(today.substring(0,2));
+            int dd = Integer.parseInt(today.substring(3,5));
+            int yyyy = Integer.parseInt(today.substring(6,DATE_STRING_LENGTH));
+            if(! (1 <= mm && mm <= 12 && 1 <= dd && dd <= 31 && 0 < yyyy) ) {
+                throw new IllegalArgumentException("Wrong date format");
+            }
+        } catch (IllegalFormatException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        this.today = today;
+    }
+
+    // for testing
+    public void setTimer(ITimer t) {
+        this.theTimer = t;
     }
 
     public void setPlannedExerciseStatsVisibility(boolean visible) {

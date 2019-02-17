@@ -2,6 +2,7 @@ package com.android.personbest.SavedDataManager;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import com.android.personbest.MainActivity;
 import com.android.personbest.StepCounter.DailyStat;
@@ -26,6 +27,17 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         IDate iDate = new IDate(day);
         Integer yesterday = iDate.getYesterDay();
         return sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
+    }
+
+
+    public int getStepsDaysBefore(int today, int days) {
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+        Integer targetDay = today;
+        while(days-->0) {
+            IDate iDate = new IDate(targetDay);
+            targetDay = iDate.getYesterDay();
+        }
+        return sp.getInt(targetDay.toString() + "_TotalSteps",DEFAULT_STEPS);
     }
 
     public int getYesterdayGoal(int day){
