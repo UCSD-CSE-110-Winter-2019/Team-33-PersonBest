@@ -21,8 +21,8 @@ public class DailyStat implements IStatistics {
     public int getGoal() { return this.goal; }
 
     public String getStats() {
-        Float distance = this.hours * this.averageMPH;
-        String stats = "MPH: " + timeWalked.toString() + "Distance: "+ distance.toString();
+        //Float distance = this.hours * this.averageMPH;
+        String stats = "MPH: " + timeWalked.toString();
         return stats;
     }
 
