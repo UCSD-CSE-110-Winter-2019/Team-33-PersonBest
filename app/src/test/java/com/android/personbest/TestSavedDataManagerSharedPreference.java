@@ -80,7 +80,7 @@ public class TestSavedDataManagerSharedPreference {
         IDate iDate =  new DateCalendar(3);
         int day = iDate.getDay();
         List<IStatistics> history = sd.getLastWeekSteps(day);
-        assertEquals(history.size(),4);
+        assertEquals(history.size(),3);
         for ( IStatistics i: history){
             assertEquals(i.getGoal(), 4000);
             assertEquals(i.getIncidentWalk(),1000);
@@ -115,16 +115,6 @@ public class TestSavedDataManagerSharedPreference {
         assertEquals(3,sd.getGoalDaysBefore(3,0));
         assertEquals(2,sd.getGoalDaysBefore(day,1));
         assertEquals(1,sd.getGoalDaysBefore(day,2));
-    }
-
-    @Test
-    public void testGetTodayString() {
-        assertEquals(DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now()), sd.getTodayString());
-    }
-
-    @Test
-    public void testGetYesterdayString() {
-        assertEquals(DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now().plusDays(-1)), sd.getYesterdayString());
     }
 
     @Test
