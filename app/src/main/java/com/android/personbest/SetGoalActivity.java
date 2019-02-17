@@ -89,7 +89,7 @@ public class SetGoalActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
 
         steps = sharedPreferences.getInt("Current Goal", 0);
-        // overflow check
+        // overflow check, will not change if overflow
         long tmpSteps = (long) steps + 500;
         if(tmpSteps == (int)tmpSteps) steps += 500;
         setGoal(steps);
