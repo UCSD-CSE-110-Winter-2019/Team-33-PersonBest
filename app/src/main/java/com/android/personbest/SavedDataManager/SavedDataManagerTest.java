@@ -26,4 +26,43 @@ public class SavedDataManagerTest implements SavedDataManager {
         }
         return toRet;
     }
+    public int getStepsDaysBefore(int today, int days) {
+        return -1;
+    }
+    public int getGoalDaysBefore(int today, int days) {
+        return -1;
+    }
+    public String getTodayString() {
+        return null;
+    }
+    public String getYesterdayString() {
+        return null;
+    }
+
+    public boolean isShownGoal(String today) {
+        return false;
+    }
+    public void setShownGoal(String today) {}
+
+    public boolean isShownSubGoal(String today) {
+        return false;
+    }
+    public void setShownSubGoal(String today) {}
+
+    public boolean isCheckedYesterdayGoal(String today) {
+        return false;
+    }
+    public void setCheckedYesterdayGoal(String today) {}
+    public boolean isShownYesterdayGoal(String today) {
+        return false;
+    }
+    public void setShownYesterdayGoal(String today) {}
+    public boolean isCheckedYesterdaySubGoal(String today) {
+        return false;
+    }
+    public void setCheckedYesterdaySubGoal(String today) {}
+    public boolean isShownYesterdaySubGoal(String today) {
+        return false;
+    }
+    public void setShownYesterdaySubGoal(String today) {}
 }

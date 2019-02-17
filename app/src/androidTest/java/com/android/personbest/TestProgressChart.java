@@ -30,13 +30,13 @@ public class TestProgressChart {
 
         // Mock data
         List<IStatistics> stepStats = new ArrayList<>();
-        stepStats.add(new DailyStat(5000, 8226, 3255, String.format("S:3255\nT:1:30:02\nD:%.2fmi", 3255/2435f)));
-        stepStats.add(new DailyStat(5540, 6260, 3752, String.format("S:3752\nT:1:43:31\nD:%.2fmi", 3752/2435f)));
-        stepStats.add(new DailyStat(6000, 1939, 882, String.format("S:1939\nT:0:50:45\nD:%.2fmi", 882/2435f)));
-        stepStats.add(new DailyStat(6500, 3755, 3078, String.format("S:3078\nT:1:23:37\nD:%.2fmi", 3078/2435f)));
-        stepStats.add(new DailyStat(6875, 4530, 3673, String.format("S:3673\nT:1:39:40\nD:%.2fmi", 3673/2435f)));
-        stepStats.add(new DailyStat(7500, 9934, 9225, String.format("S:9225\nT:4:08:29\nD:%.2fmi", 9225/2435f)));
-        stepStats.add(new DailyStat(8500, 7633, 6706, String.format("S:6706\nT:3:01:57\nD:%.2fmi", 6706/2435f)));
+        stepStats.add(new DailyStat(5000, 8226, 3255, 1200000, 4.0f));
+        stepStats.add(new DailyStat(5540, 6260, 3752, 1200000, 4.0f));
+        stepStats.add(new DailyStat(6000, 1939, 882, 1200000, 4.0f));
+        stepStats.add(new DailyStat(6500, 3755, 3078, 1200000, 4.0f));
+        stepStats.add(new DailyStat(6875, 4530, 3673, 1200000, 4.0f));
+        stepStats.add(new DailyStat(7500, 9934, 9225, 1200000, 4.0f));
+        stepStats.add(new DailyStat(8500, 7633, 6706, 1200000, 4.0f));
         manager = new SavedDataManagerTest(stepStats);
 
         // Get activity
