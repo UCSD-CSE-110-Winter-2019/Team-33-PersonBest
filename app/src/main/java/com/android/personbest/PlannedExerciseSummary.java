@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 public class PlannedExerciseSummary extends AppCompatActivity {
 
     public static final long MILLISECONDS_IN_A_MINUTE = 60000;
@@ -18,6 +20,7 @@ public class PlannedExerciseSummary extends AppCompatActivity {
     private TextView displayMph;
     private Button button;
     private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
 
     @Override
@@ -25,6 +28,7 @@ public class PlannedExerciseSummary extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planned_exercise_summary);
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
+        editor = sp.edit();
 
         displaySteps = findViewById(R.id.stepsTaken);
         displayTime = findViewById(R.id.timeElapsed);
@@ -33,6 +37,12 @@ public class PlannedExerciseSummary extends AppCompatActivity {
         Intent intent = getIntent();
         int stepsTaken = intent.getIntExtra("stepsTaken", 0);
         long msElapsed = intent.getLongExtra("timeElapsed", 0);
+
+        long totalTime = sp.getLong(String.valueOf(Calendar.DAY_OF_WEEK) + "_ExerciseTime", 0) + msElapsed;
+        int totalSteps = sp.getInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_IntentionalSteps", 0);
+        double meanMPH = intentionalWalkUtils.velocity(sp.getInt("Height", 0), totalSteps, totalTime / MILLISECONDS_IN_A_SECOND);
+        editor.putFloat(String.valueOf(Calendar.DAY_OF_WEEK) + "_AverageMPH", (float)meanMPH);
+        editor.apply();
 
         displaySteps.setText("Steps Taken: " + stepsTaken);
         displayTime.setText("Minutes Elapsed: " + (msElapsed / MILLISECONDS_IN_A_MINUTE));
