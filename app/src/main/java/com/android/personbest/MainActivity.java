@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +16,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import android.widget.Toast;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
@@ -30,8 +28,7 @@ import java.util.Observer;
 
 public class MainActivity extends AppCompatActivity implements Observer {
 
-    // FIXME hardcoded goal
-    private static final int GOAL_INIT = 5000;
+    private static final int GOAL_INIT = 5000; // default
     private static final int STEP_INIT = 0;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
     private static final long MILLISECONDS_IN_A_SECOND = 1000;
@@ -89,14 +86,18 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
     }
 
-    public StepCounter getStepCounter(){
-        return this.stepCounter;
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("State", "OnStart");
+        //initGoal();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        final Activity self = this;
 
         // Setup UI
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
@@ -108,12 +109,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedMPHValue = findViewById(R.id.mphValue);
         setPlannedExerciseStatsVisibility(false);
 
-        progressBar = findViewById(R.id.progressBar);
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
+
+        progressBar = findViewById(R.id.progressBar);
         progressBar.setMax(GOAL_INIT);
         progressBar.setMin(0);
         progressBar.setProgress(0);
+
         savedDataManager = new SavedDataManagerSharedPreference(this);
 
         final Button startStopBtn = findViewById(R.id.startStop);
@@ -155,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         goalNum = sp.getInt("Current Goal", 5000);
         editor.putInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_Goal", goalNum);
         goalVal.setText(String.valueOf(goalNum));
+        progressBar.setMax(goalNum);
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
 
         // Set Up Google Fitness
@@ -184,16 +188,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 stepCounter.updateStepCount();
             }
         });
-        btnUpdateSteps.setEnabled(false);
-        btnUpdateSteps.setVisibility(View.INVISIBLE);
 
-        checkYesterdayGoalReach();
         today = ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1;
-    }
-
-   // for test
-    public void setFitnessServiceKey(String fitnessServiceKey) {
-        this.fitnessServiceKey = fitnessServiceKey;
+        checkYesterdayGoalReach();
     }
 
     @Override
@@ -221,6 +218,32 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
+    public void goalReached(boolean isYesterday) {
+        String title = "You Reached the Goal";
+        if(isYesterday) title += " Yesterday";
+        Context context = getApplicationContext();
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(context);
+        }
+        builder.setTitle(title)
+                .setMessage("Congratulations! Do you want to set a new step goal?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                       launchSetGoalActivity();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
     public void setStepCount(int stepCount) {
         stepsTodayVal.setText(String.valueOf(stepCount));
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
@@ -236,31 +259,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
-    public void goalReached(boolean isYesterday) {
-        String title = "You Reached the Goal";
-        if(isYesterday) title += " Yesterday";
-        Context context = getApplicationContext();
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(context);
-        }
-        builder.setTitle(title)
-                .setMessage("Congratulations! Do you want to set a new step goal?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
 
     public void setGoal(int goalNum) {
         this.goalNum = goalNum;
@@ -274,6 +272,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setMax(goalNum);
         progressBar.setProgress(stepCount);
+    }
+
+    public int getGoal() {
+        return this.goalNum;
     }
 
     public void setToday(int date) {
@@ -296,6 +298,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
+        public StepCounter getStepCounter(){
+        return this.stepCounter;
+    }
+
+    // for test
+    public void setFitnessServiceKey(String fitnessServiceKey) {
+        this.fitnessServiceKey = fitnessServiceKey;
+    }
+
+
+
     public void launchProgressChart(View view) {
         Intent intent = new Intent(this, ProgressChart.class);
         startActivity(intent);
@@ -308,5 +321,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
         startActivity(intent);
     }
 
+    public void launchSetGoalActivity(View view) {
+        Intent intent = new Intent(this, SetGoalActivity.class);
+        startActivity(intent);
+    }
 
+    public void launchSetGoalActivity() {
+        Intent intent = new Intent(this, SetGoalActivity.class);
+        startActivity(intent);
+    }
 }

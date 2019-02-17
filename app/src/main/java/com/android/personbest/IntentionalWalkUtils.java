@@ -12,7 +12,7 @@ public class IntentionalWalkUtils {
     // Returns MPH
     public static double velocity(double height, int numSteps, long timeInSeconds) {
         // When starting, velocity is 0
-        if(timeInSeconds == 0)
+        if (timeInSeconds == 0)
             return 0;
         double distanceInMile = strideLength(height) * numSteps / FEET_ONE_MILE;
         double val = distanceInMile / (timeInSeconds / 3600.0);
