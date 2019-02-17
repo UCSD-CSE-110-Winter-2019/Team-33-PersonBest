@@ -86,6 +86,7 @@ public class TestGoalAchievement {
 
         activity.setTimer(mockTimer);
         activity.setTheDate(mockDate);
+        activity.setToday(TEST_DAY);
 
         editor = sp.edit();
         editor.putInt("Height", HEIGHT); // skip the set up screen
