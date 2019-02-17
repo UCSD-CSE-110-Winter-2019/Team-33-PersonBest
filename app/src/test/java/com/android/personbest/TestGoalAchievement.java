@@ -3,6 +3,7 @@ package com.android.personbest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.*;
+import android.util.Log;
 import android.widget.Button;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -38,6 +39,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.ShadowToast;
 
 import java.util.Calendar;
 import java.util.List;
@@ -48,10 +50,10 @@ import static org.robolectric.RuntimeEnvironment.application;
 @RunWith(RobolectricTestRunner.class)
 public class TestGoalAchievement {
     private static final String TEST_SERVICE = "TEST_SERVICE";
-    private static final String TEST_DAY = "02/19/2019";
+    private static final String TEST_DAY = "09/09/2019";
     private static final int TEST_DAY_INT = 3; // just random number
-    private static final int TEST_DAY_HOUR = 19; // brfore 8 pm
-    private static final String PAY_DAY = "02/01/2019";
+    private static final int TEST_DAY_HOUR = 19; // before 8 pm
+    private static final String PAY_DAY = "01/01/2019";
     private static final int GOAL_INIT = 1024;
     private static final int HEIGHT = 40;
     private static final int NEXT_STEP_COUNT = 1337;
@@ -92,6 +94,9 @@ public class TestGoalAchievement {
         activity.setToday(TEST_DAY);
 
         editor = sp.edit();
+        editor.clear();
+        editor.apply();
+
         editor.putInt("Height", HEIGHT); // skip the set up screen
         editor.putInt("Current Goal", GOAL_INIT);
         editor.apply();
@@ -260,6 +265,7 @@ public class TestGoalAchievement {
     @Test
     public void testYesterdayGoalReachedNotDisplayedAlreadyDisplayed() {
         sd.setShownYesterdayGoal(TEST_DAY);
+        System.err.println("Last day checked yesterday goal is: " + sp.getString("last_day_checked_yesterday_goal","Empty"));
         setYesterdayGoal(GOAL_INIT);
         setYesterdaySteps(GOAL_INIT + 1);
         activity.checkYesterdayGoalReach();
@@ -269,7 +275,8 @@ public class TestGoalAchievement {
 
     @Test
     public void testYesterdaySubGoalReachedNotDisplayed() {
-
+//        assertEquals("Good job! You're already at 13% of the daily recommended number of steps.",
+//                ShadowToast.getTextOfLatestToast());
     }
 
     @After

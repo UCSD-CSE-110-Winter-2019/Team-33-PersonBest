@@ -88,7 +88,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
        return sp.getString("last_day_prompted_goal","").equals(today);
     }
     public void setShownGoal(String today){
-        Log.e(TAG,"Set day " + today + " to be last-day-shown-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-shown-goal ");
         editor.putString("last_day_prompted_goal",today);
         editor.apply();
     }
@@ -97,7 +97,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getString("last_day_prompted_sub_goal","").equals(today);
     }
     public void setShownSubGoal(String today){
-        Log.e(TAG,"Set day " + today + " to be last-day-shown-sub-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-shown-sub-goal ");
         editor.putString("last_day_prompted_sub_goal",today);
         editor.apply();
     }
@@ -107,7 +107,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     public void setCheckedYesterdayGoal(String today) {
-        Log.e(TAG,"Set day " + today + " to be last-day-checked-yesterday-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-checked-yesterday-goal ");
         editor.putString("last_day_checked_yesterday_goal",today);
         editor.apply();
     }
@@ -116,7 +116,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getString("last_day_prompted_yesterday_goal","").equals(today);
     }
     public void setShownYesterdayGoal(String today) {
-        Log.e(TAG,"Set day " + today + " to be last-day-shown-yesterday-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-prompted-yesterday-goal ");
         editor.putString("last_day_prompted_yesterday_goal",today);
         editor.apply();
     }
@@ -126,7 +126,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     public void setCheckedYesterdaySubGoal(String today) {
-        Log.e(TAG,"Set day " + today + " to be last-day-checked-yesterday-sub-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-checked-yesterday-sub-goal ");
         editor.putString("last_day_checked_yesterday_sub_goal",today);
         editor.apply();
     }
@@ -135,7 +135,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getString("last_day_prompted_yesterday_sub_goal","").equals(today);
     }
     public void setShownYesterdaySubGoal(String today) {
-        Log.e(TAG,"Set day " + today + " to be last-day-shown-yesterday-sub-goal ");
+        Log.i(TAG,"Set day " + today + " to be last-day-shown-yesterday-sub-goal ");
         editor.putString("last_day_prompted_yesterday_sub_goal",today);
         editor.apply();
     }
