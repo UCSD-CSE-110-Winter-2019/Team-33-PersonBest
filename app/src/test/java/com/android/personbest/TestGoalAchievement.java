@@ -59,7 +59,7 @@ public class TestGoalAchievement {
         StepCounterFactory.put(TEST_SERVICE, new StepCounterFactory.BluePrint() {
             @Override
             public StepCounter create(MainActivity stepCountActivity) {
-                return new TestSavedDataManagerSharedPreference.TestFitnessService(stepCountActivity);
+                return new TestGoalAchievement.TestFitnessService(stepCountActivity);
             }
         });
 
@@ -72,6 +72,11 @@ public class TestGoalAchievement {
         sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
         editor = sp.edit();
         nextStepCount = 1337;
+    }
+
+    @Test
+    public void dummyTest() {
+        return;
     }
 
     @After

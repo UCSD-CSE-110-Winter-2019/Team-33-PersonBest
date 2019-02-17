@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import com.android.personbest.MainActivity;
 import com.android.personbest.StepCounter.DailyStat;
+import com.android.personbest.StepCounter.DateCalendar;
 import com.android.personbest.StepCounter.IDate;
 import com.android.personbest.StepCounter.IStatistics;
 
@@ -18,6 +19,8 @@ import java.util.List;
 public class SavedDataManagerSharedPreference implements SavedDataManager {
     private final int DEFAULT_STEPS = 0;
     private final int DEFAULT_GOAL = 5000;
+    private final float DEFAULT_MPH = 0;
+    private final Long DEFAULT_TIME = 0L;
     private final String TAG = "SavedDataManagerSharedPreference";
 
     private Activity activity;
@@ -32,7 +35,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
 
     public int getYesterdaySteps(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        IDate iDate = new IDate(day);
+        IDate iDate = new DateCalendar(day);
         Integer yesterday = iDate.getYesterDay();
         return sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
     }
@@ -42,7 +45,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         Integer targetDay = today;
         while(days-->0) {
-            IDate iDate = new IDate(targetDay);
+            IDate iDate = new DateCalendar(targetDay);
             targetDay = iDate.getYesterDay();
         }
         return sp.getInt(targetDay.toString() + "_TotalSteps",DEFAULT_STEPS);
@@ -50,7 +53,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
 
     public int getYesterdayGoal(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        IDate iDate = new IDate(day);
+        IDate iDate = new DateCalendar(day);
         Integer yesterday = iDate.getYesterDay();
         return sp.getInt(yesterday.toString() + "_Goal", DEFAULT_GOAL);
     }
@@ -59,7 +62,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         Integer targetDay = today;
         while(days-->0) {
-            IDate iDate = new IDate(targetDay);
+            IDate iDate = new DateCalendar(targetDay);
             targetDay = iDate.getYesterDay();
         }
         return sp.getInt(targetDay.toString() + "_Goal",DEFAULT_GOAL);
@@ -72,7 +75,9 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
             int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
             int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
             int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,"");
+            Float MPH = sp.getFloat(d.toString()+"_AverageMPH",DEFAULT_MPH);
+            Long timewalked = sp.getLong(d.toString()+"_ExerciseTime",DEFAULT_TIME);
+            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,timewalked,MPH);
             result.add(dailyStat);
         }
 

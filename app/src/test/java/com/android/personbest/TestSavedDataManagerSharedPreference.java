@@ -56,7 +56,7 @@ public class TestSavedDataManagerSharedPreference {
 
     @Test
     public void testGetYesterday(){
-        IDate iDate = new IDate(5);
+        IDate iDate = new DateCalendar(5);
         int day = iDate.getDay();
         SharedPreferences sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
@@ -73,10 +73,11 @@ public class TestSavedDataManagerSharedPreference {
             editor.putInt(i.toString()+"_TotalSteps",3000);
             editor.putInt(i.toString()+"_IntentionalSteps",2000);
             editor.putInt(i.toString()+"_Goal",4000);
+            editor.putFloat(i.toString()+"_AverageMPH", (float)2.1);
             editor.apply();
         }
 
-        IDate iDate =  new IDate(3);
+        IDate iDate =  new DateCalendar(3);
         int day = iDate.getDay();
         List<IStatistics> history = sd.getLastWeekSteps(day);
         assertEquals(history.size(),4);
@@ -84,7 +85,7 @@ public class TestSavedDataManagerSharedPreference {
             assertEquals(i.getGoal(), 4000);
             assertEquals(i.getIncidentWalk(),1000);
             assertEquals(i.getIntentionalWalk(),2000);
-            assertEquals(i.getStats(),"");
+            assertEquals(i.getStats(),"MPH: 2.1");
         }
     }
 
@@ -95,7 +96,7 @@ public class TestSavedDataManagerSharedPreference {
             editor.apply();
         }
 
-        IDate iDate =  new IDate(3);
+        IDate iDate =  new DateCalendar(3);
         int day = iDate.getDay();
         assertEquals(3,sd.getStepsDaysBefore(3,0));
         assertEquals(2,sd.getStepsDaysBefore(day,1));
@@ -109,7 +110,7 @@ public class TestSavedDataManagerSharedPreference {
             editor.apply();
         }
 
-        IDate iDate =  new IDate(3);
+        IDate iDate =  new DateCalendar(3);
         int day = iDate.getDay();
         assertEquals(3,sd.getGoalDaysBefore(3,0));
         assertEquals(2,sd.getGoalDaysBefore(day,1));

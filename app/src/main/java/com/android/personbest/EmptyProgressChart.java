@@ -65,13 +65,6 @@ public class EmptyProgressChart extends AppCompatActivity {
         ArrayList<LegendEntry> legendEntries = new ArrayList<>();
         xAxis.add("");
 
-        stepStats.add(new DailyStat(5000, 8226, 3255, null));
-        stepStats.add(new DailyStat(5000, 6260, 3752, null));
-        stepStats.add(new DailyStat(5000, 1939, 882, null));
-        stepStats.add(new DailyStat(5000, 3755, 3078, null));
-        stepStats.add(new DailyStat(5000, 4530, 3673, null));
-        stepStats.add(new DailyStat(5000, 9934, 9225, null));
-        stepStats.add(new DailyStat(5000, 7633, 6706, null));
 
         int i = 0, j = 6;
         for (IStatistics stat : stepStats) {
