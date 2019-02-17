@@ -63,42 +63,6 @@ public class TestStepCount {
         assertEquals("1337", textSteps.getText().toString());
     }
 
-    @Test
-    public void testGetYesterday(){
-        IDate iDate = new IDate(5);
-        int day = iDate.getDay();
-        SharedPreferences sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("4_TotalSteps",1000);
-        editor.apply();
-        StepCounterGoogleFit stepCounter = (StepCounterGoogleFit) activity.getStepCounter();
-        assertEquals(stepCounter.getYesterdaySteps(day),1000);
-    }
-
-    @Test
-    public void testGetLastWeeksStep(){
-        SharedPreferences sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        for( Integer i = 0; i < 7; i++ ){
-            editor.putInt(i.toString()+"_TotalSteps",3000);
-            editor.putInt(i.toString()+"_IntentionalSteps",2000);
-            editor.putInt(i.toString()+"_Goal",4000);
-            editor.apply();
-        }
-
-        IDate iDate =  new IDate(3);
-        int day = iDate.getDay();
-        StepCounterGoogleFit stepCounter = (StepCounterGoogleFit) activity.getStepCounter();
-        List<IStatistics> history = activity.getStepCounter().getLastWeekSteps(day);
-        assertEquals(history.size(),4);
-        for ( IStatistics i: history){
-            assertEquals(i.getGoal(), 4000);
-            assertEquals(i.getIncidentWalk(),1000);
-            assertEquals(i.getIntentionalWalk(),2000);
-            assertEquals(i.getStats(),"");
-        }
-
-    }
 
     private class TestFitnessService extends StepCounterGoogleFit {
         private static final String TAG = "[TestFitnessService]: ";

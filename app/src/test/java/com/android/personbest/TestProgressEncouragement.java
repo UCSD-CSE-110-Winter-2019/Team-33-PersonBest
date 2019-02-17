@@ -19,8 +19,8 @@ public class TestProgressEncouragement {
     @Test
     public void testProgressMade() {
         ProgressEncouragement progressEncouragement = new ProgressEncouragement(mainActivity);
-        assertEquals(true, progressEncouragement.progressMade(2,1));
-        assertEquals(false, progressEncouragement.progressMade(1,2));
+        assertEquals(true, progressEncouragement.progressMade(501,1));
+        assertEquals(false, progressEncouragement.progressMade(500,2));
     }
 
     @Test

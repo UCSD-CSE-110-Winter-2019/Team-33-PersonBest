@@ -1,11 +1,12 @@
 package com.android.personbest;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,17 +15,20 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import android.widget.Toast;
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
+import com.android.personbest.Timer.ITimer;
+import com.android.personbest.Timer.TimerMock;
+import com.android.personbest.Timer.TimerSystem;
 
-import java.util.Calendar;
-import java.util.Observable;
-import java.util.Observer;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements Observer {
 
-    // FIXME hardcoded goal
-    private static final int GOAL_INIT = 5000;
+    private static final int GOAL_INIT = 5000; // default
     private static final int STEP_INIT = 0;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
     private static final long MILLISECONDS_IN_A_SECOND = 1000;
@@ -32,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
+    private static final int DATE_STRING_LENGTH = 10;
 
     // private variables
     private String fitnessServiceKey;
@@ -44,6 +49,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private int totalIntentionalSteps;
     private StepCounterGoogleFit stepCounter;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
+    private SavedDataManager sd;
+    private ITimer theTimer;
+    private ProgressEncouragement progressEncouragement;
+    private String today;
+    private Integer todayInt;
+
+    private boolean NDEBUG = true;
 
     // UI-related members
     private TextView stepsTodayVal;
@@ -54,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedStepValue;
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
-    private Button setGoalButton;
+
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -81,10 +93,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         });
     }
 
-    public StepCounter getStepCounter(){
-        return this.stepCounter;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,12 +109,18 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedMPHValue = findViewById(R.id.mphValue);
         setPlannedExerciseStatsVisibility(false);
 
-        progressBar = findViewById(R.id.progressBar);
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
-        progressBar.setMax(goalNum);
+
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setMax(GOAL_INIT);
         progressBar.setMin(0);
         progressBar.setProgress(0);
+
+        sd = new SavedDataManagerSharedPreference(this);
+        theTimer = new TimerSystem();
+        progressEncouragement = new ProgressEncouragement(this);
+
         final Button startStopBtn = findViewById(R.id.startStop);
         startStopBtn.setText("  Start Walk/Run  ");
         startStopBtn.setTextColor(Color.BLACK);
@@ -141,11 +155,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
         editor = sp.edit();
         if(sp.getAll().isEmpty()) {
             startActivity(new Intent(this, SetUpActivity.class));
+            editor.putInt("Current Goal",GOAL_INIT);
+            editor.apply();
         }
 
-        goalNum = sp.getInt("Current Goal", 5000);
+        goalNum = sp.getInt("Current Goal", GOAL_INIT);
         editor.putInt(String.valueOf(Calendar.DAY_OF_WEEK) + "_Goal", goalNum);
         goalVal.setText(String.valueOf(goalNum));
+        progressBar.setMax(goalNum);
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
 
         // Set Up Google Fitness
@@ -153,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         StepCounterFactory.put(fitnessServiceKey, new StepCounterFactory.BluePrint() {
             @Override
             public StepCounter create(MainActivity activity) {
-                System.err.println("Main Activity: " + String.valueOf(activity));
                 return new StepCounterGoogleFit(activity);
             }
         });
@@ -175,27 +191,83 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 stepCounter.updateStepCount();
             }
         });
-        btnUpdateSteps.setEnabled(false);
-        btnUpdateSteps.setVisibility(View.INVISIBLE);
+
+        today = sd.getTodayString();
+        todayInt = Calendar.DAY_OF_WEEK;
+
+        addMockData(); // DEV
+
+        // yesterday
+        // only once since data of yesterday never changes today
+        if(!sd.isCheckedYesterdayGoal(today)) {
+           sd.setCheckedYesterdayGoal(today);
+            checkYesterdayGoalReach();
+        }
+        // not show sub-goal if goal met yesterday
+        if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today)) {
+            sd.setCheckedYesterdaySubGoal(today);
+            checkYesterdaySubGoalReach();
+        }
+
+        if(theTimer.isLateToday()) {
+            checkSubGoalReach();
+        }
+
+    }
+
+
+    public void addMockData() {
+        editor.clear(); // panic
+        editor.putInt("Current Goal",GOAL_INIT);
+        editor.apply();
+
+        int caseTesting = 3;
+        NDEBUG = false;
+        todayInt = 3;
+        String yesterday = sd.getYesterdayString();
+
+        switch (caseTesting) {
+            case 1: // today goal met -> display goal
+                sd.setShownGoal(yesterday);
+                setStepCount(goalNum+1);
+                break;
+            case 2: // yesterday goal met but not displayed -> display yesterday goal
+                sd.setShownGoal(today);
+                sd.setShownYesterdayGoal(yesterday);
+                editor.putInt("2_Goal",1);
+                editor.putInt("2_TotalSteps",10);
+                editor.apply();
+                break;
+            case 3: // yesterday sub goal met but not displayed and no today goal met -> show yesterday sub goal
+                sd.setCheckedYesterdaySubGoal(yesterday); // today not checked yet
+                sd.setShownYesterdaySubGoal(yesterday); // today not shown yet
+                sd.setShownYesterdayGoal(yesterday); // today did not show yesterday goal
+                sd.setShownSubGoal(today); // yesterday did not show sub goal (time travel here)
+                editor.putInt("2_Goal",2147483647);
+                editor.putInt("2_TotalSteps",501);
+                editor.putInt("1_TotalSteps",1);
+                editor.apply();
+                break;
+            case 4: // today goal not met but sub goal met after 8 pm -> show toady sub goal
+                break;
+            case 5: // sub goal met after 8 pm
+                theTimer = new TimerMock(22);
+                break;
+        }
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d("State", "OnStart");
-        //initGoal();
-    }
-
-    public void launchSummary(long timeElapsed, int stepsTaken) {
-        Intent intent = new Intent(this, PlannedExerciseSummary.class);
-        intent.putExtra("timeElapsed", timeElapsed);
-        intent.putExtra("stepsTaken", stepsTaken);
-        startActivity(intent);
-    }
-
-    // for test
-    public void setFitnessServiceKey(String fitnessServiceKey) {
-        this.fitnessServiceKey = fitnessServiceKey;
+    protected void onResume() {
+        super.onResume();
+        if(theTimer.isLateToday()) {
+            checkSubGoalReach();
+        }
+        // update date
+        // FIXME
+        //if(todayInt != Calendar.DAY_OF_WEEK) {
+        //    todayInt = Calendar.DAY_OF_WEEK;
+        //    today = sd.getTodayString();
+        //}
     }
 
     @Override
@@ -208,6 +280,89 @@ public class MainActivity extends AppCompatActivity implements Observer {
         } else {
             Log.e(TAG, "ERROR, google fit result code: " + resultCode);
         }
+
+        // update goals
+        goalNum = sp.getInt("Current Goal",goalNum);
+        setGoal(goalNum);
+    }
+
+    // goal is reached but should we display the message?
+    public void goalReach() {
+        if(!sd.isShownGoal(today)) {
+            sd.setShownGoal(today);
+            Log.e(TAG, "Show goal on: " + today);
+            goalReached(false);
+        }
+    }
+
+    // has prompted sub goal?
+    // has prompted goal???
+    // has made progress?
+    public void checkSubGoalReach() {
+        int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
+        int yesterdaySteps = sd.getYesterdaySteps(todayInt);
+
+        if(!sd.isShownSubGoal(today) &&
+                !sd.isShownGoal(today) &&
+                progressEncouragement.progressMade(todaySteps, yesterdaySteps)) {
+            sd.setShownSubGoal(today);
+            progressEncouragement.showEncouragementMessage(todaySteps,yesterdaySteps);
+        }
+    }
+
+    // check if goal reached yesterday
+    // need to be called only once per day
+    protected void checkYesterdayGoalReach() {
+        String yesterday = sd.getYesterdayString();
+
+        int yesterdaySteps = sd.getStepsDaysBefore(todayInt, 1);
+        int yesterdayGoal = sd.getGoalDaysBefore(todayInt, 1);
+
+        if(!sd.isShownYesterdayGoal(today) &&
+                !sd.isShownGoal(yesterday) &&
+                yesterdayGoal <= yesterdaySteps) {
+            sd.setShownYesterdayGoal(today);
+            goalReached(true);
+        }
+    }
+
+    // check if sub goal reached yesterday
+    // need to be called only once per day
+    protected void checkYesterdaySubGoalReach() {
+        String yesterday = sd.getYesterdayString();
+
+        int yesterdaySteps = sd.getYesterdaySteps(todayInt);
+        int dayBeforeYesterdaySteps = sd.getStepsDaysBefore(todayInt, 2);
+
+        if(!sd.isShownYesterdaySubGoal(today) &&
+                !sd.isShownSubGoal(yesterday) &&
+                !sd.isShownYesterdayGoal(today) &&
+                progressEncouragement.progressMade(yesterdaySteps,dayBeforeYesterdaySteps)) {
+            sd.setShownYesterdaySubGoal(today);
+            progressEncouragement.showEncouragementMessage(yesterdaySteps,dayBeforeYesterdaySteps);
+        }
+    }
+
+    protected void goalReached(boolean isYesterday) {
+        Log.d(TAG,"Goal reached");
+        Log.d(TAG,"Reached goal is yesterday's? " + isYesterday);
+        String title = "You Reached the Goal";
+        if(isYesterday) title += " Yesterday";
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        builder.setTitle(title)
+                .setMessage("Congratulations! Do you want to set a new step goal?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                       launchSetGoalActivity();
+                    }
+                })
+                .setNegativeButton("Not now", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .show();
     }
 
     public void setStepCount(int stepCount) {
@@ -215,8 +370,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
         progressBar.setProgress(stepCount);
-        //showEncouragement(stepCount);
+        if(NDEBUG) todayInt = Calendar.DAY_OF_WEEK;
+        if(stepsToGoal == 0) goalReach();
     }
+
 
     public void setGoal(int goalNum) {
         this.goalNum = goalNum;
@@ -236,13 +393,32 @@ public class MainActivity extends AppCompatActivity implements Observer {
         return this.goalNum;
     }
 
-    public void showEncouragement(int stepCount) {
-        long percentage = (int)Math.floor(stepCount * 100.0 / goalNum);
-        if(percentage < 10) return;
+    // MM/dd/yyyy
+    public void setToday(String today) {
+        try {
+            if(today.length() != DATE_STRING_LENGTH) {
+                throw new IllegalArgumentException("Wrong date format");
+            }
+            int mm = Integer.parseInt(today.substring(0,2));
+            int dd = Integer.parseInt(today.substring(3,5));
+            int yyyy = Integer.parseInt(today.substring(6,DATE_STRING_LENGTH));
+            if(! (1 <= mm && mm <= 12 && 1 <= dd && dd <= 31 && 0 < yyyy) ) {
+                throw new IllegalArgumentException("Wrong date format");
+            }
+        } catch (IllegalFormatException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        this.today = today;
+    }
 
-        Context context = getApplicationContext();
-        CharSequence text = "Good job! You're already at " + percentage + "% of the daily recommended number of steps.";
-        Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+    // for test
+    public void setTimer(ITimer t) {
+        this.theTimer = t;
+    }
+
+    public void setSavedDataManager(SavedDataManager sd) {
+        this.sd = sd;
     }
 
     public void setPlannedExerciseStatsVisibility(boolean visible) {
@@ -260,7 +436,35 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
     }
 
+    public StepCounter getStepCounter(){
+        return this.stepCounter;
+    }
+
+    // for test
+    public void setFitnessServiceKey(String fitnessServiceKey) {
+        this.fitnessServiceKey = fitnessServiceKey;
+    }
+
+
+
+    public void launchProgressChart(View view) {
+        Intent intent = new Intent(this, ProgressChart.class);
+        startActivity(intent);
+    }
+
+    public void launchSummary(long timeElapsed, int stepsTaken) {
+        Intent intent = new Intent(this, PlannedExerciseSummary.class);
+        intent.putExtra("timeElapsed", timeElapsed);
+        intent.putExtra("stepsTaken", stepsTaken);
+        startActivity(intent);
+    }
+
     public void launchSetGoalActivity(View view) {
+        Intent intent = new Intent(this, SetGoalActivity.class);
+        startActivityForResult(intent,0);
+    }
+
+    public void launchSetGoalActivity() {
         Intent intent = new Intent(this, SetGoalActivity.class);
         startActivity(intent);
     }
