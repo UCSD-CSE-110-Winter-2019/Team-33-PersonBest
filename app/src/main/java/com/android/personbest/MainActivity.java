@@ -259,4 +259,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
             plannedMPHValue.setVisibility(View.INVISIBLE);
         }
     }
+
+    public void launchSetGoalActivity(View view) {
+        Intent intent = new Intent(this, SetGoalActivity.class);
+        startActivity(intent);
+    }
 }

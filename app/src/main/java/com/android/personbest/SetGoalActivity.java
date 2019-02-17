@@ -70,8 +70,14 @@ public class SetGoalActivity extends AppCompatActivity {
 
     private void setPressed() {
         final String steps = editText.getText().toString();
-        save(Integer.parseInt(steps));
-        goBack();
+        try {
+            save(Integer.parseInt(steps));
+            goBack();
+        } catch(NumberFormatException e) {
+            e.printStackTrace();
+            CharSequence text = "Invalid input, please try again.";
+            Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void cancelPressed() {
@@ -83,7 +89,9 @@ public class SetGoalActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
 
         steps = sharedPreferences.getInt("Current Goal", 0);
-        steps += 500;
+        // overflow check
+        long tmpSteps = (long) steps + 500;
+        if(tmpSteps == (int)tmpSteps) steps += 500;
         setGoal(steps);
     }
 
