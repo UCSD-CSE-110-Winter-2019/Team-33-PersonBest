@@ -33,13 +33,6 @@ import static java.text.DateFormat.getDateInstance;
 
 public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
-<<<<<<< HEAD
-    private final int DEFAULT_STEPS = 0;
-    private final int DEFAULT_GOAL = 5000;
-    private final long DEFAULT_TIME = 0L;
-    private final float DEFAULT_MPH = 0;
-=======
->>>>>>> c734a0c36977f65d04fb0b2415d4cb25db75b45b
     private final String TAG = "GoogleFitAdapter";
     private static final long UPDATE_INTERVAL = 1000;
     private SharedPreferences sp;
