@@ -10,8 +10,6 @@ public interface SavedDataManager {
     int getYesterdayGoal(int day);
     int getGoalDaysBefore(int today, int days);
     List<IStatistics> getLastWeekSteps(int day);
-    String getTodayString();
-    String getYesterdayString();
 
     boolean isShownGoal(String today);
     void setShownGoal(String today);
