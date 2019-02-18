@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestProgressChart {
     SavedDataManager manager;
@@ -44,6 +45,9 @@ public class TestProgressChart {
         progressChart.setManager(manager);
     }
 
+    /* This test checks if the data that is put into the chart is correct. It does by getting data sets from the final
+     * data, therefore also implicitly checks the correctness of the method that generates the data sets
+     */
     @Test
     public void testSetUpChart() {
         // Day of week strings
@@ -64,7 +68,7 @@ public class TestProgressChart {
         BarData bd = progressChart.getBarData();
         LineData ld = progressChart.getLineData();
         ArrayList<String> xAxisLabel = progressChart.getXAxisLabel();
-        ArrayList<String> dailyStats = progressChart.getDailyStats();
+        String dailyStats = progressChart.createStatsStr(stepStats);
 
         BarDataSet bds = (BarDataSet)bd.getDataSetByIndex(0);
         LineDataSet lds = (LineDataSet)ld.getDataSetByIndex(0);
@@ -92,10 +96,9 @@ public class TestProgressChart {
         }
 
         // Check Daily stats
-        assertEquals(1, dailyStats.size());
-        for(int i = 0; i < dailyStats.size(); ++i) {
-            assertEquals(stepStats.get(i).getStats(), dailyStats.get(i));
-        }
+        String correctStats = "Intentional Work Statistics\n" +
+                "Sun: Steps:  3255 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n";
+        assertEquals("Expected: " + correctStats + "\n Got: " + dailyStats, correctStats, dailyStats);
 
         // Set different date
         date = 7;
@@ -106,7 +109,7 @@ public class TestProgressChart {
         bd = progressChart.getBarData();
         ld = progressChart.getLineData();
         xAxisLabel = progressChart.getXAxisLabel();
-        dailyStats = progressChart.getDailyStats();
+        dailyStats = progressChart.createStatsStr(stepStats);
 
         bds = (BarDataSet)bd.getDataSetByIndex(0);
         lds = (LineDataSet)ld.getDataSetByIndex(0);
@@ -134,12 +137,18 @@ public class TestProgressChart {
         }
 
         // Check Daily stats
-        assertEquals(7, dailyStats.size());
-        for(int i = 0; i < dailyStats.size(); ++i) {
-            assertEquals(stepStats.get(i).getStats(), dailyStats.get(i));
-        }
+        correctStats = "Intentional Work Statistics\n" +
+                "Sun: Steps:  3255 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
+                "Mon: Steps:  3752 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
+                "Tue: Steps:   882 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
+                "Wed: Steps:  3078 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
+                "Thu: Steps:  3673 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
+                "Fri: Steps:  9225 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
+                "Sat: Steps:  6706 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n";
+        assertEquals(correctStats, dailyStats);
     }
 
+    /* Not using for now
     @Test
     public void testValueFormatter() {
         // Get strings
@@ -156,5 +165,5 @@ public class TestProgressChart {
             assertEquals(stats.get(i - 1).getStats(), f.getFormattedValue(0, new BarEntry(i, new float[]{0}), 0, null));
             assertEquals("", f.getFormattedValue(1, new BarEntry(i, new float[]{0}), 0, null));
         }
-    }
+    }*/
 }

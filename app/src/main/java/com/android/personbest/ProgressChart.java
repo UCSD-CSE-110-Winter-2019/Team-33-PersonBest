@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.DailyStat;
@@ -33,9 +34,18 @@ public class ProgressChart extends AppCompatActivity {
     private SavedDataManager savedDataManager;
     private int date;
     private CombinedChart progressChart;
-    CombinedData data;
-    ArrayList<String> xAxisLabel;
-    ArrayList<String> stats;
+    private CombinedData data;
+    private ArrayList<String> xAxisLabel;
+    private String stats;
+    private final String[] DAYOFWEEK = {
+            DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(2).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(3).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(4).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(5).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(6).getDisplayName(TextStyle.SHORT, Locale.US)
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +87,7 @@ public class ProgressChart extends AppCompatActivity {
 
         List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(date);
         setBarChart(stepStats);
+        showChart();
     }
 
 
@@ -97,14 +108,11 @@ public class ProgressChart extends AppCompatActivity {
         }
 
         // Add daily stats
-        stats = new ArrayList<>();
-        for(IStatistics stat : stepStats) {
-            stats.add(stat.getStats());
-        }
+        stats = createStatsStr(stepStats);
 
         // Set data
         data = new CombinedData();
-        data.setData(createBarData(stats.toArray(new String[stats.size()])));
+        data.setData(createBarData());
         data.setData(createLineData());
 
         // Draw options
@@ -144,6 +152,12 @@ public class ProgressChart extends AppCompatActivity {
         progressChart.invalidate();
     }
 
+    private void showChart() {
+        progressChart.setData(data);
+        progressChart.invalidate();
+        ((TextView)findViewById(R.id.statsView)).setText(stats);
+    }
+
     private void createEntries(List<IStatistics> stepStats) {
         barEntries.clear();
         lineEntries.clear();
@@ -158,9 +172,8 @@ public class ProgressChart extends AppCompatActivity {
         }
     }
 
-    private BarData createBarData(String[] appendices) {
+    private BarData createBarData() {
         BarDataSet stepDataSet = new BarDataSet(barEntries, "Steps Current Week");
-        stepDataSet.setValueFormatter(new EnhancedStackedValueFormatter(appendices));
         stepDataSet.setColors(Color.rgb(0, 92, 175), Color.rgb(123, 144, 210));
         stepDataSet.setValueTextSize(8f);
         stepDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -184,6 +197,16 @@ public class ProgressChart extends AppCompatActivity {
         return new LineData(goalDataSet);
     }
 
+    public String createStatsStr(List<IStatistics> stepStats) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Intentional Work Statistics\n");
+        for(int i = 0; i < stepStats.size(); ++i) {
+            sb.append(DAYOFWEEK[i] + ": ");
+            sb.append(stepStats.get(i).getStats() + '\n');
+        }
+        return sb.toString();
+    }
+
     public LineData getLineData() {
         return data.getLineData();
     }
@@ -196,10 +219,7 @@ public class ProgressChart extends AppCompatActivity {
         return xAxisLabel;
     }
 
-    public ArrayList<String> getDailyStats() {
-        return stats;
-    }
-
+    // Not used for now, but will keep this in case we need it in the future
     public static class EnhancedStackedValueFormatter extends StackedValueFormatter {
         private String[] appendices;
         public EnhancedStackedValueFormatter(String[] appendices) {
