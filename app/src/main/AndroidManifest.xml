@@ -15,6 +15,7 @@
                 android:name=".ProgressChart"
                 android:label="@string/title_activity_progress_chart"
                 android:parentActivityName=".MainActivity"
+                android:launchMode="singleInstance"
                 android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -32,8 +33,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
-        <activity android:name=".EmptyProgressChart">
         </activity>
     </application>
 

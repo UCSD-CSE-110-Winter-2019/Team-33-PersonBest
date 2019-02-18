@@ -57,6 +57,9 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
         t.schedule(updateSteps, 0, UPDATE_INTERVAL);
     }
 
+    public void stopUpdates() {
+        if(t!=null) t.cancel();
+    }
 
     public void setup() {
         FitnessOptions fitnessOptions = FitnessOptions.builder()

@@ -85,7 +85,7 @@ public class TestSavedDataManagerSharedPreference {
             assertEquals(i.getGoal(), 4000);
             assertEquals(i.getIncidentWalk(),1000);
             assertEquals(i.getIntentionalWalk(),2000);
-            assertEquals(i.getStats(),"MPH: 2.1");
+            assertEquals(i.getStats(),"Steps:  2000 Dist: 0.0mi Time: 0.0 hrs MPH: 2.1");
         }
     }
 

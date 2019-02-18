@@ -54,6 +54,7 @@ public class TestGoalAchievement {
     private static final String TEST_SERVICE = "TEST_SERVICE";
     private static final String TEST_DAY = "09/09/2019";
     private static final int TEST_DAY_INT = 3; // just random number
+    private static final int TEST_DAY_BEFORE_YESTERDAY_INT = 1; // just random number
     private static final int TEST_DAY_HOUR = 19; // before 8 pm
     private static final String PAY_DAY = "01/01/2019";
     private static final int GOAL_INIT = 1024;
@@ -68,7 +69,7 @@ public class TestGoalAchievement {
     private int nextStepCount;
 
     private IDate mockDate;
-    private ITimer mockTimer;
+    private TimerMock mockTimer;
 
     @Before
     public void setUp() throws Exception {
@@ -282,13 +283,31 @@ public class TestGoalAchievement {
 
     @Test
     public void testSubGoal() {
-
+        mockTimer.setTime(21);
+        sd.setShownSubGoal(PAY_DAY);
+        sd.setShownGoal(PAY_DAY);
+        setYesterdaySteps(GOAL_INIT);
+        activity.setStepCount(GOAL_INIT+1000);
+        activity.setGoal(GOAL_INIT+1000+1000);
+        activity.checkSubGoalReach();
+        assertEquals("You've increased your daily steps by " + 1000 + " steps. Keep up the good work!",
+                ShadowToast.getTextOfLatestToast());
     }
 
     @Test
     public void testYesterdaySubGoalReachedNotDisplayed() {
-//        assertEquals("Good job! You're already at 13% of the daily recommended number of steps.",
-//                ShadowToast.getTextOfLatestToast());
+        sd.setShownYesterdaySubGoal(PAY_DAY);
+        sd.setShownSubGoal(TEST_DAY);
+        setYesterdaySteps(GOAL_INIT+1000);
+        setYesterdayGoal(GOAL_INIT+1000+1000);
+        setStepByDayInt(TEST_DAY_BEFORE_YESTERDAY_INT, GOAL_INIT);
+        System.err.print("Yesterday Steps: ");
+        System.err.println(sd.getYesterdaySteps(TEST_DAY_INT));
+        System.err.print("Day Before Yesterday Steps: ");
+        System.err.println(sd.getStepsDaysBefore(TEST_DAY_INT, 2));
+        activity.checkYesterdaySubGoalReach();
+        assertEquals("You've increased your daily steps by " + 1000 + " steps. Keep up the good work!",
+                ShadowToast.getTextOfLatestToast());
     }
 
     private void setYesterdaySteps(int steps) {
@@ -301,6 +320,17 @@ public class TestGoalAchievement {
         String yesterdayGoalStr = mockDate.getYesterday() + "_Goal";
         editor.putInt(yesterdayGoalStr, goal);
         editor.apply();
+    }
+
+    private void setStepByDayInt(int day, int steps) {
+        String yesterdayStepStr = String.valueOf(day) + "_TotalSteps";
+        editor.putInt(yesterdayStepStr, steps);
+        editor.apply();
+    }
+
+    @After
+    public void reset() {
+        mockTimer.setTime(TEST_DAY_HOUR);
     }
 
     private class TestFitnessService extends StepCounterGoogleFit {
