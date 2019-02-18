@@ -291,12 +291,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdaySubGoalReach() {
         String yesterday = theTimer.getYesterdayString();
 
+        int yesterdayGoal = sd.getYesterdayGoal(todayInt);
         int yesterdaySteps = sd.getYesterdaySteps(todayInt);
         int dayBeforeYesterdaySteps = sd.getStepsDaysBefore(todayInt, 2);
 
         if(!sd.isShownYesterdaySubGoal(today) &&
                 !sd.isShownSubGoal(yesterday) &&
                 !sd.isShownYesterdayGoal(today) &&
+                 yesterdaySteps < yesterdayGoal &&
                 progressEncouragement.progressMade(yesterdaySteps,dayBeforeYesterdaySteps)) {
             Log.i(TAG, "Show yesterday sub goal on: " + today);
             sd.setShownYesterdaySubGoal(today);
@@ -370,6 +372,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             throw e;
         }
         this.today = today;
+        // not updating todayInt here to make mocking work
     }
 
 
