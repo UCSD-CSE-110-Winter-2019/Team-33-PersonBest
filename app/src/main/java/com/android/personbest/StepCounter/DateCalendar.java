@@ -16,11 +16,14 @@ public class DateCalendar implements IDate {
 
     @Override
     public int getYesterday() {
-        if (this.day == 0){
+        if (this.day == 1 || Calendar.DAY_OF_WEEK == 1){
             return FINAL_DAY;
         }
-        else{
+        else if (this.day != -1){
             return this.day - 1;
+        }
+        else{
+            return Calendar.DAY_OF_WEEK - 1;
         }
     }
 
