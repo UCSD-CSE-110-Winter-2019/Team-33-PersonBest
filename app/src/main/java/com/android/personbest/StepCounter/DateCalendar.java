@@ -5,9 +5,11 @@ import java.util.Calendar;
 public class DateCalendar implements IDate {
 
     private int day;
+    private Calendar cal;
 
     public DateCalendar (){
         this.day = -1;
+        cal = Calendar.getInstance();
     }
 
     public DateCalendar(int day){
@@ -26,7 +28,7 @@ public class DateCalendar implements IDate {
 
     @Override
     public int getDay() {
-        if(day == -1) return Calendar.DAY_OF_WEEK;
+        if(day == -1) return cal.get(Calendar.DAY_OF_WEEK);
         else return this.day;
     }
 }
