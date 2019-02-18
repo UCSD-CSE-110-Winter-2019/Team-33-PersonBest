@@ -42,7 +42,6 @@ public class BDDEasySetupTest {
 
     @Test
     public void bDDEasySetupTest() {
-        String test ="";
         ViewInteraction editText = onView(
                 allOf(withId(R.id.height),
                         childAtPosition(
