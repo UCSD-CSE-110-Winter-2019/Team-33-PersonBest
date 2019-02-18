@@ -49,7 +49,7 @@ public class TestProgressChart {
      * data, therefore also implicitly checks the correctness of the method that generates the data sets
      */
     @Test
-    public void testSetUpChart() {
+    public void testSetUpChart2() {
         // Day of week strings
         final String[] week = {DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
                                DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
@@ -60,7 +60,8 @@ public class TestProgressChart {
                                DayOfWeek.of(6).getDisplayName(TextStyle.SHORT, Locale.US)
                               };
 
-        int date = 1;
+        // Set different date
+        int date = 7;
         List<IStatistics> stepStats = manager.getLastWeekSteps(date);
         progressChart.setBarChart(stepStats);
 
@@ -90,54 +91,13 @@ public class TestProgressChart {
         }
 
         // Check x-axis label
-        assertEquals(1,xAxisLabel.size() - 1);
-        for(int i = 1; i < xAxisLabel.size(); ++i) {
-            assertEquals(week[i - 1], xAxisLabel.get(i));
-        }
-
-        // Check Daily stats
-        String correctStats = "Intentional Work Statistics\n" +
-                "Sun: Steps:  3255 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n";
-        assertEquals("Expected: " + correctStats + "\n Got: " + dailyStats, correctStats, dailyStats);
-
-        // Set different date
-        date = 7;
-        stepStats = manager.getLastWeekSteps(date);
-        progressChart.setBarChart(stepStats);
-
-        // Get data
-        bd = progressChart.getBarData();
-        ld = progressChart.getLineData();
-        xAxisLabel = progressChart.getXAxisLabel();
-        dailyStats = progressChart.createStatsStr(stepStats);
-
-        bds = (BarDataSet)bd.getDataSetByIndex(0);
-        lds = (LineDataSet)ld.getDataSetByIndex(0);
-
-        // Check bar entry
-        for(int i = 0; i < bds.getEntryCount(); ++i) {
-            BarEntry be = bds.getEntryForIndex(i);
-            float incidental = be.getYVals()[0];
-            float intentional = be.getYVals()[1];
-            assertEquals(stepStats.get(i).getIncidentWalk(), incidental, 0.001);
-            assertEquals(stepStats.get(i).getIntentionalWalk(), intentional, 0.001);
-        }
-
-        // Check line entry
-        for(int i = 0; i < lds.getEntryCount(); ++i) {
-            Entry le = lds.getEntryForIndex(i);
-            float goal = le.getY();
-            assertEquals(stepStats.get(i).getGoal(), goal, 0.001);
-        }
-
-        // Check x-axis label
         assertEquals(7,xAxisLabel.size() - 1);
         for(int i = 1; i < xAxisLabel.size(); ++i) {
             assertEquals(week[i - 1], xAxisLabel.get(i));
         }
 
         // Check Daily stats
-        correctStats = "Intentional Work Statistics\n" +
+        String correctStats = "Intentional Work Statistics\n" +
                 "Sun: Steps:  3255 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
                 "Mon: Steps:  3752 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
                 "Tue: Steps:   882 Dist: 1.3mi Time: 0.3 hrs MPH: 4.0\n" +
