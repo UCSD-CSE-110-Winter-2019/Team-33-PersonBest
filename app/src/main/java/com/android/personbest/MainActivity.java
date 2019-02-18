@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 stepCounter.stopUpdates();
                 editor.putInt("StepsToday",Integer.parseInt(stepsTodayVal.getText().toString()));
                 editor.apply();
-                startActivity(new Intent(self, SetStepsAndTimeActivity.class));
+                startActivityForResult(new Intent(self, SetStepsAndTimeActivity.class), 0);
             }
         });
 
@@ -319,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         } else {
             Log.e(TAG, "ERROR, google fit result code: " + resultCode);
         }
+        setStepCount(sp.getInt("StepsToday", Integer.parseInt(stepsTodayVal.getText().toString())));
     }
 
     // goal is reached but should we display the message?
