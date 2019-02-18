@@ -18,14 +18,13 @@ public class DateCalendar implements IDate {
 
     @Override
     public int getYesterday() {
-        if (this.day == 1 || Calendar.DAY_OF_WEEK == 1){
+        int realDay = cal.get(Calendar.DAY_OF_WEEK);
+        if (this.day == 1 || realDay == 1){
             return FINAL_DAY;
-        }
-        else if (this.day != -1){
+        } else if (this.day != -1){
             return this.day - 1;
-        }
-        else{
-            return Calendar.DAY_OF_WEEK - 1;
+        } else {
+            return realDay - 1;
         }
     }
 
