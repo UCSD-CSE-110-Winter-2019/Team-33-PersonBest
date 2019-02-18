@@ -18,12 +18,17 @@ public class DateCalendar implements IDate {
 
     @Override
     public int getYesterday() {
-        int realDay = cal.get(Calendar.DAY_OF_WEEK);
+        int realDay = -1;
+        if(this.day == -1) realDay = cal.get(Calendar.DAY_OF_WEEK);
+
         if (this.day == 1 || realDay == 1){
             return FINAL_DAY;
         } else if (this.day != -1){
             return this.day - 1;
         } else {
+            if(realDay == -1) {
+                throw new IllegalStateException("realDay is not properly set with non-constructor");
+            }
             return realDay - 1;
         }
     }
