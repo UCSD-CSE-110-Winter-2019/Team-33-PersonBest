@@ -65,4 +65,5 @@ public class SavedDataManagerTest implements SavedDataManager {
         return false;
     }
     public void setShownYesterdaySubGoal(String today) {}
+    public int getTodaySteps(int day) {return day;}
 }
