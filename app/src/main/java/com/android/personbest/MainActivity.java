@@ -240,14 +240,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
             if (requestCode == stepCounter.getRequestCode()) {
                 isFirstTimeLogin = true;
                 stepCounter.beginUpdates();
+            } else {
+                // update goals
+                goalNum = sp.getInt("Current Goal",goalNum);
+                setGoal(goalNum);
             }
         } else {
             Log.e(TAG, "ERROR, google fit result code: " + resultCode);
         }
-
-        // update goals
-        goalNum = sp.getInt("Current Goal",goalNum);
-        setGoal(goalNum);
     }
 
     // goal is reached but should we display the message?
@@ -448,6 +448,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchSetGoalActivity() {
         Intent intent = new Intent(this, SetGoalActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,0);
     }
 }
