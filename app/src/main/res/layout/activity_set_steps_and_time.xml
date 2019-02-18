@@ -16,13 +16,18 @@
             android:inputType="number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:layout_editor_absoluteY="296dp" tools:layout_editor_absoluteX="0dp"/>
+            tools:layout_editor_absoluteY="296dp"
+            tools:layout_editor_absoluteX="0dp"/>
     <Button
             android:text="set time"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" tools:layout_editor_absoluteY="341dp"
-            tools:layout_editor_absoluteX="173dp" android:id="@+id/set_time"/>
-    <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="GO BACK"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteY="341dp"
+            tools:layout_editor_absoluteX="173dp"
+            android:id="@+id/set_time"/>
+    <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GO BACK"
             android:id="@+id/go_back"/>
 
 </LinearLayout>

@@ -180,5 +180,10 @@
             app:layout_constraintStart_toStartOf="@+id/stepsTodayText"
             app:layout_constraintTop_toTopOf="@+id/stepsTodayText"
             app:layout_constraintBottom_toTopOf="@+id/stepsTodayVal" android:layout_marginBottom="20dp"/>
+    <Button
+            android:text="SET TIME AND STEPS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" tools:layout_editor_absoluteY="35dp"
+            tools:layout_editor_absoluteX="215dp" android:id="@+id/set_time_steps"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedStepValue;
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
+    private Button setStepsAndTime;
 
 
     public void update(Observable o, Object arg) {
@@ -108,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         plannedTimeValue = findViewById(R.id.timeValue);
         plannedStepValue = findViewById(R.id.stepValue);
         plannedMPHValue = findViewById(R.id.mphValue);
+        setStepsAndTime = findViewById(R.id.set_time_steps);
+
         setPlannedExerciseStatsVisibility(false);
 
         stepsTodayVal.setText(String.valueOf(STEP_INIT));
@@ -160,6 +163,16 @@ public class MainActivity extends AppCompatActivity implements Observer {
             editor.putInt("Current Goal",GOAL_INIT);
             editor.apply();
         }
+
+
+        setStepsAndTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editor.putInt("StepsToday",Integer.parseInt(stepsTodayVal.getText().toString()));
+                editor.apply();
+                startActivity(new Intent(self, SetStepsAndTimeActivity.class));
+            }
+        });
 
         goalNum = sp.getInt("Current Goal", GOAL_INIT);
         editor.putInt(String.valueOf(theDate.getDay()) + "_Goal", goalNum);
@@ -214,15 +227,48 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
     }
+
+
     @Override
     protected void onResume() {
         super.onResume();
+
+        int modifiedSteps = sp.getInt("StepsToday",0);
+        stepsTodayVal.setText(String.valueOf(modifiedSteps));
+
+        String time = sp.getString("UnixTimeStr","0");
+        if (!time.equals("")){
+            long timeMilli = Long.parseLong(time);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(timeMilli);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int year = calendar.get(Calendar.YEAR);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int month = calendar.get(Calendar.MONTH) + 1;
+            String todayStr;
+            if (month < 10){
+                todayStr = "0"+ month+"/"+day+"/"+year;
+            }
+            else{
+                todayStr = month+"/"+day+"/"+year;
+            }
+            System.err.println(todayStr);
+            theDate = new DateCalendar(calendar.get(Calendar.DAY_OF_WEEK));
+            calendar.add(Calendar.DATE,-1);
+            year = calendar.get(Calendar.YEAR);
+            day = calendar.get(Calendar.DAY_OF_MONTH);
+            month = calendar.get(Calendar.MONTH) + 1;
+            String yesterdayStr = month+"/"+day+"/"+year;
+            theTimer = new TimerMock(hour, todayStr,yesterdayStr);
+        }
+
         if(theTimer.isLateToday()) {
             checkSubGoalReach();
         }
         // update date
         if(todayInt != theDate.getDay()) {
             todayInt = theDate.getDay();
+            stepCounter.notifyObservers();
             setToday(theTimer.getTodayString());
         }
     }
