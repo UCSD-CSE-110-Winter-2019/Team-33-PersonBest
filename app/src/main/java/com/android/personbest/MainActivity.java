@@ -277,7 +277,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         if(theTimer.isLateToday()) {
             checkSubGoalReach();
-            System.out.println("late Today");
         }
         // update date
         if(todayInt != theDate.getDay()) {
