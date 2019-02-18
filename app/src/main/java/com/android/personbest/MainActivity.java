@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 stepCounter.stopUpdates();
                 editor.putInt("StepsToday",Integer.parseInt(stepsTodayVal.getText().toString()));
                 editor.apply();
-                startActivityForResult(new Intent(self, SetStepsAndTimeActivity.class), 0);
+                startActivityForResult(new Intent(self, SetStepsAndTimeActivity.class), 3);
             }
         });
 
@@ -315,11 +315,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 // update goals
                 goalNum = sp.getInt("Current Goal",goalNum);
                 setGoal(goalNum);
+                setStepCount(sp.getInt("StepsToday", Integer.parseInt(stepsTodayVal.getText().toString())));
             }
         } else {
             Log.e(TAG, "ERROR, google fit result code: " + resultCode);
         }
-        setStepCount(sp.getInt("StepsToday", Integer.parseInt(stepsTodayVal.getText().toString())));
     }
 
     // goal is reached but should we display the message?
@@ -517,11 +517,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchSetGoalActivity(View view) {
         Intent intent = new Intent(this, SetGoalActivity.class);
-        startActivityForResult(intent,0);
+        startActivityForResult(intent,2);
     }
 
     public void launchSetGoalActivity() {
         Intent intent = new Intent(this, SetGoalActivity.class);
-        startActivityForResult(intent,0);
+        startActivityForResult(intent,2);
     }
 }
