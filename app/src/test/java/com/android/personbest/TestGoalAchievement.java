@@ -1,9 +1,10 @@
 package com.android.personbest;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.app.Dialog;
+import android.content.*;
+import android.util.Log;
+import android.widget.Button;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
@@ -36,9 +37,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.ShadowToast;
 
 import java.util.Calendar;
+import java.util.IllegalFormatException;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -46,23 +50,26 @@ import static org.robolectric.RuntimeEnvironment.application;
 
 @RunWith(RobolectricTestRunner.class)
 public class TestGoalAchievement {
+    private static final String TAG = "[TestGoalAchievement]";
     private static final String TEST_SERVICE = "TEST_SERVICE";
-    private static final String TEST_DAY = "02/19/2019";
+    private static final String TEST_DAY = "09/09/2019";
     private static final int TEST_DAY_INT = 3; // just random number
-    private static final int TEST_DAY_HOUR = 19; // brfore 8 pm
-    private static final String PAY_DAY = "02/01/2019";
+    private static final int TEST_DAY_BEFORE_YESTERDAY_INT = 1; // just random number
+    private static final int TEST_DAY_HOUR = 19; // before 8 pm
+    private static final String PAY_DAY = "01/01/2019";
     private static final int GOAL_INIT = 1024;
     private static final int HEIGHT = 40;
     private static final int NEXT_STEP_COUNT = 1337;
 
     private MainActivity activity;
+    private ShadowActivity shadowActivity;
     private SharedPreferences sp;
     private SavedDataManager sd;
     private SharedPreferences.Editor editor;
     private int nextStepCount;
 
     private IDate mockDate;
-    private ITimer mockTimer;
+    private TimerMock mockTimer;
 
     @Before
     public void setUp() throws Exception {
@@ -77,6 +84,7 @@ public class TestGoalAchievement {
         Intent intent = new Intent(application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        shadowActivity = Shadows.shadowOf(activity);
         //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
 
         sd = new SavedDataManagerSharedPreference(activity);
@@ -86,8 +94,12 @@ public class TestGoalAchievement {
 
         activity.setTimer(mockTimer);
         activity.setTheDate(mockDate);
+        activity.setToday(TEST_DAY);
 
         editor = sp.edit();
+        editor.clear();
+        editor.apply();
+
         editor.putInt("Height", HEIGHT); // skip the set up screen
         editor.putInt("Current Goal", GOAL_INIT);
         editor.apply();
@@ -112,6 +124,9 @@ public class TestGoalAchievement {
     @Test
     public void testTodayGoalReachedPrompted() {
         sd.setShownGoal(TEST_DAY);
+        editor.putString("last_day_prompted_goal", TEST_DAY);
+        editor.apply();
+        Log.i(TAG,"Last day shown goal is: " + sp.getString("last_day_prompted_goal","Empty"));
         activity.setGoal(GOAL_INIT);
         activity.setStepCount(GOAL_INIT+1);
         AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
@@ -212,10 +227,110 @@ public class TestGoalAchievement {
                 shadowAlertDialog.getMessage());
     }
 
+    @Test
+    public void testTodayGoalReachedYesNavigation() {
+        sd.setShownGoal(PAY_DAY);
+        activity.setGoal(GOAL_INIT);
+        activity.setStepCount(GOAL_INIT+1);
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+
+        Button confirm = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        confirm.performClick();
+        Intent intent = shadowActivity.peekNextStartedActivityForResult().intent;
+        assertEquals(new ComponentName(activity, SetGoalActivity.class), intent.getComponent());
+    }
+
+    @Test
+    public void testTodayGoalReachedNoNavigation() {
+        sd.setShownGoal(PAY_DAY);
+        activity.setGoal(GOAL_INIT);
+        activity.setStepCount(GOAL_INIT+1);
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+
+        Button btn = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        btn.performClick();
+        Intent intent = shadowActivity.peekNextStartedActivityForResult().intent;
+        assertNotEquals(new ComponentName(activity, SetGoalActivity.class), intent.getComponent());
+    }
+
+    @Test
+    public void testYesterdayGoalReachedNotDisplayed() {
+        sd.setShownYesterdayGoal(PAY_DAY);
+        setYesterdayGoal(GOAL_INIT);
+        setYesterdaySteps(GOAL_INIT + 1);
+        activity.checkYesterdayGoalReach();
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+        assertNotNull(alertDialog);
+        ShadowAlertDialog shadowAlertDialog = Shadows.shadowOf(alertDialog);
+        assertEquals("You Reached the Goal Yesterday",
+                shadowAlertDialog.getTitle());
+        assertEquals("Congratulations! Do you want to set a new step goal?",
+                shadowAlertDialog.getMessage());
+    }
+
+    @Test
+    public void testYesterdayGoalReachedNotDisplayedAlreadyDisplayed() {
+        sd.setShownYesterdayGoal(TEST_DAY);
+        editor.putString("last_day_prompted_yesterday_goal", TEST_DAY);
+        editor.apply();
+        Log.i(TAG,"Last day shown yesterday goal is: " + sp.getString("last_day_prompted_yesterday_goal","Empty"));
+        setYesterdayGoal(GOAL_INIT);
+        setYesterdaySteps(GOAL_INIT + 1);
+        activity.checkYesterdayGoalReach();
+        AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+        assertNull(alertDialog);
+    }
+
+    @Test
+    public void testSubGoal() {
+        mockTimer.setTime(21);
+        sd.setShownSubGoal(PAY_DAY);
+        sd.setShownGoal(PAY_DAY);
+        setYesterdaySteps(GOAL_INIT);
+        activity.setStepCount(GOAL_INIT+1000);
+        activity.setGoal(GOAL_INIT+1000+1000);
+        activity.checkSubGoalReach();
+        assertEquals("You've increased your daily steps by " + 1000 + " steps. Keep up the good work!",
+                ShadowToast.getTextOfLatestToast());
+    }
+
+    @Test
+    public void testYesterdaySubGoalReachedNotDisplayed() {
+        sd.setShownYesterdaySubGoal(PAY_DAY);
+        sd.setShownSubGoal(TEST_DAY);
+        setYesterdaySteps(GOAL_INIT+1000);
+        setYesterdayGoal(GOAL_INIT+1000+1000);
+        setStepByDayInt(TEST_DAY_BEFORE_YESTERDAY_INT, GOAL_INIT);
+        System.err.print("Yesterday Steps: ");
+        System.err.println(sd.getYesterdaySteps(TEST_DAY_INT));
+        System.err.print("Day Before Yesterday Steps: ");
+        System.err.println(sd.getStepsDaysBefore(TEST_DAY_INT, 2));
+        activity.checkYesterdaySubGoalReach();
+        assertEquals("You've increased your daily steps by " + 1000 + " steps. Keep up the good work!",
+                ShadowToast.getTextOfLatestToast());
+    }
+
+    private void setYesterdaySteps(int steps) {
+        String yesterdayStepStr = mockDate.getYesterday() + "_TotalSteps";
+        editor.putInt(yesterdayStepStr, steps);
+        editor.apply();
+    }
+
+    private void setYesterdayGoal(int goal) {
+        String yesterdayGoalStr = mockDate.getYesterday() + "_Goal";
+        editor.putInt(yesterdayGoalStr, goal);
+        editor.apply();
+    }
+
+    private void setStepByDayInt(int day, int steps) {
+        String yesterdayStepStr = String.valueOf(day) + "_TotalSteps";
+        editor.putInt(yesterdayStepStr, steps);
+        editor.apply();
+    }
+
     @After
     public void reset() {
-        editor.clear();
-        editor.apply();
+        mockTimer.setTime(TEST_DAY_HOUR);
     }
 
     private class TestFitnessService extends StepCounterGoogleFit {

@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public void goalReach() {
         if(!sd.isShownGoal(today)) {
             sd.setShownGoal(today);
-            Log.e(TAG, "Show goal on: " + today);
+            Log.i(TAG, "Show goal on: " + today);
             goalReached(false);
         }
     }
@@ -263,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 !sd.isShownGoal(today) &&
                 todaySteps < goalNum &&
                 progressEncouragement.progressMade(todaySteps, yesterdaySteps)) {
+            Log.i(TAG, "Show sub goal on: " + today);
             sd.setShownSubGoal(today);
             progressEncouragement.showEncouragementMessage(todaySteps,yesterdaySteps);
         }
@@ -279,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if(!sd.isShownYesterdayGoal(today) &&
                 !sd.isShownGoal(yesterday) &&
                 yesterdayGoal <= yesterdaySteps) {
+            Log.i(TAG, "Show yesterday goal on: " + today);
             sd.setShownYesterdayGoal(today);
             goalReached(true);
         }
@@ -289,13 +291,16 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdaySubGoalReach() {
         String yesterday = theTimer.getYesterdayString();
 
+        int yesterdayGoal = sd.getYesterdayGoal(todayInt);
         int yesterdaySteps = sd.getYesterdaySteps(todayInt);
         int dayBeforeYesterdaySteps = sd.getStepsDaysBefore(todayInt, 2);
 
         if(!sd.isShownYesterdaySubGoal(today) &&
                 !sd.isShownSubGoal(yesterday) &&
                 !sd.isShownYesterdayGoal(today) &&
+                 yesterdaySteps < yesterdayGoal &&
                 progressEncouragement.progressMade(yesterdaySteps,dayBeforeYesterdaySteps)) {
+            Log.i(TAG, "Show yesterday sub goal on: " + today);
             sd.setShownYesterdaySubGoal(today);
             progressEncouragement.showEncouragementMessage(yesterdaySteps,dayBeforeYesterdaySteps);
         }
@@ -367,6 +372,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             throw e;
         }
         this.today = today;
+        // not updating todayInt here to make mocking work
     }
 
 
