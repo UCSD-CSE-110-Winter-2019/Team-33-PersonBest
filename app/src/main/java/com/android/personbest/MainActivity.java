@@ -340,6 +340,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
             isFirstTimeLogin = false;
             setGoal(stepCount + GOAL_DEMO_INCR);
             goalNum = stepCount + GOAL_DEMO_INCR;
+            editor.putInt("Current Goal", goalNum);
+            editor.apply();
         }
         stepsTodayVal.setText(String.valueOf(stepCount));
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
