@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.android.personbest.MainActivity;
 import com.google.android.gms.tasks.Task;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,8 +33,6 @@ import static java.text.DateFormat.getDateInstance;
 
 public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
-    private final int DEFAULT_STEPS = 0;
-    private final int DEFAULT_GOAL = 5000;
     private final String TAG = "GoogleFitAdapter";
     private static final long UPDATE_INTERVAL = 1000;
     private SharedPreferences sp;
@@ -58,6 +57,9 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
         t.schedule(updateSteps, 0, UPDATE_INTERVAL);
     }
 
+    public void stopUpdates() {
+        if(t!=null) t.cancel();
+    }
 
     public void setup() {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
@@ -181,34 +183,4 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
     }
 
 
-    public int getYesterdaySteps(){
-        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
-        Date now = new Date();
-        int day = now.getDay();
-        Integer yesterday = this.getYesterday(day);
-        int totalSteps = sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
-        return totalSteps;
-    }
-
-    private int getYesterday(int day){
-        if (day == 0) return 6;
-        else return day - 1;
-    }
-
-    public List<IStatistics> getLastWeekSteps(){
-        SharedPreferences sp = activity.getPreferences(Context.MODE_PRIVATE);
-        Date now = new Date();
-        int day = now.getDay();
-        List<IStatistics> result = new ArrayList<>();
-        for (Integer d = 0; d <= day; d++){
-            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
-            int intentionalSteps = sp.getInt(d.toString()+"_IntenionalSteps",DEFAULT_STEPS);
-            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,"");
-            result.add(dailyStat);
-        }
-
-        return result;
-
-    }
 }

@@ -1,9 +1,12 @@
 package com.android.personbest;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.android.personbest.StepCounter.IDate;
 import com.android.personbest.StepCounter.IStatistics;
 //import com.android.personbest.StepCounter.Statistics;
 import com.android.personbest.StepCounter.StepCounter;
@@ -20,6 +23,7 @@ import org.robolectric.RuntimeEnvironment;
 //import edu.ucsd.cse110.googlefitapp.fitness.FitnessService;
 //import edu.ucsd.cse110.googlefitapp.fitness.FitnessServiceFactory;
 
+import java.util.IdentityHashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -59,15 +63,12 @@ public class TestStepCount {
         assertEquals("1337", textSteps.getText().toString());
     }
 
+
     private class TestFitnessService extends StepCounterGoogleFit {
         private static final String TAG = "[TestFitnessService]: ";
 
         public TestFitnessService(MainActivity stepCountActivity) {
             super(stepCountActivity);
-            if (stepCountActivity == null ){
-                System.out.println("Pass in NULL Activity");
-            }
-            System.out.println("Constructor");
         }
 
         @Override
@@ -86,13 +87,6 @@ public class TestStepCount {
             this.activity.setStepCount(nextStepCount);
         }
 
-        public int getYesterdaySteps(){
-            return 0;
-        }
-
-        @Override
-        public List<IStatistics> getLastWeekSteps() {
-            return null;
-        }
     }
+
 }

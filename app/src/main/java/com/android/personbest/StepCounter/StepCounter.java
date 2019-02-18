@@ -6,6 +6,4 @@ public interface StepCounter {
     int getRequestCode();
     void setup();
     void updateStepCount();
-    int getYesterdaySteps();
-    List<IStatistics> getLastWeekSteps();
 }

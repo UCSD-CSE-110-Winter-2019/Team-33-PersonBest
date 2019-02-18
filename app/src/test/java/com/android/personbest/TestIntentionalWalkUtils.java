@@ -14,6 +14,8 @@ public class TestIntentionalWalkUtils {
 
     @Test
     public void testVelocity() {
+
+        /// NOT WORKING
         int height = 70; // Height of Julian Edelman
         int numSteps = 8192;
         long timeInSeconds = 32768L;
