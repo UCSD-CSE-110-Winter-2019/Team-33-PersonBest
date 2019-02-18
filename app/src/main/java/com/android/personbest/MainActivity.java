@@ -29,6 +29,7 @@ import java.util.*;
 public class MainActivity extends AppCompatActivity implements Observer {
 
     private static final int GOAL_INIT = 5000; // default
+    private static final int GOAL_DEMO_INCR = 5; // @339
     private static final int STEP_INIT = 0;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
     private static final long MILLISECONDS_IN_A_SECOND = 1000;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private IDate theDate;
     private String today;
     private Integer todayInt;
+    private boolean isFirstTimeLogin;
 
     private boolean NDEBUG = true;
 
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         theTimer = new TimerSystem();
         progressEncouragement = new ProgressEncouragement(this);
         theDate = new DateCalendar();
+        isFirstTimeLogin = false;
 
         final Button startStopBtn = findViewById(R.id.startStop);
         startStopBtn.setText("  Start Walk/Run  ");
@@ -155,11 +158,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // Check if this is the first time launching app
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
         editor = sp.edit();
-        if(sp.getAll().isEmpty()) {
-            startActivity(new Intent(this, SetUpActivity.class));
-            editor.putInt("Current Goal",GOAL_INIT);
-            editor.apply();
-        }
+
 
         goalNum = sp.getInt("Current Goal", GOAL_INIT);
         editor.putInt(String.valueOf(theDate.getDay()) + "_Goal", goalNum);
@@ -184,6 +183,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
         stepCounter.setup();
         stepCounter.addObserver(this);
         stepCounter.beginUpdates();
+
+        if(sp.getAll().isEmpty()) {
+            stepCounter.stopUpdates();
+            startActivity(new Intent(this, SetUpActivity.class));
+            editor.putInt("Current Goal",GOAL_INIT);
+            editor.apply();
+        }
 
         // Update Button
         Button btnUpdateSteps = findViewById(R.id.btnUpdateSteps);
@@ -232,7 +238,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
 //       If authentication was required during google fit setup, this will be called after the user authenticates
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == stepCounter.getRequestCode()) {
-                stepCounter.updateStepCount();
+                isFirstTimeLogin = true;
+                stepCounter.beginUpdates();
             }
         } else {
             Log.e(TAG, "ERROR, google fit result code: " + resultCode);
@@ -329,6 +336,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void setStepCount(int stepCount) {
+        if(isFirstTimeLogin) { // demo only
+            isFirstTimeLogin = false;
+            setGoal(stepCount + GOAL_DEMO_INCR);
+            goalNum = stepCount + GOAL_DEMO_INCR;
+        }
         stepsTodayVal.setText(String.valueOf(stepCount));
         int stepsToGoal = (stepCount <= goalNum) ? goalNum - stepCount: 0;
         stepsLeftVal.setText(String.valueOf(stepsToGoal));
