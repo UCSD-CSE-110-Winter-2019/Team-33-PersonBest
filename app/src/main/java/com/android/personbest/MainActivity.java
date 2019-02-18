@@ -233,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void onResume() {
         super.onResume();
 
+
+
         int modifiedSteps = sp.getInt("StepsToday",0);
         stepsTodayVal.setText(String.valueOf(modifiedSteps));
 
@@ -268,8 +270,27 @@ public class MainActivity extends AppCompatActivity implements Observer {
         // update date
         if(todayInt != theDate.getDay()) {
             todayInt = theDate.getDay();
-            stepCounter.notifyObservers();
+            stepCounter.updateStepCount();
+            int stepsToday = sd.getTodaySteps(todayInt);
+            System.err.println(stepsToday);
+            this.setStepCount(stepsToday);
             setToday(theTimer.getTodayString());
+
+
+            // yesterday
+            boolean checked = false;
+            // only once since data of yesterday never changes today
+            if(!sd.isCheckedYesterdayGoal(today)) {
+                checked = true;
+                sd.setCheckedYesterdayGoal(today);
+                checkYesterdayGoalReach();
+            }
+            // not show sub-goal if goal met yesterday
+            if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today) && !checked) {
+                sd.setCheckedYesterdaySubGoal(today);
+                checkYesterdaySubGoalReach();
+            }
+
         }
     }
 
@@ -479,6 +500,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchSetGoalActivity() {
         Intent intent = new Intent(this, SetGoalActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,0);
     }
 }

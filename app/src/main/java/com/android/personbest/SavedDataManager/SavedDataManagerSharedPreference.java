@@ -38,6 +38,11 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
     }
 
+    public int getTodaySteps(int day){
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+        IDate iDate = new DateCalendar(day);
+        return sp.getInt(iDate.getDay() + "_TotalSteps",DEFAULT_STEPS);
+    }
 
     public int getStepsDaysBefore(int today, int days) {
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
