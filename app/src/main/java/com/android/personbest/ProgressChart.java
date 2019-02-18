@@ -4,21 +4,20 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
-import com.android.personbest.StepCounter.StepCounter;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.charts.CombinedChart;
+import com.github.mikephil.charting.components.*;
+import com.github.mikephil.charting.data.*;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.StackedValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.security.InvalidParameterException;
 import java.time.DayOfWeek;
@@ -30,20 +29,34 @@ import java.util.List;
 import java.util.Locale;
 
 public class ProgressChart extends AppCompatActivity {
-    private List<BarEntry> entries;
+    private List<BarEntry> barEntries;
+    private List<Entry> lineEntries;
     private SavedDataManager savedDataManager;
     private int date;
-    private BarChart progressChart;
+    private CombinedChart progressChart;
+    private CombinedData data;
+    private ArrayList<String> xAxisLabel;
+    private String stats;
+    private final String[] DAYOFWEEK = {
+            DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(2).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(3).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(4).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(5).getDisplayName(TextStyle.SHORT, Locale.US),
+            DayOfWeek.of(6).getDisplayName(TextStyle.SHORT, Locale.US)
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress_chart);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        entries = new ArrayList<>();
+        barEntries = new ArrayList<>();
+        lineEntries = new ArrayList<>();
         savedDataManager = new SavedDataManagerSharedPreference(this);
 
         final Activity self = this;
@@ -53,43 +66,181 @@ public class ProgressChart extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                ((ProgressChart) self).setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1);
+                ((ProgressChart) self).setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue());
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         progressChart = findViewById(R.id.progressChart);
 
-        setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1);
+        setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue());
+    }
+
+    public void setManager(SavedDataManager manager) {
+        savedDataManager = manager;
     }
 
     public void setDate(int date) {
-        if(date < 0 || date >= 7)
+        if (date < 1 || date >= 8)
             throw new InvalidParameterException("Date expected between 0 and 6, but got" + date);
         this.date = date;
-        setBarChart();
+
+        List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(date);
+        setBarChart(stepStats);
+        showChart();
     }
 
-    public void setBarChart() {
-        entries.clear();
-        List<IStatistics> stepStats = new ArrayList<>();//stepCounter.getLastWeekSteps(date);
-        ArrayList<String> xAxis = new ArrayList<>();
 
+    // Some of the configuration ideas (like axis) used this tutorial
+    // https://www.studytutorial.in/android-combined-line-and-bar-chart-using-mpandroid-library-android-tutorial
+    // as reference
+    public void setBarChart(List<IStatistics> stepStats) {
+
+        createEntries(stepStats);
+
+        // Create Axis
+        xAxisLabel = new ArrayList<>();
+        xAxisLabel.add("");
+        int j = 6;
+        for(BarEntry be: barEntries) {
+            j = j % 7 + 1;
+            xAxisLabel.add(DayOfWeek.of(j).getDisplayName(TextStyle.SHORT, Locale.US));
+        }
+
+        // Add daily stats
+        stats = createStatsStr(stepStats);
+
+        // Set data
+        data = new CombinedData();
+        data.setData(createBarData());
+        data.setData(createLineData());
+
+        // Draw options
+        progressChart.setDrawOrder(new CombinedChart.DrawOrder[]{CombinedChart.DrawOrder.BAR,
+                                                                  CombinedChart.DrawOrder.LINE});
+        progressChart.setDrawGridBackground(false);
+
+        // Legend options
+        ArrayList<LegendEntry> legendEntries = new ArrayList<>();
+        legendEntries.add(new LegendEntry("Incidental Walk", Legend.LegendForm.DEFAULT,
+                Float.NaN, Float.NaN, null, Color.rgb(0, 92, 175)));
+        legendEntries.add(new LegendEntry("Intentional Walk", Legend.LegendForm.DEFAULT,
+                Float.NaN, Float.NaN, null, Color.rgb(123, 144, 210)));
+
+        Legend legend = progressChart.getLegend();
+        legend.setCustom(legendEntries);
+
+        //Axis options
+        YAxis rightAxis = progressChart.getAxisRight();
+        rightAxis.setDrawGridLines(false);
+        rightAxis.setAxisMinimum(0f);
+
+        YAxis leftAxis = progressChart.getAxisLeft();
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setAxisMinimum(0f);
+
+        XAxis xAxis = progressChart.getXAxis();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setAxisMinimum(0.6f);
+        xAxis.setGranularity(1f);
+        xAxis.setAxisMaximum(data.getXMax() + 0.4f);
+
+        progressChart.getDescription().setEnabled(false);
+
+        progressChart.setData(data);
+        progressChart.invalidate();
+    }
+
+    private void showChart() {
+        progressChart.setData(data);
+        progressChart.invalidate();
+        ((TextView)findViewById(R.id.statsView)).setText(stats);
+    }
+
+    private void createEntries(List<IStatistics> stepStats) {
+        barEntries.clear();
+        lineEntries.clear();
         int i = 0;
         for (IStatistics stat : stepStats) {
             i += 1;
             float[] tempArr = new float[2];
             tempArr[0] = stat.getIncidentWalk();
             tempArr[1] = stat.getIntentionalWalk();
-            entries.add(new BarEntry(i, tempArr));
-            xAxis.add(DayOfWeek.of(i).getDisplayName(TextStyle.FULL, Locale.JAPAN));
+            barEntries.add(new BarEntry(i, tempArr));
+            lineEntries.add(new Entry(i, stat.getGoal()));
         }
-        BarDataSet stepDataSet = new BarDataSet(entries, "Steps Current Week");
+    }
+
+    private BarData createBarData() {
+        BarDataSet stepDataSet = new BarDataSet(barEntries, "Steps Current Week");
         stepDataSet.setColors(Color.rgb(0, 92, 175), Color.rgb(123, 144, 210));
-        BarData stepData = new BarData(stepDataSet);
-        progressChart.setData(stepData);
-        progressChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xAxis));
-        progressChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        progressChart.invalidate();
+        stepDataSet.setValueTextSize(8f);
+        stepDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+
+        BarData bd =  new BarData(stepDataSet);
+        bd.setBarWidth(0.4f);
+        return bd;
+    }
+
+    private LineData createLineData() {
+        LineDataSet goalDataSet = new LineDataSet(lineEntries, "Goals Current Week");
+        goalDataSet.setColors(Color.rgb(8, 25, 45));
+        goalDataSet.setCircleColor(Color.rgb(190, 194, 63));
+        goalDataSet.setCircleRadius(3f);
+        goalDataSet.setFillColor(Color.rgb(218, 201, 166));
+        goalDataSet.setValueTextSize(8f);
+        goalDataSet.setValueTextColor(Color.rgb(54, 86, 60));
+        goalDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+
+        goalDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        return new LineData(goalDataSet);
+    }
+
+    public String createStatsStr(List<IStatistics> stepStats) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Intentional Work Statistics\n");
+        for(int i = 0; i < stepStats.size(); ++i) {
+            sb.append(DAYOFWEEK[i] + ": ");
+            sb.append(stepStats.get(i).getStats() + '\n');
+        }
+        return sb.toString();
+    }
+
+    public LineData getLineData() {
+        return data.getLineData();
+    }
+
+    public BarData getBarData() {
+        return data.getBarData();
+    }
+
+    public ArrayList<String> getXAxisLabel() {
+        return xAxisLabel;
+    }
+
+    // Not used for now, but will keep this in case we need it in the future
+    public static class EnhancedStackedValueFormatter extends StackedValueFormatter {
+        private String[] appendices;
+        public EnhancedStackedValueFormatter(String[] appendices) {
+            super(false, null, 0);
+            this.appendices = appendices;
+        }
+
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            float[] vals = ((BarEntry)entry).getYVals();
+
+            if (vals != null) {
+                // find out if we are on top of the stack
+                if (vals[vals.length - 1] == value) {
+
+                    return appendices[(int)entry.getX() - 1];
+                } else {
+                    return ""; // return empty
+                }
+            }
+            return null;
+        }
     }
 }
