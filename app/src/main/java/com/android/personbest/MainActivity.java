@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         setStepsAndTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stepCounter.stopUpdates();
                 editor.putInt("StepsToday",Integer.parseInt(stepsTodayVal.getText().toString()));
                 editor.apply();
                 startActivity(new Intent(self, SetStepsAndTimeActivity.class));
