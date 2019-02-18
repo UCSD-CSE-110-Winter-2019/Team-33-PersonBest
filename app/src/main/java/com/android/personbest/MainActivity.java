@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private SharedPreferences.Editor editor;
     private int goalNum;
     private boolean plannedExercise = false;
+    private boolean checkedToday;
     private long timer;
     private int plannedSteps;
     private int totalIntentionalSteps;
@@ -216,6 +217,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
            sd.setCheckedYesterdayGoal(today);
             checkYesterdayGoalReach();
         }
+
+        this.checkedToday = false;
         // not show sub-goal if goal met yesterday
         if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today)) {
             sd.setCheckedYesterdaySubGoal(today);
@@ -224,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         if(theTimer.isLateToday()) {
             checkSubGoalReach();
+            checkedToday = true;
         }
 
     }
@@ -266,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         if(theTimer.isLateToday()) {
             checkSubGoalReach();
+            System.out.println("late Today");
         }
         // update date
         if(todayInt != theDate.getDay()) {
@@ -277,16 +282,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
             setToday(theTimer.getTodayString());
 
 
-            // yesterday
-            boolean checked = false;
             // only once since data of yesterday never changes today
-            if(!sd.isCheckedYesterdayGoal(today)) {
-                checked = true;
+            if(!sd.isCheckedYesterdayGoal(today) && !checkedToday) {
+                checkedToday = true;
                 sd.setCheckedYesterdayGoal(today);
                 checkYesterdayGoalReach();
             }
             // not show sub-goal if goal met yesterday
-            if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today) && !checked) {
+            if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today) && !checkedToday) {
                 sd.setCheckedYesterdaySubGoal(today);
                 checkYesterdaySubGoalReach();
             }
