@@ -436,6 +436,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchSetGoalActivity() {
         Intent intent = new Intent(this, SetGoalActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,0);
     }
 }
