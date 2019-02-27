@@ -39,6 +39,26 @@ public class SavedDataManagerTest implements SavedDataManager {
         return null;
     }
 
+    public int getStepsByDayStr(String day) {
+        return -1;
+    }
+    public boolean setStepsByDayStr(String day, int step) {
+        return true;
+    }
+    public int getGoalByDayStr(String day) {
+        return -1;
+    }
+    public boolean setGoalByDayStr(String day, int goal) {
+        return true;
+    }
+    public IStatistics getStatByDayStr(String day) {
+        return null;
+    }
+    public boolean setStatByDayStr(String day, IStatistics stat) {
+        return true;
+    }
+
+
     public boolean isShownGoal(String today) {
         return false;
     }
