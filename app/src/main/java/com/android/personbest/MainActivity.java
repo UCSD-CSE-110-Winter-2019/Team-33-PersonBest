@@ -21,6 +21,7 @@ import com.android.personbest.StepCounter.*;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerMock;
 import com.android.personbest.Timer.TimerSystem;
+import com.google.firebase.FirebaseApp;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Activity self = this;
+
+        FirebaseApp.initializeApp(this);
 
         // Setup UI
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
