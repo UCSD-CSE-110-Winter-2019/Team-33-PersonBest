@@ -66,14 +66,14 @@ public class ProgressChart extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                ((ProgressChart) self).setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue());
+                ((ProgressChart) self).setDate((ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() + 1) % 7);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         progressChart = findViewById(R.id.progressChart);
 
-        setDate(ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue());
+        setDate((ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() + 1) % 7);
     }
 
     public void setManager(SavedDataManager manager) {
