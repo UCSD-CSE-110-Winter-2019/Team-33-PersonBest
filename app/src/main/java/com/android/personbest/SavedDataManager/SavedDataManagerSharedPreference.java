@@ -8,6 +8,7 @@ import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.DateCalendar;
 import com.android.personbest.StepCounter.IDate;
 import com.android.personbest.StepCounter.IStatistics;
+import com.android.personbest.Timer.ITimer;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -101,6 +102,8 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return true;
     }
 
+    // note: if not exist, will use default
+    // might need to change in the future
     public IStatistics getStatByDayStr(String day) {
         int totalSteps = this.getStepsByDayStr(day);
         int goal = this.getStepsByDayStr(day);
@@ -123,6 +126,16 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return true;
     }
 
+    public List<IStatistics> getLastMonthStat(String day) {
+        List<String> days = ITimer.getLastMonthDayStrings(day);
+        ArrayList<IStatistics> toReturn = new ArrayList<>();
+
+        for(String d : days) {
+            toReturn.add(this.getStatByDayStr(d));
+        }
+
+        return toReturn;
+    }
 
     public boolean isShownGoal(String today) {
        return sp.getString("last_day_prompted_goal","").equals(today);

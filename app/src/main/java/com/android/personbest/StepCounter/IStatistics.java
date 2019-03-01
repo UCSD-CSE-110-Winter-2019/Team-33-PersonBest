@@ -2,6 +2,11 @@ package com.android.personbest.StepCounter;
 
 public interface IStatistics {
     //TODO Design Stats
+    String getDayStr();
+    void setDayStr(String dayStr);
+    int getYearFromDayStr();
+    int getMonthFromDayStr();
+    int getDayFromDayStr();
     int getGoal();
     void setGoal(int goal);
     int getTotalSteps();

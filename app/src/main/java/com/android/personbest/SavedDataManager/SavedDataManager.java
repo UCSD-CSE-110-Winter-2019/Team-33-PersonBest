@@ -21,6 +21,10 @@ public interface SavedDataManager {
     IStatistics getStatByDayStr(String day);
     boolean setStatByDayStr(String day, IStatistics stat);
 
+    // return a list of IStatistics
+    // 28 days before the day in the argument
+    List<IStatistics> getLastMonthStat(String day);
+
     // below data are local only
     boolean isShownGoal(String today);
     void setShownGoal(String today);

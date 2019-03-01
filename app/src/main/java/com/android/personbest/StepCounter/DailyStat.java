@@ -1,6 +1,11 @@
 package com.android.personbest.StepCounter;
 
+import com.android.personbest.Timer.ITimer;
+
+import java.util.IllegalFormatException;
+
 public class DailyStat implements IStatistics {
+    private String dayStr;
     private int goal;
     private int totalSteps;
     private int intentionalSteps;
@@ -9,7 +14,31 @@ public class DailyStat implements IStatistics {
     private float averageMPH;
     private float hours;
     public static final long MILLISECONDS_IN_A_MINUTE = 60000;
+    private static final int DATE_STRING_LENGTH = 10;
 
+    public String getDayStr() {
+        return null;
+    }
+
+    public void setDayStr(String dayStr) {
+        if(ITimer.isValidDayStr(dayStr)) {
+            this.dayStr = dayStr;
+        } else {
+            throw new IllegalArgumentException("Wrong date format");
+        }
+    }
+
+    public int getYearFromDayStr() {
+        return ITimer.getYearFromDayStr(dayStr);
+    }
+
+    public int getMonthFromDayStr() {
+        return ITimer.getMonthFromDayStr(dayStr);
+    }
+
+    public int getDayFromDayStr() {
+        return ITimer.getDayFromDayStr(dayStr);
+    }
 
     public int getGoal() {
         return goal;

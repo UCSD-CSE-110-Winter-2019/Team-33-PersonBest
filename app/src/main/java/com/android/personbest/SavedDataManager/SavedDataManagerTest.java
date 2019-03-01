@@ -26,6 +26,9 @@ public class SavedDataManagerTest implements SavedDataManager {
         }
         return toRet;
     }
+    public List<IStatistics> getLastMonthStat(String day) {
+        return null;
+    }
     public int getStepsDaysBefore(int today, int days) {
         return -1;
     }

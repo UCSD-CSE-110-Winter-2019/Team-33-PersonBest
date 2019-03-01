@@ -1,6 +1,6 @@
 package com.android.personbest.Timer;
 
-public class TimerMock implements ITimer {
+public class TimerMock extends ITimer {
     private int time;
     private String todayStr;
     private String yesterdayStr;
