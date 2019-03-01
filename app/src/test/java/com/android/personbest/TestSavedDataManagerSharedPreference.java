@@ -33,6 +33,7 @@ public class TestSavedDataManagerSharedPreference {
     private int nextStepCount;
     private String theTestDay = "02/19/2019";
     private String thePayDay = "02/01/2019";
+    int mkdks = 0;
 
     @Before
     public void setUp() throws Exception {
