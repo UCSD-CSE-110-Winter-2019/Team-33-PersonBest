@@ -51,6 +51,8 @@ public class TestSavedDataManagerSharedPreference {
         sd = new SavedDataManagerSharedPreference(activity);
         sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
         editor = sp.edit();
+        editor.clear();
+        editor.apply();
         nextStepCount = 1337;
     }
 
@@ -169,12 +171,6 @@ public class TestSavedDataManagerSharedPreference {
         assertFalse(sd.isShownYesterdaySubGoal(theTestDay));
         sd.setShownYesterdaySubGoal(theTestDay);
         assertTrue(sd.isShownYesterdaySubGoal(theTestDay));
-    }
-
-    @After
-    public void reset() {
-        editor.clear();
-        editor.apply();
     }
 
     private class TestFitnessService extends StepCounterGoogleFit {
