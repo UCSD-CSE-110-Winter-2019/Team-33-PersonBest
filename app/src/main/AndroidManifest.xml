@@ -12,8 +12,8 @@
         <activity
                 android:name=".ProgressChart"
                 android:label="@string/title_activity_progress_chart"
-                android:parentActivityName=".MainActivity"
                 android:launchMode="singleInstance"
+                android:parentActivityName=".MainActivity"
                 android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
