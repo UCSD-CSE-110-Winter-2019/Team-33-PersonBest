@@ -14,6 +14,8 @@ public interface SavedDataManager {
     List<IStatistics> getLastWeekSteps(int day);
 
     // data to sync
+    boolean setCurrentUsrEmail(String email);
+    String getCurrentUsrEmail();
     int getStepsByDayStr(String day);
     boolean setStepsByDayStr(String day, int step);
     int getGoalByDayStr(String day);
