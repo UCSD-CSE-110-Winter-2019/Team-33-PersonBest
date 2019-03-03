@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.android.personbest">
+    package="com.android.personbest">
 
     <application
             android:allowBackup="true"
@@ -23,20 +23,17 @@
                 android:parentActivityName=".MainActivity"
                 android:theme="@style/AppTheme.NoActionBar">
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value="com.android.personbest.MainActivity"/>
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.android.personbest.MainActivity" />
         </activity>
-        <activity android:name=".SetGoalActivity">
-        </activity>
-        <activity android:name=".SetUpActivity">
-        </activity>
-        <activity android:name=".PlannedExerciseSummary">
-        </activity>
+        <activity android:name=".SetGoalActivity"></activity>
+        <activity android:name=".SetUpActivity"></activity>
+        <activity android:name=".PlannedExerciseSummary"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
