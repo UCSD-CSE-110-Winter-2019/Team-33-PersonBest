@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "998924189833-vmphpu2sv48v7qmcvbjd2tuuhbfsfihc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "f769c2b3a3b1df720968821a22c70974856ccd15"
+          }
+        },
+        {
           "client_id": "998924189833-s9u9gl4nkb8sc1ciepofjtvbshf7pe6q.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -38,7 +46,12 @@
         },
         "appinvite_service": {
           "status": 2,
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "998924189833-s9u9gl4nkb8sc1ciepofjtvbshf7pe6q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
