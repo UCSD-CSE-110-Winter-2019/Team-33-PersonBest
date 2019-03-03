@@ -55,5 +55,5 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     implementation 'com.google.firebase:firebase-core:16.0.7'
-
+    implementation 'com.google.firebase:firebase-firestore:18.0.1'
 }
