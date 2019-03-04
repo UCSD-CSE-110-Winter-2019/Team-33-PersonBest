@@ -18,14 +18,10 @@ public class SavedDataManagerTest implements SavedDataManager {
     }
 
     @Override
-    public int getYesterdaySteps(int day) {
-        return -1;
+    public List<IStatistics> getLastWeekSteps(String day) {
+        return null;
     }
-    @Override
-    public int getYesterdayGoal(int day) {
-        return -1;
-    }
-    @Override
+
     public List<IStatistics> getLastWeekSteps(int day) {
         List<IStatistics> toRet = new ArrayList<>();
         for(int i = 1; i <=day; ++i) {

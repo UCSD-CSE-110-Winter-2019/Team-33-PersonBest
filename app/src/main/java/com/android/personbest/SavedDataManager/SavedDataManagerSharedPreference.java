@@ -38,57 +38,6 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return null;
     }
 
-    public int getYesterdaySteps(int day){
-        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        IDate iDate = new DateCalendar(day);
-        Integer yesterday = iDate.getYesterday();
-        return sp.getInt(yesterday.toString() + "_TotalSteps",DEFAULT_STEPS);
-    }
-
-
-    public int getStepsDaysBefore(int today, int days) {
-        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        Integer targetDay = today;
-        while(days-->0) {
-            IDate iDate = new DateCalendar(targetDay);
-            targetDay = iDate.getYesterday();
-        }
-        return sp.getInt(targetDay.toString() + "_TotalSteps",DEFAULT_STEPS);
-    }
-
-    public int getYesterdayGoal(int day){
-        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        IDate iDate = new DateCalendar(day);
-        Integer yesterday = iDate.getYesterday();
-        return sp.getInt(yesterday.toString() + "_Goal", DEFAULT_GOAL);
-    }
-
-    public int getGoalDaysBefore(int today, int days) {
-        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        Integer targetDay = today;
-        while(days-->0) {
-            IDate iDate = new DateCalendar(targetDay);
-            targetDay = iDate.getYesterday();
-        }
-        return sp.getInt(targetDay.toString() + "_Goal",DEFAULT_GOAL);
-    }
-
-    public List<IStatistics> getLastWeekSteps(int day){
-        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        List<IStatistics> result = new ArrayList<>();
-        for (Integer d = 1; d <= day; d++){
-            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
-            int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
-            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-            Float MPH = sp.getFloat(d.toString()+"_AverageMPH",DEFAULT_MPH);
-            Long timewalked = sp.getLong(d.toString()+"_ExerciseTime",DEFAULT_TIME);
-            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,timewalked,MPH);
-            result.add(dailyStat);
-        }
-
-        return result;
-
-    }
 
     public boolean isFirstTimeUser() {
         return (sp.getAll().isEmpty());
@@ -181,6 +130,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
 
         return new DailyStat(goal,totalSteps,intentionalSteps,timeWalked,MPH);
     }
+
     public boolean setStatByDayStr(String day, IStatistics stat) {
         this.setStepsByDayStr(day, stat.getTotalSteps());
         this.setGoalByDayStr(day, stat.getGoal());
@@ -189,6 +139,27 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         this.setExerciseTimeByDayStr(day, stat.getTimeWalked());
 
         return true;
+    }
+
+    public List<IStatistics> getLastWeekSteps(String day) {
+        return null;
+    }
+
+    public List<IStatistics> getLastWeekSteps(int day){
+        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+        List<IStatistics> result = new ArrayList<>();
+        for (Integer d = 1; d <= day; d++){
+            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
+            int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
+            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
+            Float MPH = sp.getFloat(d.toString()+"_AverageMPH",DEFAULT_MPH);
+            Long timewalked = sp.getLong(d.toString()+"_ExerciseTime",DEFAULT_TIME);
+            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,timewalked,MPH);
+            result.add(dailyStat);
+        }
+
+        return result;
+
     }
 
     public List<IStatistics> getLastMonthStat(String day) {

@@ -37,42 +37,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
         return null;
     }
 
-    public int getYesterdaySteps(int day){
-        return 0;
-    }
-
-
-    public int getStepsDaysBefore(int today, int days) {
-        return 0;
-    }
-
-    public int getYesterdayGoal(int day){
-        return 0;
-    }
-
-    public int getGoalDaysBefore(int today, int days) {
-        return 0;
-    }
-
-    public List<IStatistics> getLastWeekSteps(int day){
-        return null;
-//        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-//        List<IStatistics> result = new ArrayList<>();
-//        for (Integer d = 1; d <= day; d++){
-//            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
-//            int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
-//            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-//            Float MPH = sp.getFloat(d.toString()+"_AverageMPH",DEFAULT_MPH);
-//            Long timewalked = sp.getLong(d.toString()+"_ExerciseTime",DEFAULT_TIME);
-//            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,timewalked,MPH);
-//            result.add(dailyStat);
-//        }
-//
-//        return result;
-
-    }
-
-    public boolean isFirstTimeUser() {
+   public boolean isFirstTimeUser() {
         return sdsp.isFirstTimeUser();
     }
     public void setFirstTimeUser(boolean isFirstTime) {
@@ -151,16 +116,28 @@ public class SavedDataManagerFirestore implements SavedDataManager {
 //
 //        return new DailyStat(goal,totalSteps,intentionalSteps,timeWalked,MPH);
     }
-    public boolean setStatByDayStr(String day, IStatistics stat) {
-        this.setStepsByDayStr(day, stat.getTotalSteps());
-        this.setGoalByDayStr(day, stat.getGoal());
-        this.setIntentionalStepsByDayStr(day, stat.getIntentionalSteps());
-        this.setAvgMPHByDayStr(day, stat.getAverageMPH());
-        this.setExerciseTimeByDayStr(day, stat.getTimeWalked());
 
-        return true;
+    public List<IStatistics> getLastWeekSteps(int day){
+        return null;
+//        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
+//        List<IStatistics> result = new ArrayList<>();
+//        for (Integer d = 1; d <= day; d++){
+//            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
+//            int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
+//            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
+//            Float MPH = sp.getFloat(d.toString()+"_AverageMPH",DEFAULT_MPH);
+//            Long timewalked = sp.getLong(d.toString()+"_ExerciseTime",DEFAULT_TIME);
+//            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,timewalked,MPH);
+//            result.add(dailyStat);
+//        }
+//
+//        return result;
+
     }
 
+    public List<IStatistics> getLastWeekSteps(String day) {
+        return null;
+    }
     public List<IStatistics> getLastMonthStat(String day) {
         return null;
     }

@@ -7,10 +7,6 @@ import java.util.List;
 // todayStr = theTimer.getTodayString()
 public interface SavedDataManager {
     // legacy API
-    int getYesterdaySteps(int day);
-    int getStepsDaysBefore(int today, int days);
-    int getYesterdayGoal(int day);
-    int getGoalDaysBefore(int today, int days);
     List<IStatistics> getLastWeekSteps(int day);
 
     // local
@@ -47,6 +43,7 @@ public interface SavedDataManager {
 
     // TODO
 //    List<IStatistics> getFriendMonthlyStat(String email);
+    List<IStatistics> getLastWeekSteps(String day);
 
     // return a list of IStatistics
     // 28 days before the day in the argument

@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // has made progress?
     public void checkSubGoalReach() {
         int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
-        int yesterdaySteps = sd.getYesterdaySteps(todayInt);
+        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString());
 
         if(!sd.isShownSubGoal(today) &&
                 !sd.isShownGoal(today) &&
@@ -305,8 +305,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdayGoalReach() {
         String yesterday = theTimer.getYesterdayString();
 
-        int yesterdaySteps = sd.getStepsDaysBefore(todayInt, 1);
-        int yesterdayGoal = sd.getGoalDaysBefore(todayInt, 1);
+        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString());
+        int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString());
 
         if(!sd.isShownYesterdayGoal(today) &&
                 !sd.isShownGoal(yesterday) &&
@@ -322,9 +322,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdaySubGoalReach() {
         String yesterday = theTimer.getYesterdayString();
 
-        int yesterdayGoal = sd.getYesterdayGoal(todayInt);
-        int yesterdaySteps = sd.getYesterdaySteps(todayInt);
-        int dayBeforeYesterdaySteps = sd.getStepsDaysBefore(todayInt, 2);
+        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString());
+        int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString());
+        int dayBeforeYesterdaySteps = sd.getStepsByDayStr(ITimer.getDayStrDayBefore(theTimer.getTodayString(),2));
 
         if(!sd.isShownYesterdaySubGoal(today) &&
                 !sd.isShownSubGoal(yesterday) &&

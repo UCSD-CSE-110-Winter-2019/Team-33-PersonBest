@@ -289,10 +289,6 @@ public class TestGoalAchievement {
         setYesterdaySteps(GOAL_INIT+1000);
         setYesterdayGoal(GOAL_INIT+1000+1000);
         setStepByDayString(TEST_DAY_BEFORE_YESTERDAY_INT, GOAL_INIT);
-        System.err.print("Yesterday Steps: ");
-        System.err.println(sd.getYesterdaySteps(TEST_DAY_INT));
-        System.err.print("Day Before Yesterday Steps: ");
-        System.err.println(sd.getStepsDaysBefore(TEST_DAY_INT, 2));
         activity.checkYesterdaySubGoalReach();
         assertEquals("You've increased your daily steps by " + 1000 + " steps. Keep up the good work!",
                 ShadowToast.getTextOfLatestToast());

@@ -55,6 +55,18 @@ public abstract class ITimer {
         return toReturn;
     }
 
+    public static String getDayStrDayBefore(String day, int n) {
+        if(!isValidDayStr(day)) throw new IllegalArgumentException("argument day in day wrong format");
+        return (DateTimeFormatter.ofPattern("MM/dd/yyyy").format(
+                ZonedDateTime.of(
+                    getYearFromDayStr(day),
+                    getMonthFromDayStr(day),
+                    getDayFromDayStr(day),
+                    1,1,1,1, ZonedDateTime.now().getZone()
+                ).minusDays(n)
+        ));
+    }
+
     public abstract boolean isLateToday();
     public abstract String getTodayString();
     public abstract String getYesterdayString();
