@@ -1,6 +1,7 @@
 package com.android.personbest;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +15,7 @@ public class SetUpActivity extends AppCompatActivity {
     private EditText editText;
     private Button saveButton;
     private SavedDataManager sd;
+    private SharedPreferences sp;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +23,16 @@ public class SetUpActivity extends AppCompatActivity {
 
         saveButton = findViewById(R.id.save_button);
         editText = findViewById(R.id.height);
+
+        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
+
+        // we testing?
+        String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
+        if(test_mode.equals(getResources().getString(R.string.test_cloud))) {
+            sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+        } else if (test_mode.equals(getResources().getString(R.string.test_local))) {
+            sd = new SavedDataManagerSharedPreference(this);
+        }
 
         sd = new SavedDataManagerSharedPreference(this);
         sd.setCurrentGoal(5000);

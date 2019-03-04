@@ -6,6 +6,7 @@ package com.android.personbest;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -25,6 +26,7 @@ public class SetGoalActivity extends AppCompatActivity {
     Button setButton;
     EditText editText;
     SavedDataManager sd;
+    SharedPreferences sp;
     ITimer theTimer;
 
     TextView goalRecommandation;
@@ -38,6 +40,16 @@ public class SetGoalActivity extends AppCompatActivity {
         initGoal();
         initViews();
         sd = new SavedDataManagerSharedPreference(this);
+
+        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
+        // we testing?
+        String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
+        if(test_mode.equals(getResources().getString(R.string.test_cloud))) {
+            sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+        } else if (test_mode.equals(getResources().getString(R.string.test_local))) {
+            sd = new SavedDataManagerSharedPreference(this);
+        }
+
         theTimer = new TimerSystem();
     }
 

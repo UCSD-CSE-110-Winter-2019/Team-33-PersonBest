@@ -69,7 +69,7 @@ public class SavedDataManagerTest implements SavedDataManager {
 
     @Override
     public void setFirstTimeUser(boolean isFirstTime) {
-        
+
     }
 
     @Override

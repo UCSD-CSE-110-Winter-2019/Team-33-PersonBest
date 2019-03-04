@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
 import com.android.personbest.Timer.ITimer;
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private StepCounterGoogleFit stepCounter;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
     private SavedDataManager sd;
+    private SharedPreferences sp;
     private ITimer theTimer;
     private ProgressEncouragement progressEncouragement;
     private IDate theDate;
@@ -127,7 +130,18 @@ public class MainActivity extends AppCompatActivity implements Observer {
         progressBar.setMin(0);
         progressBar.setProgress(0);
 
-        sd = new SavedDataManagerSharedPreference(this);
+        // set saved data manager
+        sd = new SavedDataManagerFirestore(this);
+
+        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
+        // we testing?
+        String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
+        if(test_mode.equals(getResources().getString(R.string.test_cloud))) {
+            sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+        } else if (test_mode.equals(getResources().getString(R.string.test_local))) {
+            sd = new SavedDataManagerSharedPreference(this);
+        }
+
         theTimer = new TimerSystem();
         progressEncouragement = new ProgressEncouragement(this);
         theDate = new DateCalendar();

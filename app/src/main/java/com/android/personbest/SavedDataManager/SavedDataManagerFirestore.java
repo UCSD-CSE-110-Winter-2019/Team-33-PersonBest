@@ -11,12 +11,10 @@ import com.android.personbest.StepCounter.IStatistics;
 import com.android.personbest.Timer.ITimer;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SavedDataManagerSharedPreference implements SavedDataManager {
+public class SavedDataManagerFirestore implements SavedDataManager {
     private static final int GOAL_INIT = 0;
     private final int DEFAULT_STEPS = 0;
     private final int DEFAULT_GOAL = 5000;
@@ -28,7 +26,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
 
-    public SavedDataManagerSharedPreference(Activity activity) {
+    public SavedDataManagerFirestore(Activity activity) {
         this.activity = activity;
         this.sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         this.editor = sp.edit();
@@ -145,14 +143,11 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return sp.getInt("goal_current:", GOAL_INIT);
     }
     public boolean setCurrentGoal(int goal) {
-        editor.putInt("goal_current:", goal);
-        editor.apply();
         return true;
     }
 
-    // if today not in db, use current goal
     public int getGoalByDayStr(String day) {
-        return sp.getInt("goal:"+day, getCurrentGoal());
+        return sp.getInt("goal:"+day, DEFAULT_GOAL);
     }
     public boolean setGoalByDayStr(String day, int goal) {
         editor.putInt("goal:"+day, goal);

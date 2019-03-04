@@ -31,6 +31,15 @@ public class PlannedExerciseSummary extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planned_exercise_summary);
         sd = new SavedDataManagerSharedPreference(this);
+
+        // we testing?
+        String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
+        if(test_mode.equals(getResources().getString(R.string.test_cloud))) {
+            sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+        } else if (test_mode.equals(getResources().getString(R.string.test_local))) {
+            sd = new SavedDataManagerSharedPreference(this);
+        }
+
         theTimer = new TimerSystem();
 
         displaySteps = findViewById(R.id.stepsTaken);
