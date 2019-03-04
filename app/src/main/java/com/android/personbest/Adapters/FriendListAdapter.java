@@ -1,6 +1,7 @@
 package com.android.personbest.Adapters;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,12 +28,16 @@ public class FriendListAdapter extends FirestoreRecyclerAdapter<FriendModel, Fri
 
     @Override
     protected void onBindViewHolder(FriendListViewHolder holder, int position, FriendModel model) {
-        holder.setName(model.name);
+        Log.d("DEBUG", model.getName());
+        holder.setName(model.getName());
     }
 
     @NonNull
     @Override
     public FriendListViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return null;
+        View view = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.friend_card, viewGroup, false);
+
+        return new FriendListViewHolder(view);
     }
 }

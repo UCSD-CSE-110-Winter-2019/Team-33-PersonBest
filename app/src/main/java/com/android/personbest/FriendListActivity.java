@@ -13,19 +13,23 @@ import android.view.ViewGroup;
 import com.android.personbest.Adapters.FriendListAdapter;
 import com.android.personbest.Models.FriendModel;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 public class FriendListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private FirebaseFirestore db;
+    private FriendListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = FirebaseFirestore.getInstance();
         setContentView(R.layout.activity_friend_list);
+        FirebaseApp.initializeApp(this);
+        db = FirebaseFirestore.getInstance();
         initLayouts();
+        adapter.startListening();
     }
 
     protected void initLayouts() {
@@ -33,17 +37,25 @@ public class FriendListActivity extends AppCompatActivity {
         initRecycler();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
     protected void initRecycler() {
         Query query = db.collection("friendsListTest");
+
         recyclerView = findViewById(R.id.friends_recycler);
-        LinearLayoutManager layoutManager = new GridLayoutManager(this.getApplicationContext(), 1);
-        layoutManager.setReverseLayout(true);
+        LinearLayoutManager layoutManager = new GridLayoutManager(this, 1);
+        //layoutManager.setReverseLayout(true);
         //layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
         FirestoreRecyclerOptions<FriendModel> options = new FirestoreRecyclerOptions.Builder<FriendModel>()
                 .setQuery(query, FriendModel.class)
                 .build();
-        recyclerView.setAdapter(new FriendListAdapter(options));
+        adapter = new FriendListAdapter(options);
+        recyclerView.setAdapter(adapter);
     }
 
     public void initRefresh() {
