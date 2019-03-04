@@ -34,6 +34,10 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         this.editor = sp.edit();
     }
 
+    public String getIdByEmail(String email) {
+        return null;
+    }
+
     public int getYesterdaySteps(int day){
         SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
         IDate iDate = new DateCalendar(day);
@@ -171,9 +175,9 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         int totalSteps = this.getStepsByDayStr(day);
         int goal = this.getStepsByDayStr(day);
 
-        int intentionalSteps = sp.getInt("intentional_steps:" + day,DEFAULT_STEPS);
-        Float MPH = sp.getFloat("average_MPH:" + day,DEFAULT_MPH);
-        Long timeWalked = sp.getLong("exercise_time:" + day,DEFAULT_TIME);
+        int intentionalSteps = this.getIntentionalStepsByDayStr(day):
+        Float MPH = this.getAvgMPHByDayStr(day);
+        Long timeWalked = this.getExerciseTimeByDayStr(day);
 
         return new DailyStat(goal,totalSteps,intentionalSteps,timeWalked,MPH);
     }

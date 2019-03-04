@@ -33,6 +33,7 @@ public class PlannedExerciseSummary extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planned_exercise_summary);
+
         sd = new SavedDataManagerFirestore(this);
 
         // we testing?

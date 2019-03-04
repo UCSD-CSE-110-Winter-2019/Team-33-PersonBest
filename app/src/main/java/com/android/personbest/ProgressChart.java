@@ -61,7 +61,6 @@ public class ProgressChart extends AppCompatActivity {
 
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
-        savedDataManager = new SavedDataManagerFirestore(this);
 
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();

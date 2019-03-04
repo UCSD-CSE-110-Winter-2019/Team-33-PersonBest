@@ -40,7 +40,6 @@ public class SetGoalActivity extends AppCompatActivity {
 
         initGoal();
         initViews();
-        sd = new SavedDataManagerFirestore(this);
 
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();

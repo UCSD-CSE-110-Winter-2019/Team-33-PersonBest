@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 
 public class SetUpActivity extends AppCompatActivity {
@@ -23,7 +24,7 @@ public class SetUpActivity extends AppCompatActivity {
 
         saveButton = findViewById(R.id.save_button);
         editText = findViewById(R.id.height);
-
+        
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
@@ -32,7 +33,6 @@ public class SetUpActivity extends AppCompatActivity {
             sd = new SavedDataManagerSharedPreference(this);
         }
 
-        sd = new SavedDataManagerSharedPreference(this);
         sd.setCurrentGoal(5000);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
