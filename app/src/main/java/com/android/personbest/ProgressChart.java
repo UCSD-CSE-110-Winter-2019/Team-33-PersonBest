@@ -41,6 +41,7 @@ public class ProgressChart extends AppCompatActivity {
     private ArrayList<String> xAxisLabel;
     private String stats;
     private SharedPreferences sp;
+    private String todayStr;
     private final String[] DAYOFWEEK = {
             DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
             DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
@@ -62,6 +63,8 @@ public class ProgressChart extends AppCompatActivity {
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
 
+        todayStr = getIntent().getStringExtra("todayStr");
+
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
@@ -81,26 +84,22 @@ public class ProgressChart extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                ((ProgressChart) self).setDate((ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() + 1) % 7);
+                ((ProgressChart) self).setDate(todayStr);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         progressChart = findViewById(R.id.progressChart);
 
-        setDate((ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() + 1) % 7);
+        this.setDate(todayStr);
     }
 
     public void setManager(SavedDataManager manager) {
         savedDataManager = manager;
     }
 
-    public void setDate(int date) {
-        if (date < 1 || date >= 8)
-            throw new InvalidParameterException("Date expected between 0 and 6, but got" + date);
-        this.date = date;
-
-        List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(date);
+    public void setDate(String today) {
+        List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(today);
         setBarChart(stepStats);
         showChart();
     }

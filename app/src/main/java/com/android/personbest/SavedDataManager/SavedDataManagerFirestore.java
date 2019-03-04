@@ -117,24 +117,6 @@ public class SavedDataManagerFirestore implements SavedDataManager {
 //        return new DailyStat(goal,totalSteps,intentionalSteps,timeWalked,MPH);
     }
 
-    public List<IStatistics> getLastWeekSteps(int day){
-        return null;
-//        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-//        List<IStatistics> result = new ArrayList<>();
-//        for (Integer d = 1; d <= day; d++){
-//            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
-//            int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
-//            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-//            Float MPH = sp.getFloat(d.toString()+"_AverageMPH",DEFAULT_MPH);
-//            Long timewalked = sp.getLong(d.toString()+"_ExerciseTime",DEFAULT_TIME);
-//            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,timewalked,MPH);
-//            result.add(dailyStat);
-//        }
-//
-//        return result;
-
-    }
-
     public List<IStatistics> getLastWeekSteps(String day) {
         return null;
     }

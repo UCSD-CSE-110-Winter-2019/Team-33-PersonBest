@@ -6,9 +6,6 @@ import java.util.List;
 
 // todayStr = theTimer.getTodayString()
 public interface SavedDataManager {
-    // legacy API
-    List<IStatistics> getLastWeekSteps(int day);
-
     // local
     boolean isFirstTimeUser();
     void setFirstTimeUser(boolean isFirstTime);
@@ -41,13 +38,13 @@ public interface SavedDataManager {
     IStatistics getStatByDayStr(String day);
 //    boolean setStatByDayStr(String day, IStatistics stat); // might unnecessary
 
-    // TODO
-//    List<IStatistics> getFriendMonthlyStat(String email);
+    // return list of IStatistics
     List<IStatistics> getLastWeekSteps(String day);
-
     // return a list of IStatistics
     // 28 days before the day in the argument
     List<IStatistics> getLastMonthStat(String day);
+    // TODO
+//    List<IStatistics> getFriendMonthlyStat(String email);
 
     // below data are local only
     boolean isShownGoal(String today);

@@ -10,6 +10,7 @@ import java.util.List;
 public abstract class ITimer {
     private static final int DATE_STRING_LENGTH = 10;
     protected static final int LAST_MONTH_DAYS = 28;
+    protected static final int LAST_WEEK_DAYS = 7;
 
     public static boolean isValidDayStr(@NonNull String day) {
         try {
@@ -36,6 +37,23 @@ public abstract class ITimer {
 
     public static int getDayFromDayStr(String dayStr) {
         return Integer.parseInt(dayStr.substring(3,5));
+    }
+
+    public static List<String> getLastWeekDayStrings(String day) {
+        if(!isValidDayStr(day)) throw new IllegalArgumentException("argument day in day wrong format");
+
+        ArrayList<String> toReturn = new ArrayList<>();
+        for(int i = 1; i <= ITimer.LAST_WEEK_DAYS; ++i) {
+            toReturn.add(DateTimeFormatter.ofPattern("MM/dd/yyyy").format(
+                    ZonedDateTime.of(
+                        getYearFromDayStr(day),
+                        getMonthFromDayStr(day),
+                        getDayFromDayStr(day),
+                        1,1,1,1, ZonedDateTime.now().getZone()
+                    ).minusDays(i)
+            ));
+        }
+        return toReturn;
     }
 
     public static List<String> getLastMonthDayStrings(String day) {

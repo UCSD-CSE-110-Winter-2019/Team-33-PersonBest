@@ -24,6 +24,8 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     private final Long DEFAULT_TIME = 0L;
     private final String TAG = "SavedDataManagerSharedPreference";
 
+    private final static int DAYS_IN_WEEK = 7;
+
     private Activity activity;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
@@ -142,24 +144,14 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     public List<IStatistics> getLastWeekSteps(String day) {
-        return null;
-    }
+        List<String> days = ITimer.getLastWeekDayStrings(day);
+        ArrayList<IStatistics> toReturn = new ArrayList<>();
 
-    public List<IStatistics> getLastWeekSteps(int day){
-        SharedPreferences sp = activity.getSharedPreferences("user_data",Context.MODE_PRIVATE);
-        List<IStatistics> result = new ArrayList<>();
-        for (Integer d = 1; d <= day; d++){
-            int totalSteps = sp.getInt(d.toString() + "_TotalSteps",DEFAULT_STEPS);
-            int intentionalSteps = sp.getInt(d.toString()+"_IntentionalSteps",DEFAULT_STEPS);
-            int goal = sp.getInt(d.toString()+"_Goal",DEFAULT_GOAL);
-            Float MPH = sp.getFloat(d.toString()+"_AverageMPH",DEFAULT_MPH);
-            Long timewalked = sp.getLong(d.toString()+"_ExerciseTime",DEFAULT_TIME);
-            DailyStat dailyStat = new DailyStat(goal,totalSteps,intentionalSteps,timewalked,MPH);
-            result.add(dailyStat);
+        for(String d : days) {
+            toReturn.add(this.getStatByDayStr(d));
         }
 
-        return result;
-
+        return toReturn;
     }
 
     public List<IStatistics> getLastMonthStat(String day) {

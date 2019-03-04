@@ -459,6 +459,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchProgressChart(View view) {
         Intent intent = new Intent(this, ProgressChart.class);
+        intent.putExtra("todayStr", theTimer.getTodayString());
         startActivity(intent);
     }
 
