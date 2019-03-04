@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerSystem;
@@ -39,7 +40,7 @@ public class SetGoalActivity extends AppCompatActivity {
 
         initGoal();
         initViews();
-        sd = new SavedDataManagerSharedPreference(this);
+        sd = new SavedDataManagerFirestore(this);
 
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
         // we testing?

@@ -2,12 +2,14 @@ package com.android.personbest;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerSystem;
@@ -23,6 +25,7 @@ public class PlannedExerciseSummary extends AppCompatActivity {
     private TextView displayMph;
     private Button button;
     private SavedDataManager sd;
+    private SharedPreferences sp;
     private ITimer theTimer;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
 
@@ -30,7 +33,9 @@ public class PlannedExerciseSummary extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planned_exercise_summary);
-        sd = new SavedDataManagerSharedPreference(this);
+        sd = new SavedDataManagerFirestore(this);
+
+        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
 
         // we testing?
         String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");

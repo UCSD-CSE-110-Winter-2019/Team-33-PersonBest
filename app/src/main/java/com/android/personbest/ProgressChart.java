@@ -1,6 +1,8 @@
 package com.android.personbest;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -9,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
@@ -37,6 +40,7 @@ public class ProgressChart extends AppCompatActivity {
     private CombinedData data;
     private ArrayList<String> xAxisLabel;
     private String stats;
+    private SharedPreferences sp;
     private final String[] DAYOFWEEK = {
             DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
             DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
@@ -57,7 +61,16 @@ public class ProgressChart extends AppCompatActivity {
 
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
-        savedDataManager = new SavedDataManagerSharedPreference(this);
+        savedDataManager = new SavedDataManagerFirestore(this);
+
+        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
+        // we testing?
+        String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
+        if(test_mode.equals(getResources().getString(R.string.test_cloud))) {
+            savedDataManager = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+        } else if (test_mode.equals(getResources().getString(R.string.test_local))) {
+            savedDataManager = new SavedDataManagerSharedPreference(this);
+        }
 
         final Activity self = this;
 
