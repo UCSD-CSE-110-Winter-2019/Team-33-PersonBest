@@ -54,7 +54,7 @@ public class TestGoalAchievement {
     private static final String TEST_SERVICE = "TEST_SERVICE";
     private static final String TEST_DAY = "09/09/2019";
     private static final int TEST_DAY_INT = 3; // just random number
-    private static final String TEST_DAY_BEFORE_YESTERDAY_INT = "12/09/2019"; // just random number
+    private static final String TEST_DAY_BEFORE_YESTERDAY_INT = "09/07/2019"; // not a random number
     private static final int TEST_DAY_HOUR = 19; // before 8 pm
     private static final String PAY_DAY = "01/01/2019";
     private static final int GOAL_INIT = 1024;

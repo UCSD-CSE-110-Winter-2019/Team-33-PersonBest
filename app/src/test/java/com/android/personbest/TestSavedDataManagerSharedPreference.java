@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
+import com.android.personbest.Timer.ITimer;
+import com.android.personbest.Timer.TimerMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,14 +57,10 @@ public class TestSavedDataManagerSharedPreference {
     }
 
     @Test
-    public void testGetYesterday(){
-        IDate iDate = new DateCalendar(5);
-        int day = iDate.getDay();
-        SharedPreferences sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("4_TotalSteps",1000);
-        editor.apply();
-        assertEquals(sd.getYesterdaySteps(day),1000);
+    public void testYesterdaySteps(){
+        ITimer timer = new TimerMock(0, "03/03/2019", "03/02/2019");
+        sd.setStepsByDayStr(timer.getYesterdayString(), 1000);
+        assertEquals(sd.getStepsByDayStr(timer.getYesterdayString()),1000);
     }
 
     @Test
