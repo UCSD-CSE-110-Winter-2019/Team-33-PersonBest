@@ -6,7 +6,6 @@ package com.android.personbest;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
+import com.android.personbest.Timer.ITimer;
+import com.android.personbest.Timer.TimerSystem;
 
 public class SetGoalActivity extends AppCompatActivity {
 
@@ -21,6 +24,8 @@ public class SetGoalActivity extends AppCompatActivity {
     Button acceptButton;
     Button setButton;
     EditText editText;
+    SavedDataManager sd;
+    ITimer theTimer;
 
     TextView goalRecommandation;
     int stepGoal = 555;
@@ -32,6 +37,8 @@ public class SetGoalActivity extends AppCompatActivity {
 
         initGoal();
         initViews();
+        sd = new SavedDataManagerSharedPreference(this);
+        theTimer = new TimerSystem();
     }
 
     private void initViews() {
@@ -82,9 +89,8 @@ public class SetGoalActivity extends AppCompatActivity {
 
     public void initGoal() {
         int steps = 0;
-        SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
+        steps = sd.getCurrentGoal();
 
-        steps = sharedPreferences.getInt("Current Goal", 0);
         // overflow check, will not change if overflow
         long tmpSteps = (long) steps + 500;
         if(tmpSteps == (int)tmpSteps) steps += 500;
@@ -100,11 +106,8 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     public void save(int stepNumber) {
-        SharedPreferences sharedPref = getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        editor.putInt("Current Goal", stepNumber);
-        editor.apply();
+        sd.setGoalByDayStr(theTimer.getTodayString(),stepNumber);
+        sd.setCurrentGoal(stepNumber);
     }
 
     public void goBack() {

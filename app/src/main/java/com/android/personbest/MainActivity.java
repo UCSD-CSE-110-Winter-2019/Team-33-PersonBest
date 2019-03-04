@@ -5,9 +5,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +22,12 @@ import com.android.personbest.StepCounter.*;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerMock;
 import com.android.personbest.Timer.TimerSystem;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,8 +46,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     // private variables
     private String fitnessServiceKey;
-    private SharedPreferences sp;
-    private SharedPreferences.Editor editor;
     private int goalNum;
     private boolean plannedExercise = false;
     private long timer;
@@ -55,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private IDate theDate;
     private String today;
     private Integer todayInt;
+    private FirebaseAuth mAuth;
+    private GoogleSignInAccount curAccount;
+    private FirebaseUser curFirebaseUser;
 
     private boolean NDEBUG = true;
 
@@ -76,8 +83,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             public void run() {
                 stepCounter.updateStepCount();
                 int totalSoFar = Integer.parseInt(stepsTodayVal.getText().toString());
-                editor.putInt(String.valueOf(theDate.getDay()) + "_TotalSteps", totalSoFar);
-                editor.apply();
+                sd.setStepsByDayStr(theTimer.getTodayString(),totalSoFar);
                 if(plannedTimeValue.getVisibility() == View.VISIBLE) {
                     long timeDiff = (System.currentTimeMillis() - timer);
                     plannedTimeValue.setText(String.valueOf(timeDiff / MILLISECONDS_IN_A_MINUTE));
@@ -85,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     int stepDiff = totalSoFar - plannedSteps;
                     plannedStepValue.setText(String.valueOf(stepDiff));
 
-                    double currMph = intentionalWalkUtils.velocity(sp.getInt("Height", 0), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
+                    double currMph = intentionalWalkUtils.velocity(sd.getUserHeight(), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
                     plannedMPHValue.setText(String.valueOf(currMph));
                 }
                 int left = goalNum - totalSoFar;
@@ -147,25 +153,22 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     setPlannedExerciseStatsVisibility(false);
                     timer = System.currentTimeMillis() - timer;
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
-                    totalIntentionalSteps = sp.getInt(String.valueOf(theDate.getDay()) + "_IntentionalSteps", 0) + plannedSteps;
-                    editor.putInt(String.valueOf(theDate.getDay()) + "_IntentionalSteps", totalIntentionalSteps);
-                    editor.apply();
+                    totalIntentionalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString()) + plannedSteps;
+                    sd.setIntentionalStepsByDayStr(theTimer.getTodayString(),totalIntentionalSteps);
                     launchSummary(timer, plannedSteps);
                 }
             }
         });
 
         // Check if this is the first time launching app
-        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        editor = sp.edit();
-        if(sp.getAll().isEmpty()) {
+        if(sd.isFirstTimeUser()) {
             startActivity(new Intent(this, SetUpActivity.class));
-            editor.putInt("Current Goal",GOAL_INIT);
-            editor.apply();
+            sd.setFirstTimeUser(false);
+            sd.setCurrentGoal(GOAL_INIT);
         }
 
-        goalNum = sp.getInt("Current Goal", GOAL_INIT);
-        editor.putInt(String.valueOf(theDate.getDay()) + "_Goal", goalNum);
+        goalNum = sd.getCurrentGoal();
+        sd.setGoalByDayStr(theTimer.getTodayString(), goalNum);
         goalVal.setText(String.valueOf(goalNum));
         progressBar.setMax(goalNum);
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
@@ -216,6 +219,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
             checkSubGoalReach();
         }
 
+        // the user should be signed in by here
+        mAuth = FirebaseAuth.getInstance();
+        curAccount = GoogleSignIn.getLastSignedInAccount(this);
+        curFirebaseUser = mAuth.getCurrentUser();
+        if(curFirebaseUser == null) {
+            firebaseAuthWithGoogle(curAccount);
+            curFirebaseUser = mAuth.getCurrentUser();
+        }
     }
     @Override
     protected void onResume() {
@@ -242,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
         // update goals
-        goalNum = sp.getInt("Current Goal",goalNum);
+        goalNum = sd.getCurrentGoal();
         setGoal(goalNum);
     }
 
@@ -342,9 +353,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void setGoal(int goalNum) {
         this.goalNum = goalNum;
-        editor.putInt(String.valueOf(theDate.getDay()) + "_Goal", goalNum);
-        editor.apply();
         this.goalVal.setText(String.valueOf(goalNum));
+        sd.setGoalByDayStr(theTimer.getTodayString(), goalNum);
 
         // changing goal will also change progress
         int stepCount = Integer.valueOf(this.stepsTodayVal.getText().toString());
@@ -408,7 +418,27 @@ public class MainActivity extends AppCompatActivity implements Observer {
         this.fitnessServiceKey = fitnessServiceKey;
     }
 
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            //updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            //updateUI(null);
+                        }
+                    }
+                });
+    }
 
     public void launchProgressChart(View view) {
         Intent intent = new Intent(this, ProgressChart.class);

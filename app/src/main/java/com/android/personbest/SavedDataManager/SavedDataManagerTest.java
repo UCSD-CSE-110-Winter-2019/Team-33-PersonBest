@@ -7,6 +7,7 @@ import java.util.List;
 
 public class SavedDataManagerTest implements SavedDataManager {
     List<IStatistics> steps;
+
     public SavedDataManagerTest(List<IStatistics> data) {
         steps = data;
     }
@@ -61,6 +62,58 @@ public class SavedDataManagerTest implements SavedDataManager {
         return true;
     }
 
+    @Override
+    public boolean isFirstTimeUser() {
+        return false;
+    }
+
+    @Override
+    public void setFirstTimeUser(boolean isFirstTime) {
+        
+    }
+
+    @Override
+    public boolean setUserHeight(int height) {
+        return false;
+    }
+
+    @Override
+    public int getUserHeight() {
+        return 0;
+    }
+
+    @Override
+    public boolean setExerciseTimeByDayStr(String day, long time) {
+        return false;
+    }
+
+    @Override
+    public long getExerciseTimeByDayStr(String day) {
+        return 0;
+    }
+
+    @Override
+    public boolean setIntentionalStepsByDayStr(String day, int step) {
+        return false;
+    }
+
+    @Override
+    public int getIntentionalStepsByDayStr(String day) {
+        return 0;
+    }
+
+    @Override
+    public boolean setAvgMPHByDayStr(String day, float mph) {
+        return false;
+    }
+
+    @Override
+    public float getAvgMPHByDayStr(String day) {
+        return 0;
+    }
+
+    public boolean setCurrentGoal(int goal) { return false; }
+    public int getCurrentGoal() { return 0; }
 
     public boolean isShownGoal(String today) {
         return false;

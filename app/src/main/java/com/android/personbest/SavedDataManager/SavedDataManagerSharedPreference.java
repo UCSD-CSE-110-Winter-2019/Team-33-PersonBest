@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SavedDataManagerSharedPreference implements SavedDataManager {
+    private static final int GOAL_INIT = 0;
     private final int DEFAULT_STEPS = 0;
     private final int DEFAULT_GOAL = 5000;
     private final float DEFAULT_MPH = 0;
@@ -84,7 +85,24 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
 
     }
 
+    public boolean isFirstTimeUser() {
+        return (sp.getAll().isEmpty());
+    }
+    public void setFirstTimeUser(boolean isFirstTime) {
+        editor.putBoolean("is_first_time_user", false);
+    }
+
     // data to sync
+
+    public int getUserHeight() {
+        return sp.getInt("Height", 0);
+    }
+    public boolean setUserHeight(int height) {
+        editor.putInt("Height", height);
+        editor.apply();
+        return true;
+    }
+
     public int getStepsByDayStr(String day) {
         return sp.getInt("total_steps:"+day, DEFAULT_STEPS);
     }
@@ -93,6 +111,42 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         editor.apply();
         return true;
     }
+
+    public int getIntentionalStepsByDayStr(String day) {
+        return sp.getInt("intentional_steps:" + day, DEFAULT_STEPS);
+    }
+    public boolean setIntentionalStepsByDayStr(String day, int step) {
+        editor.putInt("intentional_steps:" + day, step);
+        editor.apply();
+        return true;
+    }
+
+    public long getExerciseTimeByDayStr(String day) {
+        return sp.getLong("exercise_time:" + day, 0);
+    }
+
+    public boolean setExerciseTimeByDayStr(String day, long time) {
+        editor.putLong("exercise_time:" + day, time);
+        editor.apply();
+        return true;
+    }
+
+    public float getAvgMPHByDayStr(String day) {
+        return sp.getLong("average_mph:" + day, 0);
+    }
+    public boolean setAvgMPHByDayStr(String day, float mph) {
+        editor.putFloat("average_mph:" + day, mph);
+        editor.apply();
+        return true;
+    }
+
+    public int getCurrentGoal() {
+        return sp.getInt("goal_current:", GOAL_INIT);
+    }
+    public boolean setCurrentGoal(int goal) {
+        return true;
+    }
+
     public int getGoalByDayStr(String day) {
         return sp.getInt("goal:"+day, DEFAULT_GOAL);
     }
@@ -117,11 +171,9 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     public boolean setStatByDayStr(String day, IStatistics stat) {
         this.setStepsByDayStr(day, stat.getTotalSteps());
         this.setGoalByDayStr(day, stat.getGoal());
-
-        editor.putInt("intentional_steps:"+day, stat.getIntentionalSteps());
-        editor.putFloat("average_MPH:"+day, stat.getAverageMPH());
-        editor.putLong("exercise_time:"+day, stat.getTimeWalked());
-        editor.apply();
+        this.setIntentionalStepsByDayStr(day, stat.getIntentionalSteps());
+        this.setAvgMPHByDayStr(day, stat.getAverageMPH());
+        this.setExerciseTimeByDayStr(day, stat.getTimeWalked());
 
         return true;
     }
