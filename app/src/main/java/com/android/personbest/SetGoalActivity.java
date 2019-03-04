@@ -38,9 +38,6 @@ public class SetGoalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_goal);
 
-        initGoal();
-        initViews();
-
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
@@ -53,7 +50,8 @@ public class SetGoalActivity extends AppCompatActivity {
             sd = new SavedDataManagerFirestore(this);
         }
 
-        theTimer = new TimerSystem();
+        initGoal();
+        initViews();
     }
 
     private void initViews() {
@@ -121,7 +119,6 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     public void save(int stepNumber) {
-        sd.setGoalByDayStr(theTimer.getTodayString(),stepNumber);
         sd.setCurrentGoal(stepNumber);
     }
 
