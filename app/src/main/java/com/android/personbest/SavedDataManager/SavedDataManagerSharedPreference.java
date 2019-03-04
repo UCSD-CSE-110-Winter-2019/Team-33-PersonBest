@@ -160,6 +160,11 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         return true;
     }
 
+    public void clearData() {
+        editor.clear();
+        editor.apply();
+    }
+
     // note: if not exist, will use default
     // might need to change in the future
     public IStatistics getStatByDayStr(String day) {

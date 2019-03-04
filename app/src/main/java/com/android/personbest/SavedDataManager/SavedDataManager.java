@@ -40,6 +40,8 @@ public interface SavedDataManager {
     int getGoalByDayStr(String day);
     boolean setGoalByDayStr(String day, int goal);
 
+    void clearData(); // clear everything
+
     IStatistics getStatByDayStr(String day);
 //    boolean setStatByDayStr(String day, IStatistics stat); // might unnecessary
 

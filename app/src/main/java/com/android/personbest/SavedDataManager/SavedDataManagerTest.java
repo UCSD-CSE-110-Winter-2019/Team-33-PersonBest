@@ -27,6 +27,11 @@ public class SavedDataManagerTest implements SavedDataManager {
         }
         return toRet;
     }
+
+    public void clearData() {
+
+    }
+
     public List<IStatistics> getLastMonthStat(String day) {
         return null;
     }
