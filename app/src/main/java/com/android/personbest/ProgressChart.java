@@ -41,7 +41,7 @@ public class ProgressChart extends AppCompatActivity {
     private ArrayList<String> xAxisLabel;
     private String stats;
     private SharedPreferences sp;
-    private String todayStr;
+    private String todayStr = "03/02/2019"; // Default day
     private final String[] DAYOFWEEK = {
             DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
             DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
@@ -63,7 +63,9 @@ public class ProgressChart extends AppCompatActivity {
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
 
-        todayStr = getIntent().getStringExtra("todayStr");
+        String tmpTodayStr = getIntent().getStringExtra("todayStr");
+        if(tmpTodayStr != null)
+            todayStr = tmpTodayStr;
 
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();

@@ -10,7 +10,8 @@ final class ExecMode {
     static EMode getExecMode() {
         return execMode;
     }
-    static void setExecMode(EMode em) {
+    static boolean setExecMode(EMode em) {
         execMode = em;
+        return true;
     }
 }

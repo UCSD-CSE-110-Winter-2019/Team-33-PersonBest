@@ -19,7 +19,7 @@ public class SavedDataManagerTest implements SavedDataManager {
 
     @Override
     public List<IStatistics> getLastWeekSteps(String day) {
-        return null;
+        return steps;
     }
 
     public List<IStatistics> getLastWeekSteps(int day) {
