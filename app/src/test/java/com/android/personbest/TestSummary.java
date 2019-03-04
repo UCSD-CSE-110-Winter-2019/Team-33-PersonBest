@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.TextView;
 
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.StepCounter;
 import com.android.personbest.StepCounter.StepCounterFactory;
 import com.android.personbest.StepCounter.StepCounterGoogleFit;
@@ -31,6 +33,7 @@ public class TestSummary {
     private TextView displaySteps;
     private TextView displayTime;
     private TextView displayMph;
+    private SavedDataManager sd;
 
     @Before
     public void setup() {

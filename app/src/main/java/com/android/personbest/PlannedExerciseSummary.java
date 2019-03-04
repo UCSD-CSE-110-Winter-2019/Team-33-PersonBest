@@ -35,13 +35,11 @@ public class PlannedExerciseSummary extends AppCompatActivity {
         setContentView(R.layout.activity_planned_exercise_summary);
         sd = new SavedDataManagerFirestore(this);
 
-        sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
-
         // we testing?
-        String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
-        if(test_mode.equals(getResources().getString(R.string.test_cloud))) {
+        ExecMode.EMode test_mode = ExecMode.getExecMode();
+        if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
-        } else if (test_mode.equals(getResources().getString(R.string.test_local))) {
+        } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
             sd = new SavedDataManagerSharedPreference(this);
         }
 
