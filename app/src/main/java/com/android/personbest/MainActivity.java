@@ -21,6 +21,7 @@ import com.android.personbest.StepCounter.*;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerMock;
 import com.android.personbest.Timer.TimerSystem;
+import com.google.firebase.FirebaseApp;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
-    private static final int DATE_STRING_LENGTH = 10;
 
     // private variables
     private String fitnessServiceKey;
@@ -99,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Activity self = this;
+
+        FirebaseApp.initializeApp(this);
 
         // Setup UI
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
@@ -357,21 +359,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     // MM/dd/yyyy
     public void setToday(String today) {
-        try {
-            if(today.length() != DATE_STRING_LENGTH) {
-                throw new IllegalArgumentException("Wrong date format");
-            }
-            int mm = Integer.parseInt(today.substring(0,2));
-            int dd = Integer.parseInt(today.substring(3,5));
-            int yyyy = Integer.parseInt(today.substring(6,DATE_STRING_LENGTH));
-            if(! (1 <= mm && mm <= 12 && 1 <= dd && dd <= 31 && 0 < yyyy) ) {
-                throw new IllegalArgumentException("Wrong date format");
-            }
-        } catch (IllegalFormatException e) {
-            e.printStackTrace();
-            throw e;
+        if(ITimer.isValidDayStr(today)) {
+            this.today = today;
+        } else {
+            throw new IllegalArgumentException("Wrong date format");
         }
-        this.today = today;
         // not updating todayInt here to make mocking work
     }
 
