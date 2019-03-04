@@ -24,13 +24,17 @@ public class SetUpActivity extends AppCompatActivity {
 
         saveButton = findViewById(R.id.save_button);
         editText = findViewById(R.id.height);
-        
+
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
             sd = new SavedDataManagerSharedPreference(this);
+        }
+        else {
+            // set saved data manager
+            sd = new SavedDataManagerFirestore(this);
         }
 
         sd.setCurrentGoal(5000);

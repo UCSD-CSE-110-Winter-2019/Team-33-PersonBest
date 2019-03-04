@@ -175,7 +175,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         int totalSteps = this.getStepsByDayStr(day);
         int goal = this.getStepsByDayStr(day);
 
-        int intentionalSteps = this.getIntentionalStepsByDayStr(day):
+        int intentionalSteps = this.getIntentionalStepsByDayStr(day);
         Float MPH = this.getAvgMPHByDayStr(day);
         Long timeWalked = this.getExerciseTimeByDayStr(day);
 

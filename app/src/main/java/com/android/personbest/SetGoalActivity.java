@@ -48,6 +48,10 @@ public class SetGoalActivity extends AppCompatActivity {
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
             sd = new SavedDataManagerSharedPreference(this);
         }
+        else {
+            // set saved data manager
+            sd = new SavedDataManagerFirestore(this);
+        }
 
         theTimer = new TimerSystem();
     }

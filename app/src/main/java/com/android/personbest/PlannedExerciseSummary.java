@@ -34,14 +34,16 @@ public class PlannedExerciseSummary extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planned_exercise_summary);
 
-        sd = new SavedDataManagerFirestore(this);
-
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
             sd = new SavedDataManagerSharedPreference(this);
+        }
+        else {
+            // set saved data manager
+            sd = new SavedDataManagerFirestore(this);
         }
 
         theTimer = new TimerSystem();

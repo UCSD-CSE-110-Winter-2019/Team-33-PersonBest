@@ -44,13 +44,13 @@ public class TestSummary {
             }
         });
 
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
+
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
-        SharedPreferences sp = mainActivity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("Height", 72);
-        editor.apply();
+        sd = new SavedDataManagerSharedPreference(mainActivity);
+        sd.setUserHeight(72);
 
         Intent summary = new Intent(mainActivity, PlannedExerciseSummary.class);
         summary.putExtra("timeElapsed", TWO_MIN);

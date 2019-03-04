@@ -54,7 +54,7 @@ public class TestGoalAchievement {
     private static final String TEST_SERVICE = "TEST_SERVICE";
     private static final String TEST_DAY = "09/09/2019";
     private static final int TEST_DAY_INT = 3; // just random number
-    private static final int TEST_DAY_BEFORE_YESTERDAY_INT = 1; // just random number
+    private static final String TEST_DAY_BEFORE_YESTERDAY_INT = "12/09/2019"; // just random number
     private static final int TEST_DAY_HOUR = 19; // before 8 pm
     private static final String PAY_DAY = "01/01/2019";
     private static final int GOAL_INIT = 1024;
@@ -63,9 +63,7 @@ public class TestGoalAchievement {
 
     private MainActivity activity;
     private ShadowActivity shadowActivity;
-    private SharedPreferences sp;
     private SavedDataManager sd;
-    private SharedPreferences.Editor editor;
     private int nextStepCount;
 
     private IDate mockDate;
@@ -79,16 +77,14 @@ public class TestGoalAchievement {
                 return new TestGoalAchievement.TestFitnessService(stepCountActivity);
             }
         });
-
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
 
         Intent intent = new Intent(application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         shadowActivity = Shadows.shadowOf(activity);
-        //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
 
         sd = new SavedDataManagerSharedPreference(activity);
-        sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
         mockDate = new DateCalendar(TEST_DAY_INT);
         mockTimer = new TimerMock(TEST_DAY_HOUR, TEST_DAY, PAY_DAY);
 
@@ -96,13 +92,9 @@ public class TestGoalAchievement {
         activity.setTheDate(mockDate);
         activity.setToday(TEST_DAY);
 
-        editor = sp.edit();
-        editor.clear();
-        editor.apply();
-
-        editor.putInt("Height", HEIGHT); // skip the set up screen
-        editor.putInt("Current Goal", GOAL_INIT);
-        editor.apply();
+        sd.clearData();
+        sd.setUserHeight(HEIGHT);
+        sd.setCurrentGoal(GOAL_INIT);
         nextStepCount = NEXT_STEP_COUNT;
 
     }
@@ -124,9 +116,7 @@ public class TestGoalAchievement {
     @Test
     public void testTodayGoalReachedPrompted() {
         sd.setShownGoal(TEST_DAY);
-        editor.putString("last_day_prompted_goal", TEST_DAY);
-        editor.apply();
-        Log.i(TAG,"Last day shown goal is: " + sp.getString("last_day_prompted_goal","Empty"));
+        sd.setShownGoal(TEST_DAY);
         activity.setGoal(GOAL_INIT);
         activity.setStepCount(GOAL_INIT+1);
         AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
@@ -271,9 +261,7 @@ public class TestGoalAchievement {
     @Test
     public void testYesterdayGoalReachedNotDisplayedAlreadyDisplayed() {
         sd.setShownYesterdayGoal(TEST_DAY);
-        editor.putString("last_day_prompted_yesterday_goal", TEST_DAY);
-        editor.apply();
-        Log.i(TAG,"Last day shown yesterday goal is: " + sp.getString("last_day_prompted_yesterday_goal","Empty"));
+        sd.setShownYesterdayGoal(TEST_DAY);
         setYesterdayGoal(GOAL_INIT);
         setYesterdaySteps(GOAL_INIT + 1);
         activity.checkYesterdayGoalReach();
@@ -300,7 +288,7 @@ public class TestGoalAchievement {
         sd.setShownSubGoal(TEST_DAY);
         setYesterdaySteps(GOAL_INIT+1000);
         setYesterdayGoal(GOAL_INIT+1000+1000);
-        setStepByDayInt(TEST_DAY_BEFORE_YESTERDAY_INT, GOAL_INIT);
+        setStepByDayString(TEST_DAY_BEFORE_YESTERDAY_INT, GOAL_INIT);
         System.err.print("Yesterday Steps: ");
         System.err.println(sd.getYesterdaySteps(TEST_DAY_INT));
         System.err.print("Day Before Yesterday Steps: ");
@@ -311,21 +299,15 @@ public class TestGoalAchievement {
     }
 
     private void setYesterdaySteps(int steps) {
-        String yesterdayStepStr = mockDate.getYesterday() + "_TotalSteps";
-        editor.putInt(yesterdayStepStr, steps);
-        editor.apply();
+        sd.setStepsByDayStr(PAY_DAY, steps);
     }
 
     private void setYesterdayGoal(int goal) {
-        String yesterdayGoalStr = mockDate.getYesterday() + "_Goal";
-        editor.putInt(yesterdayGoalStr, goal);
-        editor.apply();
+        sd.setGoalByDayStr(PAY_DAY, goal);
     }
 
-    private void setStepByDayInt(int day, int steps) {
-        String yesterdayStepStr = String.valueOf(day) + "_TotalSteps";
-        editor.putInt(yesterdayStepStr, steps);
-        editor.apply();
+    private void setStepByDayString(String day, int steps) {
+        sd.setStepsByDayStr(day, steps);
     }
 
     @After

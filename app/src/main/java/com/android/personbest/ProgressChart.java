@@ -69,6 +69,10 @@ public class ProgressChart extends AppCompatActivity {
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
             savedDataManager = new SavedDataManagerSharedPreference(this);
         }
+        else {
+            // set saved data manager
+            savedDataManager = new SavedDataManagerFirestore(this);
+        }
 
         final Activity self = this;
 

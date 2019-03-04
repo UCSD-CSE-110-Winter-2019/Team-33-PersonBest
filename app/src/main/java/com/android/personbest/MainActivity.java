@@ -130,9 +130,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         progressBar.setMin(0);
         progressBar.setProgress(0);
 
-        // set saved data manager
-        sd = new SavedDataManagerFirestore(this);
-
 
         // we testing?
         ExecMode.EMode test_mode = ExecMode.getExecMode();
@@ -140,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
             sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
             sd = new SavedDataManagerSharedPreference(this);
+        }
+        else {
+            // set saved data manager
+            sd = new SavedDataManagerFirestore(this);
         }
 
         theTimer = new TimerSystem();
@@ -234,12 +235,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
         // the user should be signed in by here
-        mAuth = FirebaseAuth.getInstance();
-        curAccount = GoogleSignIn.getLastSignedInAccount(this);
-        curFirebaseUser = mAuth.getCurrentUser();
-        if(curFirebaseUser == null) {
-            firebaseAuthWithGoogle(curAccount);
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            mAuth = FirebaseAuth.getInstance();
+            curAccount = GoogleSignIn.getLastSignedInAccount(this);
             curFirebaseUser = mAuth.getCurrentUser();
+            if (curFirebaseUser == null) {
+                firebaseAuthWithGoogle(curAccount);
+                curFirebaseUser = mAuth.getCurrentUser();
+            }
         }
     }
     @Override
