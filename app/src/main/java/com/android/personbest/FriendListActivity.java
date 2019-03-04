@@ -44,7 +44,7 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     protected void initRecycler() {
-        Query query = db.collection("friendsListTest");
+        Query query = db.collection("friendsListTest").orderBy("name");
 
         recyclerView = findViewById(R.id.friends_recycler);
         LinearLayoutManager layoutManager = new GridLayoutManager(this, 1);
