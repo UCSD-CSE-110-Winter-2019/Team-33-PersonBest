@@ -33,10 +33,10 @@ public class PlannedExerciseSummary extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planned_exercise_summary);
+
         sd = new SavedDataManagerFirestore(this);
 
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
-
         // we testing?
         String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
         if(test_mode.equals(getResources().getString(R.string.test_cloud))) {

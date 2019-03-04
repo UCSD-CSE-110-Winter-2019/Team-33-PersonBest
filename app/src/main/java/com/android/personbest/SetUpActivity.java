@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 
 public class SetUpActivity extends AppCompatActivity {
@@ -24,8 +25,8 @@ public class SetUpActivity extends AppCompatActivity {
         saveButton = findViewById(R.id.save_button);
         editText = findViewById(R.id.height);
 
+        sd = new SavedDataManagerFirestore(this);
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
-
         // we testing?
         String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
         if(test_mode.equals(getResources().getString(R.string.test_cloud))) {
@@ -34,7 +35,6 @@ public class SetUpActivity extends AppCompatActivity {
             sd = new SavedDataManagerSharedPreference(this);
         }
 
-        sd = new SavedDataManagerSharedPreference(this);
         sd.setCurrentGoal(5000);
 
         saveButton.setOnClickListener(new View.OnClickListener() {

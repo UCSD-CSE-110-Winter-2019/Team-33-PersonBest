@@ -19,7 +19,7 @@ public interface SavedDataManager {
 
     // return null if not exists
     // return id of a existing email in db
-//    String getIdByEmail(String email);
+    String getIdByEmail(String email);
 
     // data to sync
     int getUserHeight();

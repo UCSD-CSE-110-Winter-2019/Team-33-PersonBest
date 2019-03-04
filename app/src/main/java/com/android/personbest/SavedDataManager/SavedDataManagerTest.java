@@ -11,6 +11,12 @@ public class SavedDataManagerTest implements SavedDataManager {
     public SavedDataManagerTest(List<IStatistics> data) {
         steps = data;
     }
+
+    @Override
+    public String getIdByEmail(String email) {
+        return null;
+    }
+
     @Override
     public int getYesterdaySteps(int day) {
         return -1;

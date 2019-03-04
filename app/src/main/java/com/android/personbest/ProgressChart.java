@@ -61,8 +61,8 @@ public class ProgressChart extends AppCompatActivity {
 
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
-        savedDataManager = new SavedDataManagerFirestore(this);
 
+        savedDataManager = new SavedDataManagerFirestore(this);
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
         // we testing?
         String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");

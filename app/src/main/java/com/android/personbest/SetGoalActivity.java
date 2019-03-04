@@ -40,8 +40,8 @@ public class SetGoalActivity extends AppCompatActivity {
 
         initGoal();
         initViews();
-        sd = new SavedDataManagerFirestore(this);
 
+        sd = new SavedDataManagerFirestore(this);
         sp = getSharedPreferences("user_data", Context.MODE_PRIVATE);
         // we testing?
         String test_mode = sp.getString(getResources().getString(R.string.test_mode), "");
