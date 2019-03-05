@@ -17,6 +17,7 @@ public class PlannedExerciseSummary extends AppCompatActivity {
 
     public static final long MILLISECONDS_IN_A_MINUTE = 60000;
     public static final long MILLISECONDS_IN_A_SECOND = 1000;
+    private static ExecMode.EMode test_mode;
     private TextView displaySteps;
     private TextView displayTime;
     private TextView displayMph;
@@ -32,7 +33,7 @@ public class PlannedExerciseSummary extends AppCompatActivity {
         setContentView(R.layout.activity_planned_exercise_summary);
 
         // we testing?
-        ExecMode.EMode test_mode = ExecMode.getExecMode();
+        test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
@@ -53,10 +54,22 @@ public class PlannedExerciseSummary extends AppCompatActivity {
         int stepsTaken = intent.getIntExtra("stepsTaken", 0);
         long msElapsed = intent.getLongExtra("timeElapsed", 0);
 
-        long totalTime = msElapsed + sd.getExerciseTimeByDayStr(theTimer.getTodayString(), null);
-        int totalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString(), null);
-        double meanMPH = intentionalWalkUtils.velocity(sd.getUserHeight(null), totalSteps, totalTime / MILLISECONDS_IN_A_SECOND);
-        sd.setAvgMPHByDayStr(theTimer.getTodayString(), (float)meanMPH, null, null);
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            sd.getExerciseTimeByDayStr(theTimer.getTodayString(), totalTime -> {
+                sd.getIntentionalStepsByDayStr(theTimer.getTodayString(), totalSteps -> {
+                    double meanMPH = intentionalWalkUtils.velocity(sd.getUserHeight(null), totalSteps,
+                            (totalTime + msElapsed) / MILLISECONDS_IN_A_SECOND);
+                    sd.setAvgMPHByDayStr(theTimer.getTodayString(), (float) meanMPH, null, null);
+                });
+
+            });
+        }
+        else {
+            long totalTime = msElapsed + sd.getExerciseTimeByDayStr(theTimer.getTodayString(), null);
+            int totalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString(), null);
+            double meanMPH = intentionalWalkUtils.velocity(sd.getUserHeight(null), totalSteps, totalTime / MILLISECONDS_IN_A_SECOND);
+            sd.setAvgMPHByDayStr(theTimer.getTodayString(), (float) meanMPH, null, null);
+        }
 
         displaySteps.setText("Steps Taken: " + stepsTaken);
         displayTime.setText("Minutes Elapsed: " + (msElapsed / MILLISECONDS_IN_A_MINUTE));

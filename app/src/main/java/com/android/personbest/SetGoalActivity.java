@@ -19,17 +19,18 @@ import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.Timer.ITimer;
 
 public class SetGoalActivity extends AppCompatActivity {
+    private static ExecMode.EMode test_mode;
 
-    Button cancelButton;
-    Button acceptButton;
-    Button setButton;
-    EditText editText;
-    SavedDataManager sd;
-    SharedPreferences sp;
-    ITimer theTimer;
+    private Button cancelButton;
+    private Button acceptButton;
+    private Button setButton;
+    private EditText editText;
+    private SavedDataManager sd;
+    private SharedPreferences sp;
+    private ITimer theTimer;
 
-    TextView goalRecommandation;
-    int stepGoal = 555;
+    private TextView goalRecommandation;
+    private int stepGoal = 555;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,7 @@ public class SetGoalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_set_goal);
 
         // we testing?
-        ExecMode.EMode test_mode = ExecMode.getExecMode();
+        test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
@@ -99,13 +100,20 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     public void initGoal() {
-        int steps = 0;
-        steps = sd.getCurrentGoal(null);
-
-        // overflow check, will not change if overflow
-        long tmpSteps = (long) steps + 500;
-        if(tmpSteps == (int)tmpSteps) steps += 500;
-        setGoal(steps);
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            sd.getCurrentGoal(steps -> {
+                long tmpSteps = (long) steps + 500;
+                if (tmpSteps == (int) tmpSteps) steps += 500;
+                setGoal(steps);
+            });
+        }
+        else {
+            int steps = sd.getCurrentGoal(null);
+            // overflow check, will not change if overflow
+            long tmpSteps = (long) steps + 500;
+            if (tmpSteps == (int) tmpSteps) steps += 500;
+            setGoal(steps);
+        }
     }
 
     public void setGoal(int num) {

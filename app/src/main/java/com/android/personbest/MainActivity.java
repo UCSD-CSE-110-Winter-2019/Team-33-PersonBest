@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
 
+    private static ExecMode.EMode test_mode;
+
     // private variables
     private String fitnessServiceKey;
     private int goalNum;
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
 
         // we testing?
-        ExecMode.EMode test_mode = ExecMode.getExecMode();
+        test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
@@ -158,9 +160,19 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     setPlannedExerciseStatsVisibility(false);
                     timer = System.currentTimeMillis() - timer;
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
-                    totalIntentionalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString(), null) + plannedSteps;
-                    sd.setIntentionalStepsByDayStr(theTimer.getTodayString(),totalIntentionalSteps, null, null);
-                    launchSummary(timer, plannedSteps);
+
+                    if(test_mode == ExecMode.EMode.DEFAULT) {
+                        sd.getIntentionalStepsByDayStr(theTimer.getTodayString(), sp -> {
+                            totalIntentionalSteps = sp + plannedSteps;
+                            sd.setIntentionalStepsByDayStr(theTimer.getTodayString(), totalIntentionalSteps, null, null);
+                            launchSummary(timer, plannedSteps);
+                        });
+                    }
+                    else {
+                        totalIntentionalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString(), null) + plannedSteps;
+                        sd.setIntentionalStepsByDayStr(theTimer.getTodayString(), totalIntentionalSteps, null, null);
+                        launchSummary(timer, plannedSteps);
+                    }
                 }
             }
         });
@@ -172,11 +184,20 @@ public class MainActivity extends AppCompatActivity implements Observer {
             sd.setCurrentGoal(GOAL_INIT, null, null);
         }
 
-        goalNum = sd.getCurrentGoal(null);
-        sd.setGoalByDayStr(theTimer.getTodayString(), goalNum, null, null);
-        goalVal.setText(String.valueOf(goalNum));
-        progressBar.setMax(goalNum);
-        stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            sd.getCurrentGoal(gl -> goalNum = gl);
+            sd.setGoalByDayStr(theTimer.getTodayString(), goalNum, null, null);
+            goalVal.setText(String.valueOf(goalNum));
+            progressBar.setMax(goalNum);
+            stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
+        }
+        else {
+            goalNum = sd.getCurrentGoal(null);
+            sd.setGoalByDayStr(theTimer.getTodayString(), goalNum, null, null);
+            goalVal.setText(String.valueOf(goalNum));
+            progressBar.setMax(goalNum);
+            stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
+        }
 
         // Set Up Google Fitness
         fitnessServiceKey = FITNESS_SERVICE_KEY;
@@ -260,8 +281,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
         // update goals
-        goalNum = sd.getCurrentGoal(null);
-        setGoal(goalNum);
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            sd.getCurrentGoal(gl -> goalNum = gl);
+            setGoal(goalNum);
+        }
+        else {
+            goalNum = sd.getCurrentGoal(null);
+            setGoal(goalNum);
+        }
     }
 
     // goal is reached but should we display the message?
@@ -278,15 +305,29 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // has made progress?
     public void checkSubGoalReach() {
         int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
-        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
 
-        if(!sd.isShownSubGoal(today) &&
-                !sd.isShownGoal(today) &&
-                todaySteps < goalNum &&
-                progressEncouragement.progressMade(todaySteps, yesterdaySteps)) {
-            Log.i(TAG, "Show sub goal on: " + today);
-            sd.setShownSubGoal(today);
-            progressEncouragement.showEncouragementMessage(todaySteps,yesterdaySteps);
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            sd.getStepsByDayStr(theTimer.getYesterdayString(), yesterdaySteps -> {
+                if (!sd.isShownSubGoal(today) &&
+                        !sd.isShownGoal(today) &&
+                        todaySteps < goalNum &&
+                        progressEncouragement.progressMade(todaySteps, yesterdaySteps)) {
+                    Log.i(TAG, "Show sub goal on: " + today);
+                    sd.setShownSubGoal(today);
+                    progressEncouragement.showEncouragementMessage(todaySteps, yesterdaySteps);
+                }
+            });
+        }
+        else {
+            int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
+            if (!sd.isShownSubGoal(today) &&
+                    !sd.isShownGoal(today) &&
+                    todaySteps < goalNum &&
+                    progressEncouragement.progressMade(todaySteps, yesterdaySteps)) {
+                Log.i(TAG, "Show sub goal on: " + today);
+                sd.setShownSubGoal(today);
+                progressEncouragement.showEncouragementMessage(todaySteps, yesterdaySteps);
+            }
         }
     }
 
@@ -295,15 +336,31 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdayGoalReach() {
         String yesterday = theTimer.getYesterdayString();
 
-        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
-        int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString(), null);
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            sd.getStepsByDayStr(theTimer.getYesterdayString(), yesterdaySteps -> {
+                sd.getGoalByDayStr(theTimer.getYesterdayString(), yesterdayGoal -> {
+                    if (!sd.isShownYesterdayGoal(today) &&
+                            !sd.isShownGoal(yesterday) &&
+                            yesterdayGoal <= yesterdaySteps) {
+                        Log.i(TAG, "Show yesterday goal on: " + today);
+                        sd.setShownYesterdayGoal(today);
+                        goalReached(true);
+                    }
+                });
+            });
+        }
+        else {
+            int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
+            int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString(), null);
 
-        if(!sd.isShownYesterdayGoal(today) &&
-                !sd.isShownGoal(yesterday) &&
-                yesterdayGoal <= yesterdaySteps) {
-            Log.i(TAG, "Show yesterday goal on: " + today);
-            sd.setShownYesterdayGoal(today);
-            goalReached(true);
+
+            if (!sd.isShownYesterdayGoal(today) &&
+                    !sd.isShownGoal(yesterday) &&
+                    yesterdayGoal <= yesterdaySteps) {
+                Log.i(TAG, "Show yesterday goal on: " + today);
+                sd.setShownYesterdayGoal(today);
+                goalReached(true);
+            }
         }
     }
 
@@ -312,18 +369,36 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdaySubGoalReach() {
         String yesterday = theTimer.getYesterdayString();
 
-        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
-        int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString(), null);
-        int dayBeforeYesterdaySteps = sd.getStepsByDayStr(ITimer.getDayStrDayBefore(theTimer.getTodayString(),2), null);
+        if (test_mode == ExecMode.EMode.DEFAULT) {
+            sd.getStepsByDayStr(theTimer.getYesterdayString(), yesterdaySteps -> {
+                sd.getGoalByDayStr(theTimer.getYesterdayString(), yesterdayGoal -> {
+                    sd.getStepsByDayStr(ITimer.getDayStrDayBefore(theTimer.getTodayString(), 2), dayBeforeYesterdaySteps -> {
+                        if (!sd.isShownYesterdaySubGoal(today) &&
+                                !sd.isShownSubGoal(yesterday) &&
+                                !sd.isShownYesterdayGoal(today) &&
+                                yesterdaySteps < yesterdayGoal &&
+                                progressEncouragement.progressMade(yesterdaySteps, dayBeforeYesterdaySteps)) {
+                            Log.i(TAG, "Show yesterday sub goal on: " + today);
+                            sd.setShownYesterdaySubGoal(today);
+                            progressEncouragement.showEncouragementMessage(yesterdaySteps, dayBeforeYesterdaySteps);
+                        }
+                    });
+                });
+            });
+        } else {
+            int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
+            int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString(), null);
+            int dayBeforeYesterdaySteps = sd.getStepsByDayStr(ITimer.getDayStrDayBefore(theTimer.getTodayString(), 2), null);
 
-        if(!sd.isShownYesterdaySubGoal(today) &&
-                !sd.isShownSubGoal(yesterday) &&
-                !sd.isShownYesterdayGoal(today) &&
-                 yesterdaySteps < yesterdayGoal &&
-                progressEncouragement.progressMade(yesterdaySteps,dayBeforeYesterdaySteps)) {
-            Log.i(TAG, "Show yesterday sub goal on: " + today);
-            sd.setShownYesterdaySubGoal(today);
-            progressEncouragement.showEncouragementMessage(yesterdaySteps,dayBeforeYesterdaySteps);
+            if (!sd.isShownYesterdaySubGoal(today) &&
+                    !sd.isShownSubGoal(yesterday) &&
+                    !sd.isShownYesterdayGoal(today) &&
+                    yesterdaySteps < yesterdayGoal &&
+                    progressEncouragement.progressMade(yesterdaySteps, dayBeforeYesterdaySteps)) {
+                Log.i(TAG, "Show yesterday sub goal on: " + today);
+                sd.setShownYesterdaySubGoal(today);
+                progressEncouragement.showEncouragementMessage(yesterdaySteps, dayBeforeYesterdaySteps);
+            }
         }
     }
 

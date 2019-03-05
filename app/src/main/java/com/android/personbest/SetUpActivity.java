@@ -12,6 +12,8 @@ import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 
 public class SetUpActivity extends AppCompatActivity {
+    private static ExecMode.EMode test_mode;
+
     private EditText editText;
     private Button saveButton;
     private SavedDataManager sd;
@@ -25,7 +27,7 @@ public class SetUpActivity extends AppCompatActivity {
         editText = findViewById(R.id.height);
 
         // we testing?
-        ExecMode.EMode test_mode = ExecMode.getExecMode();
+        test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {

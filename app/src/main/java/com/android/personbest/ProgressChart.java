@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class ProgressChart extends AppCompatActivity {
+    private static ExecMode.EMode test_mode;
+    private List<IStatistics> stepStats;
     private List<BarEntry> barEntries;
     private List<Entry> lineEntries;
     private SavedDataManager savedDataManager;
@@ -63,7 +65,7 @@ public class ProgressChart extends AppCompatActivity {
             todayStr = tmpTodayStr;
 
         // we testing?
-        ExecMode.EMode test_mode = ExecMode.getExecMode();
+        test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             savedDataManager = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
@@ -96,9 +98,19 @@ public class ProgressChart extends AppCompatActivity {
     }
 
     public void setDate(String today) {
-        List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(today, null);
-        setBarChart(stepStats);
-        showChart();
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            savedDataManager.getLastWeekSteps(today, ss -> {
+                stepStats = ss;
+                setBarChart(stepStats);
+                showChart();
+            });
+        }
+        else {
+            stepStats = savedDataManager.getLastWeekSteps(today, null);
+            setBarChart(stepStats);
+            showChart();
+        }
+
     }
 
 
