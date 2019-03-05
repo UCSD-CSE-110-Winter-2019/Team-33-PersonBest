@@ -44,7 +44,7 @@ public abstract class ITimer {
 
         ArrayList<String> toReturn = new ArrayList<>();
         for(int i = 1; i <= ITimer.LAST_WEEK_DAYS; ++i) {
-            toReturn.add(DateTimeFormatter.ofPattern("MM/dd/yyyy").format(
+            toReturn.add(DateTimeFormatter.ofPattern("MM-dd-yyyy").format(
                     ZonedDateTime.of(
                         getYearFromDayStr(day),
                         getMonthFromDayStr(day),

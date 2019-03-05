@@ -9,6 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.*;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -32,6 +33,8 @@ public class SavedDataManagerFirestore implements SavedDataManager {
     private GoogleSignInAccount curAccount;
     private FirebaseUser curFirebaseUser;
 
+    private CollectionReference ffUserData;
+
     public SavedDataManagerFirestore(Activity activity) {
         this.activity = activity;
         this.sdsp = new SavedDataManagerSharedPreference(activity);
@@ -49,6 +52,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                 .setPersistenceEnabled(true)
                 .build();
         ff.setFirestoreSettings(settings);
+        ffUserData = ff.collection("user_data");
 
         curUsrID = curAccount.getId();
     }
@@ -57,8 +61,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
     public void getIdByEmail(String email, SavedDataOperatorString callback) {
         final String query = email;
         final SavedDataOperatorString cb = callback;
-        ff.collection("user_data")
-                .document("emails")
+        ffUserData.document("emails")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -87,8 +90,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
     public int getUserHeight(SavedDataOperatorInt callback) {
         if(callback != null) {
             final SavedDataOperatorInt cb = callback;
-            ff.collection("user_data")
-                .document(curUsrID)
+            ffUserData.document(curUsrID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -113,6 +115,8 @@ public class SavedDataManagerFirestore implements SavedDataManager {
         return sdsp.getUserHeight(null);
     }
     public void setUserHeight(int height, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
+
+        sdsp.setUserHeight(height,null,null);
     }
 
     public int getStepsByDayStr(String day, SavedDataOperatorInt callback) {
