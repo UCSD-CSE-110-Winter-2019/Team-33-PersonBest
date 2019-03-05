@@ -1,10 +1,6 @@
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -18,8 +14,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
-
-import java.util.Calendar;
 
 import static org.junit.Assert.assertEquals;
 
@@ -58,6 +52,6 @@ public class TestDailyStats {
     @Test
     public void testSetGoal() {
         mainActivity.setGoal(10000);
-        assertEquals(TEN_K, sd.getGoalByDayStr(timer.getTodayString()));
+        assertEquals(TEN_K, sd.getGoalByDayStr(timer.getTodayString(), null));
     }
 }

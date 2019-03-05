@@ -1,6 +1,5 @@
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -13,8 +12,6 @@ import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerSystem;
-
-import java.util.Calendar;
 
 public class PlannedExerciseSummary extends AppCompatActivity {
 
@@ -56,14 +53,14 @@ public class PlannedExerciseSummary extends AppCompatActivity {
         int stepsTaken = intent.getIntExtra("stepsTaken", 0);
         long msElapsed = intent.getLongExtra("timeElapsed", 0);
 
-        long totalTime = msElapsed + sd.getExerciseTimeByDayStr(theTimer.getTodayString());
-        int totalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString());
-        double meanMPH = intentionalWalkUtils.velocity(sd.getUserHeight(), totalSteps, totalTime / MILLISECONDS_IN_A_SECOND);
-        sd.setAvgMPHByDayStr(theTimer.getTodayString(), (float)meanMPH);
+        long totalTime = msElapsed + sd.getExerciseTimeByDayStr(theTimer.getTodayString(), null);
+        int totalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString(), null);
+        double meanMPH = intentionalWalkUtils.velocity(sd.getUserHeight(null), totalSteps, totalTime / MILLISECONDS_IN_A_SECOND);
+        sd.setAvgMPHByDayStr(theTimer.getTodayString(), (float)meanMPH, null, null);
 
         displaySteps.setText("Steps Taken: " + stepsTaken);
         displayTime.setText("Minutes Elapsed: " + (msElapsed / MILLISECONDS_IN_A_MINUTE));
-        displayMph.setText("MPH: " + intentionalWalkUtils.velocity(sd.getUserHeight(), stepsTaken, msElapsed / MILLISECONDS_IN_A_SECOND));
+        displayMph.setText("MPH: " + intentionalWalkUtils.velocity(sd.getUserHeight(null), stepsTaken, msElapsed / MILLISECONDS_IN_A_SECOND));
 
         button = findViewById(R.id.goBack);
         button.setOnClickListener(new View.OnClickListener() {

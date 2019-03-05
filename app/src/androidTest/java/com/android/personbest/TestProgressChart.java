@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class TestProgressChart {
@@ -63,7 +62,7 @@ public class TestProgressChart {
 
         // Set different date
         int date = 7;
-        List<IStatistics> stepStats = manager.getLastWeekSteps("03/02/2019");
+        List<IStatistics> stepStats = manager.getLastWeekSteps("03/02/2019", null);
         progressChart.setBarChart(stepStats);
 
         // Get data

@@ -1,6 +1,5 @@
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,7 +36,7 @@ public class SetUpActivity extends AppCompatActivity {
             sd = new SavedDataManagerFirestore(this);
         }
 
-        sd.setCurrentGoal(5000);
+        sd.setCurrentGoal(5000, null, null);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,7 +49,7 @@ public class SetUpActivity extends AppCompatActivity {
     public boolean save() {
         if(editText.getText().toString().length() == 0) return false;
         int height = Integer.parseInt(editText.getText().toString());
-        sd.setUserHeight(height);
+        sd.setUserHeight(height, null, null);
         Toast.makeText(SetUpActivity.this, "Height Saved!", Toast.LENGTH_SHORT).show();
         return true;
     }

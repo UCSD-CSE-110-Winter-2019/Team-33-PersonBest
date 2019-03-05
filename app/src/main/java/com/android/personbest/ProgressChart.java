@@ -1,7 +1,6 @@
 package com.android.personbest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
-import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.*;
@@ -22,10 +20,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.StackedValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
-import java.security.InvalidParameterException;
 import java.time.DayOfWeek;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +96,7 @@ public class ProgressChart extends AppCompatActivity {
     }
 
     public void setDate(String today) {
-        List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(today);
+        List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(today, null);
         setBarChart(stepStats);
         showChart();
     }

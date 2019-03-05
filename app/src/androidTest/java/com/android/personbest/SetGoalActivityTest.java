@@ -1,21 +1,12 @@
 package com.android.personbest;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.test.rule.ActivityTestRule;
-import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
-import com.android.personbest.StepCounter.StepCounter;
-import com.android.personbest.StepCounter.StepCounterFactory;
-import com.android.personbest.StepCounter.StepCounterGoogleFit;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static android.content.Context.MODE_PRIVATE;
 import static org.junit.Assert.*;
 
 public class SetGoalActivityTest {
@@ -35,7 +26,7 @@ public class SetGoalActivityTest {
         final int input = 777;
         int output = 0;
         setGoalActivity.save(777);
-        output = sd.getCurrentGoal();
+        output = sd.getCurrentGoal(null);
         assertEquals(input, output);
     }
 
@@ -45,7 +36,7 @@ public class SetGoalActivityTest {
         int goal2;
 
         setGoalActivity.initGoal();
-        goal1 = sd.getCurrentGoal() + 500;
+        goal1 = sd.getCurrentGoal(null) + 500;
         goal2 = setGoalActivity.getGoal();
         assertEquals(goal1, goal2);
     }

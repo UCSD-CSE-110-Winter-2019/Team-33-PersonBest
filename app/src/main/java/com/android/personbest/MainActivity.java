@@ -2,14 +2,11 @@ package com.android.personbest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -22,17 +19,9 @@ import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
 import com.android.personbest.Timer.ITimer;
-import com.android.personbest.Timer.TimerMock;
 import com.android.personbest.Timer.TimerSystem;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.*;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements Observer {
@@ -62,9 +51,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private IDate theDate;
     private String today;
     private Integer todayInt;
-    private FirebaseAuth mAuth;
-    private GoogleSignInAccount curAccount;
-    private FirebaseUser curFirebaseUser;
+
+//    private FirebaseAuth mAuth;
+//    private GoogleSignInAccount curAccount;
+//    private FirebaseUser curFirebaseUser;
 
     private boolean NDEBUG = true;
 
@@ -86,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             public void run() {
                 stepCounter.updateStepCount();
                 int totalSoFar = Integer.parseInt(stepsTodayVal.getText().toString());
-                sd.setStepsByDayStr(theTimer.getTodayString(),totalSoFar);
+                sd.setStepsByDayStr(theTimer.getTodayString(),totalSoFar, null, null);
                 if(plannedTimeValue.getVisibility() == View.VISIBLE) {
                     long timeDiff = (System.currentTimeMillis() - timer);
                     plannedTimeValue.setText(String.valueOf(timeDiff / MILLISECONDS_IN_A_MINUTE));
@@ -94,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     int stepDiff = totalSoFar - plannedSteps;
                     plannedStepValue.setText(String.valueOf(stepDiff));
 
-                    double currMph = intentionalWalkUtils.velocity(sd.getUserHeight(), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
+                    double currMph = intentionalWalkUtils.velocity(sd.getUserHeight(null), stepDiff, timeDiff / MILLISECONDS_IN_A_SECOND);
                     plannedMPHValue.setText(String.valueOf(currMph));
                 }
                 int left = goalNum - totalSoFar;
@@ -168,8 +158,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     setPlannedExerciseStatsVisibility(false);
                     timer = System.currentTimeMillis() - timer;
                     plannedSteps = Integer.parseInt(stepsTodayVal.getText().toString()) - plannedSteps;
-                    totalIntentionalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString()) + plannedSteps;
-                    sd.setIntentionalStepsByDayStr(theTimer.getTodayString(),totalIntentionalSteps);
+                    totalIntentionalSteps = sd.getIntentionalStepsByDayStr(theTimer.getTodayString(), null) + plannedSteps;
+                    sd.setIntentionalStepsByDayStr(theTimer.getTodayString(),totalIntentionalSteps, null, null);
                     launchSummary(timer, plannedSteps);
                 }
             }
@@ -179,11 +169,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if(sd.isFirstTimeUser()) {
             startActivity(new Intent(this, SetUpActivity.class));
             sd.setFirstTimeUser(false);
-            sd.setCurrentGoal(GOAL_INIT);
+            sd.setCurrentGoal(GOAL_INIT, null, null);
         }
 
-        goalNum = sd.getCurrentGoal();
-        sd.setGoalByDayStr(theTimer.getTodayString(), goalNum);
+        goalNum = sd.getCurrentGoal(null);
+        sd.setGoalByDayStr(theTimer.getTodayString(), goalNum, null, null);
         goalVal.setText(String.valueOf(goalNum));
         progressBar.setMax(goalNum);
         stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
@@ -235,15 +225,15 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
         // the user should be signed in by here
-        if(test_mode == ExecMode.EMode.DEFAULT) {
-            mAuth = FirebaseAuth.getInstance();
-            curAccount = GoogleSignIn.getLastSignedInAccount(this);
-            curFirebaseUser = mAuth.getCurrentUser();
-            if (curFirebaseUser == null) {
-                firebaseAuthWithGoogle(curAccount);
-                curFirebaseUser = mAuth.getCurrentUser();
-            }
-        }
+        //if(test_mode == ExecMode.EMode.DEFAULT) {
+        //    mAuth = FirebaseAuth.getInstance();
+        //    curAccount = GoogleSignIn.getLastSignedInAccount(this);
+        //    curFirebaseUser = mAuth.getCurrentUser();
+        //    if (curFirebaseUser == null) {
+        //        firebaseAuthWithGoogle(curAccount);
+        //        curFirebaseUser = mAuth.getCurrentUser();
+        //    }
+        //}
     }
     @Override
     protected void onResume() {
@@ -270,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
         // update goals
-        goalNum = sd.getCurrentGoal();
+        goalNum = sd.getCurrentGoal(null);
         setGoal(goalNum);
     }
 
@@ -288,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // has made progress?
     public void checkSubGoalReach() {
         int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
-        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString());
+        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
 
         if(!sd.isShownSubGoal(today) &&
                 !sd.isShownGoal(today) &&
@@ -305,8 +295,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdayGoalReach() {
         String yesterday = theTimer.getYesterdayString();
 
-        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString());
-        int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString());
+        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
+        int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString(), null);
 
         if(!sd.isShownYesterdayGoal(today) &&
                 !sd.isShownGoal(yesterday) &&
@@ -322,9 +312,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void checkYesterdaySubGoalReach() {
         String yesterday = theTimer.getYesterdayString();
 
-        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString());
-        int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString());
-        int dayBeforeYesterdaySteps = sd.getStepsByDayStr(ITimer.getDayStrDayBefore(theTimer.getTodayString(),2));
+        int yesterdaySteps = sd.getStepsByDayStr(theTimer.getYesterdayString(), null);
+        int yesterdayGoal = sd.getGoalByDayStr(theTimer.getYesterdayString(), null);
+        int dayBeforeYesterdaySteps = sd.getStepsByDayStr(ITimer.getDayStrDayBefore(theTimer.getTodayString(),2), null);
 
         if(!sd.isShownYesterdaySubGoal(today) &&
                 !sd.isShownSubGoal(yesterday) &&
@@ -371,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public void setGoal(int goalNum) {
         this.goalNum = goalNum;
         this.goalVal.setText(String.valueOf(goalNum));
-        sd.setGoalByDayStr(theTimer.getTodayString(), goalNum);
+        sd.setGoalByDayStr(theTimer.getTodayString(), goalNum, null, null);
 
         // changing goal will also change progress
         int stepCount = Integer.valueOf(this.stepsTodayVal.getText().toString());
@@ -433,28 +423,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // for test
     public void setFitnessServiceKey(String fitnessServiceKey) {
         this.fitnessServiceKey = fitnessServiceKey;
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            //updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            //updateUI(null);
-                        }
-                    }
-                });
     }
 
     public void launchProgressChart(View view) {

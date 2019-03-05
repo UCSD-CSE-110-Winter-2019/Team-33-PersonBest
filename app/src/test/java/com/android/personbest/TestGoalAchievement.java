@@ -1,31 +1,20 @@
 package com.android.personbest;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.*;
-import android.util.Log;
 import android.widget.Button;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
-import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerMock;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.robolectric.*;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.android.personbest.StepCounter.StepCounter;
 import com.android.personbest.StepCounter.StepCounterFactory;
@@ -33,17 +22,11 @@ import com.android.personbest.StepCounter.StepCounterGoogleFit;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowToast;
-
-import java.util.Calendar;
-import java.util.IllegalFormatException;
-import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.robolectric.RuntimeEnvironment.application;
@@ -93,8 +76,8 @@ public class TestGoalAchievement {
         activity.setToday(TEST_DAY);
 
         sd.clearData();
-        sd.setUserHeight(HEIGHT);
-        sd.setCurrentGoal(GOAL_INIT);
+        sd.setUserHeight(HEIGHT, null, null);
+        sd.setCurrentGoal(GOAL_INIT, null, null);
         nextStepCount = NEXT_STEP_COUNT;
 
     }
@@ -295,15 +278,15 @@ public class TestGoalAchievement {
     }
 
     private void setYesterdaySteps(int steps) {
-        sd.setStepsByDayStr(PAY_DAY, steps);
+        sd.setStepsByDayStr(PAY_DAY, steps, null, null);
     }
 
     private void setYesterdayGoal(int goal) {
-        sd.setGoalByDayStr(PAY_DAY, goal);
+        sd.setGoalByDayStr(PAY_DAY, goal, null, null);
     }
 
     private void setStepByDayString(String day, int steps) {
-        sd.setStepsByDayStr(day, steps);
+        sd.setStepsByDayStr(day, steps, null, null);
     }
 
     @After

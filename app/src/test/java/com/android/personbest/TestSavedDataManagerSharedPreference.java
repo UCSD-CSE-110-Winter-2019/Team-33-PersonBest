@@ -1,6 +1,5 @@
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import com.android.personbest.SavedDataManager.SavedDataManager;
@@ -8,17 +7,12 @@ import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerMock;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
-
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -59,8 +53,8 @@ public class TestSavedDataManagerSharedPreference {
     @Test
     public void testYesterdaySteps(){
         ITimer timer = new TimerMock(0, "03/03/2019", "03/02/2019");
-        sd.setStepsByDayStr(timer.getYesterdayString(), 1000);
-        assertEquals(sd.getStepsByDayStr(timer.getYesterdayString()),1000);
+        sd.setStepsByDayStr(timer.getYesterdayString(), 1000, null, null);
+        assertEquals(sd.getStepsByDayStr(timer.getYesterdayString(), null),1000);
     }
 
     @Test

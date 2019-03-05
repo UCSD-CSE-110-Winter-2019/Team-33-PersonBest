@@ -5,14 +5,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import com.android.personbest.StepCounter.DailyStat;
-import com.android.personbest.StepCounter.DateCalendar;
-import com.android.personbest.StepCounter.IDate;
 import com.android.personbest.StepCounter.IStatistics;
 import com.android.personbest.Timer.ITimer;
 
-import java.io.Serializable;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,83 +31,69 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         this.editor = sp.edit();
     }
 
-    public String getIdByEmail(String email) {
-        return null;
+    public void getIdByEmail(String email, SavedDataOperatorString callback) {
+        callback.op(null);
     }
 
-
-    public boolean isFirstTimeUser() {
-        return (sp.getAll().isEmpty());
-    }
-    public void setFirstTimeUser(boolean isFirstTime) {
-        editor.putBoolean("is_first_time_user", false);
-    }
 
     // data to sync
 
-    public int getUserHeight() {
+    public int getUserHeight(SavedDataOperatorInt callback) {
         return sp.getInt("Height", 0);
     }
-    public boolean setUserHeight(int height) {
+    public void setUserHeight(int height, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         editor.putInt("Height", height);
         editor.apply();
-        return true;
     }
 
-    public int getStepsByDayStr(String day) {
+    public int getStepsByDayStr(String day, SavedDataOperatorInt callback) {
         return sp.getInt("total_steps:"+day, DEFAULT_STEPS);
     }
-    public boolean setStepsByDayStr(String day, int step) {
+    public void setStepsByDayStr(String day, int step, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         editor.putInt("total_steps:"+day, step);
         editor.apply();
-        return true;
     }
 
-    public int getIntentionalStepsByDayStr(String day) {
+    public int getIntentionalStepsByDayStr(String day, SavedDataOperatorInt callback) {
         return sp.getInt("intentional_steps:" + day, DEFAULT_STEPS);
     }
-    public boolean setIntentionalStepsByDayStr(String day, int step) {
+    public void setIntentionalStepsByDayStr(String day, int step, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         editor.putInt("intentional_steps:" + day, step);
         editor.apply();
-        return true;
     }
 
-    public long getExerciseTimeByDayStr(String day) {
+    public long getExerciseTimeByDayStr(String day, SavedDataOperatorLong callback) {
         return sp.getLong("exercise_time:" + day, 0);
     }
 
-    public boolean setExerciseTimeByDayStr(String day, long time) {
+    public void setExerciseTimeByDayStr(String day, long time, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         editor.putLong("exercise_time:" + day, time);
         editor.apply();
-        return true;
     }
 
-    public float getAvgMPHByDayStr(String day) {
+    public float getAvgMPHByDayStr(String day, SavedDataOperatorFloat callback) {
         return sp.getLong("average_mph:" + day, 0);
     }
-    public boolean setAvgMPHByDayStr(String day, float mph) {
+    public void setAvgMPHByDayStr(String day, float mph, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         editor.putFloat("average_mph:" + day, mph);
         editor.apply();
-        return true;
     }
 
-    public int getCurrentGoal() {
+    public int getCurrentGoal(SavedDataOperatorInt callback) {
         return sp.getInt("goal_current:", GOAL_INIT);
     }
-    public boolean setCurrentGoal(int goal) {
+    public void setCurrentGoal(int goal, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         editor.putInt("goal_current:", goal);
         editor.apply();
-        return true;
     }
 
     // if today not in db, use current goal
-    public int getGoalByDayStr(String day) {
-        return sp.getInt("goal:"+day, getCurrentGoal());
+    public int getGoalByDayStr(String day, SavedDataOperatorInt callback) {
+        return sp.getInt("goal:"+day, getCurrentGoal(null));
     }
-    public boolean setGoalByDayStr(String day, int goal) {
+    public void setGoalByDayStr(String day, int goal, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         editor.putInt("goal:"+day, goal);
         editor.apply();
-        return true;
     }
 
     public void clearData() {
@@ -122,48 +103,61 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
 
     // note: if not exist, will use default
     // might need to change in the future
-    public IStatistics getStatByDayStr(String day) {
-        int totalSteps = this.getStepsByDayStr(day);
-        int goal = this.getStepsByDayStr(day);
+    public IStatistics getStatByDayStr(String day, SavedDataOperatorIStat callback) {
+        int totalSteps = this.getStepsByDayStr(day, null);
+        int goal = this.getStepsByDayStr(day, null);
 
-        int intentionalSteps = this.getIntentionalStepsByDayStr(day);
-        Float MPH = this.getAvgMPHByDayStr(day);
-        Long timeWalked = this.getExerciseTimeByDayStr(day);
+        int intentionalSteps = this.getIntentionalStepsByDayStr(day, null);
+        Float MPH = this.getAvgMPHByDayStr(day, null);
+        Long timeWalked = this.getExerciseTimeByDayStr(day, null);
 
         return new DailyStat(goal,totalSteps,intentionalSteps,timeWalked,MPH);
     }
 
     public boolean setStatByDayStr(String day, IStatistics stat) {
-        this.setStepsByDayStr(day, stat.getTotalSteps());
-        this.setGoalByDayStr(day, stat.getGoal());
-        this.setIntentionalStepsByDayStr(day, stat.getIntentionalSteps());
-        this.setAvgMPHByDayStr(day, stat.getAverageMPH());
-        this.setExerciseTimeByDayStr(day, stat.getTimeWalked());
+        this.setStepsByDayStr(day, stat.getTotalSteps(), null, null);
+        this.setGoalByDayStr(day, stat.getGoal(), null, null);
+        this.setIntentionalStepsByDayStr(day, stat.getIntentionalSteps(), null, null);
+        this.setAvgMPHByDayStr(day, stat.getAverageMPH(), null, null);
+        this.setExerciseTimeByDayStr(day, stat.getTimeWalked(), null, null);
 
         return true;
     }
 
-    public List<IStatistics> getLastWeekSteps(String day) {
+    public List<IStatistics> getLastWeekSteps(String day, SavedDataOperatorListIStat callback) {
         List<String> days = ITimer.getLastWeekDayStrings(day);
         ArrayList<IStatistics> toReturn = new ArrayList<>();
 
         for(String d : days) {
-            toReturn.add(this.getStatByDayStr(d));
+            toReturn.add(this.getStatByDayStr(d, null));
         }
 
         return toReturn;
     }
 
-    public List<IStatistics> getLastMonthStat(String day) {
+    public List<IStatistics> getLastMonthStat(String day, SavedDataOperatorListIStat callback) {
         List<String> days = ITimer.getLastMonthDayStrings(day);
         ArrayList<IStatistics> toReturn = new ArrayList<>();
 
         for(String d : days) {
-            toReturn.add(this.getStatByDayStr(d));
+            toReturn.add(this.getStatByDayStr(d, null));
         }
 
         return toReturn;
     }
+
+    // shared preference will NEVER know about the friends
+    public List<IStatistics> getFriendMonthlyStat(String email, SavedDataOperatorListIStat callback) {
+        return null;
+    }
+
+    public boolean isFirstTimeUser() {
+        return (sp.getAll().isEmpty());
+    }
+    public void setFirstTimeUser(boolean isFirstTime) {
+        editor.putBoolean("is_first_time_user", false);
+    }
+
 
     public boolean isShownGoal(String today) {
        return sp.getString("last_day_prompted_goal","").equals(today);

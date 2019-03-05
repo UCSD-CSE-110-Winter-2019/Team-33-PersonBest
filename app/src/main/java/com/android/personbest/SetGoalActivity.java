@@ -4,7 +4,6 @@
 
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +17,6 @@ import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.Timer.ITimer;
-import com.android.personbest.Timer.TimerSystem;
 
 public class SetGoalActivity extends AppCompatActivity {
 
@@ -102,7 +100,7 @@ public class SetGoalActivity extends AppCompatActivity {
 
     public void initGoal() {
         int steps = 0;
-        steps = sd.getCurrentGoal();
+        steps = sd.getCurrentGoal(null);
 
         // overflow check, will not change if overflow
         long tmpSteps = (long) steps + 500;
@@ -119,7 +117,7 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     public void save(int stepNumber) {
-        sd.setCurrentGoal(stepNumber);
+        sd.setCurrentGoal(stepNumber, null, null);
     }
 
     public void goBack() {

@@ -1,9 +1,7 @@
 package com.android.personbest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.TextView;
 
 import com.android.personbest.SavedDataManager.SavedDataManager;
@@ -50,7 +48,7 @@ public class TestSummary {
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         sd = new SavedDataManagerSharedPreference(mainActivity);
-        sd.setUserHeight(72);
+        sd.setUserHeight(72, null, null);
 
         Intent summary = new Intent(mainActivity, PlannedExerciseSummary.class);
         summary.putExtra("timeElapsed", TWO_MIN);
