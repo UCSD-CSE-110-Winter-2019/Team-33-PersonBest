@@ -85,35 +85,35 @@ public abstract class ITimer {
         ));
     }
 
-    public static String getDayStamp(String day) {
+    public static int getDayStamp(String day) {
         if(!isValidDayStr(day)) throw new IllegalArgumentException("argument day in day wrong format");
-        return (DateTimeFormatter.ofPattern("yyyyMMdd").format(
+        return Integer.parseInt((DateTimeFormatter.ofPattern("yyyyMMdd").format(
                 ZonedDateTime.of(
                     getYearFromDayStr(day),
                     getMonthFromDayStr(day),
                     getDayFromDayStr(day),
                     1,1,1,1, ZonedDateTime.now().getZone()
                 )
-        ));
+        )));
     }
 
-    public static String getDayStampDayBefore(String day, int n) {
+    public static int getDayStampDayBefore(String day, int n) {
         if(!isValidDayStr(day)) throw new IllegalArgumentException("argument day in day wrong format");
-        return (DateTimeFormatter.ofPattern("yyyyMMdd").format(
+        return Integer.parseInt((DateTimeFormatter.ofPattern("yyyyMMdd").format(
                 ZonedDateTime.of(
                     getYearFromDayStr(day),
                     getMonthFromDayStr(day),
                     getDayFromDayStr(day),
                     1,1,1,1, ZonedDateTime.now().getZone()
                 ).minusDays(n)
-        ));
+        )));
     }
 
-    public static String getDayStampWeekBefore(String day) {
+    public static int getDayStampWeekBefore(String day) {
         return getDayStampDayBefore(day, LAST_WEEK_DAYS);
     }
 
-    public static String getDayStampMonthBefore(String day) {
+    public static int getDayStampMonthBefore(String day) {
         return getDayStampDayBefore(day, LAST_MONTH_DAYS);
     }
 

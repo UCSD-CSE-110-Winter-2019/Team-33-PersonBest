@@ -184,6 +184,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
             sd.setCurrentGoal(GOAL_INIT, null, null);
         }
 
+        goalNum = sd.getCurrentGoal(null); // use goal num to initialize goal first TODO
+
         if(test_mode == ExecMode.EMode.DEFAULT) {
             sd.getCurrentGoal(gl -> {
                 goalNum = gl;

@@ -410,8 +410,9 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                Integer val = (Integer) document.getData().get(col_key);
-                                if(val == null) val = default_val;
+                                Long va = (Long) document.getData().get(col_key);
+                                if(va == null) va = (long) default_val;
+                                Integer val = (int) (long) va;
                                 Log.d(TAG, "DocumentSnapshot data: " + val);
                                 cb.op(val);
                             } else {
@@ -462,10 +463,11 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                Float val = (float) document.getData().get(col_key);
-                                if(val == null) val = default_val;
+                                Double val = (Double) document.getData().get(col_key);
+                                if(val == null) val = (double) default_val;
+                                float va = (float) (double) val;
                                 Log.d(TAG, "DocumentSnapshot data: " + val);
-                                cb.op(val);
+                                cb.op(va);
                             } else {
                                 Log.d(TAG, "No such document");
                                 cb.op(default_val);
@@ -478,7 +480,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                 });
     }
 
-    private void getDataBatchIstat(CollectionReference col, String dayStamp, SavedDataOperatorListIStat callback) {
+    private void getDataBatchIstat(CollectionReference col, int dayStamp, SavedDataOperatorListIStat callback) {
         if(col != null && callback != null) {
             final SavedDataOperatorListIStat cb = callback;
             Query query = col.orderBy(KEY_DAYSTAMP).whereGreaterThanOrEqualTo(KEY_DAYSTAMP, dayStamp);
@@ -512,7 +514,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
         int goal = val.containsKey(D_KEY_GOALS) ? (int) (long) val.get(D_KEY_GOALS) : DEFAULT_GOAL;
         int totalSteps = val.containsKey(D_KEY_STEPS) ? (int) (long) val.get(D_KEY_STEPS) : DEFAULT_STEPS;
         int intentionalSteps = val.containsKey(D_KEY_INTE_STEPS) ? (int) (long) val.get(D_KEY_INTE_STEPS) : DEFAULT_STEPS;
-        Float MPH = val.containsKey(D_KEY_MPH) ? (float) val.get(D_KEY_MPH) : DEFAULT_MPH;
+        Float MPH = val.containsKey(D_KEY_MPH) ? (float) (double) val.get(D_KEY_MPH) : DEFAULT_MPH;
         Long timeWalked = val.containsKey(D_KEY_EXER_TIME) ? (long) val.get(D_KEY_EXER_TIME) : DEFAULT_TIME;
         return (new DailyStat(goal, totalSteps, intentionalSteps, timeWalked, MPH));
     }
