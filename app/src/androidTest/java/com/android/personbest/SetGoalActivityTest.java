@@ -3,6 +3,7 @@ package com.android.personbest;
 import android.support.test.rule.ActivityTestRule;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,5 +40,10 @@ public class SetGoalActivityTest {
         goal1 = sd.getCurrentGoal(null) + 500;
         goal2 = setGoalActivity.getGoal();
         assertEquals(goal1, goal2);
+    }
+
+    @After
+    public void cleanUp() {
+        sd.clearData();
     }
 }
