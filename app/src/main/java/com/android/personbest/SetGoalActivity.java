@@ -119,7 +119,12 @@ public class SetGoalActivity extends AppCompatActivity {
     public void setGoal(int num) {
         this.stepGoal = num;
         goalRecommandation = findViewById(R.id.recommanded_goal);
-        goalRecommandation.setText(stepGoal + "");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                goalRecommandation.setText(stepGoal + "");
+            }
+        });
     }
 
     public int getGoal() {
