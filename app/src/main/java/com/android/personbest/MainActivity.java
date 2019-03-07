@@ -185,11 +185,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
 
         if(test_mode == ExecMode.EMode.DEFAULT) {
-            sd.getCurrentGoal(gl -> goalNum = gl);
-            sd.setGoalByDayStr(theTimer.getTodayString(), goalNum, null, null);
-            goalVal.setText(String.valueOf(goalNum));
-            progressBar.setMax(goalNum);
-            stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
+            sd.getCurrentGoal(gl -> {
+                goalNum = gl;
+                sd.setGoalByDayStr(theTimer.getTodayString(), goalNum, null, null);
+                goalVal.setText(String.valueOf(goalNum));
+                progressBar.setMax(goalNum);
+                stepsLeftVal.setText(String.valueOf(goalNum - STEP_INIT));
+            });
         }
         else {
             goalNum = sd.getCurrentGoal(null);
@@ -282,8 +284,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         // update goals
         if(test_mode == ExecMode.EMode.DEFAULT) {
-            sd.getCurrentGoal(gl -> goalNum = gl);
-            setGoal(goalNum);
+            sd.getCurrentGoal(gl -> {
+                goalNum = gl;
+                setGoal(goalNum);
+            });
         }
         else {
             goalNum = sd.getCurrentGoal(null);

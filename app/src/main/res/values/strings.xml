@@ -23,4 +23,5 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
+    <string name="web_client_id">998924189833-s9u9gl4nkb8sc1ciepofjtvbshf7pe6q.apps.googleusercontent.com</string>
 </resources>
