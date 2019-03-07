@@ -16,11 +16,16 @@ public interface SavedDataManager {
     void getIdByEmail(String email, SavedDataOperatorString callback);
 
     // data to sync
+    // use return value for local data
+    // just discard return value if want to use cloud data
 
     // will call callback with -1 if failure
     int getUserHeight(SavedDataOperatorInt callback);
     // will call 2 operator with corresponding messages
     void setUserHeight(int height, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp);
+
+    int getCurrentGoal(SavedDataOperatorInt callback);
+    void setCurrentGoal(int goal, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp);
 
     int getStepsByDayStr(String day, SavedDataOperatorInt callback);
     void setStepsByDayStr(String day, int step, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp);
@@ -32,8 +37,6 @@ public interface SavedDataManager {
     float getAvgMPHByDayStr(String day, SavedDataOperatorFloat callback);
     void setAvgMPHByDayStr(String day, float mph, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp);
 
-    int getCurrentGoal(SavedDataOperatorInt callback);
-    void setCurrentGoal(int goal, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp);
     int getGoalByDayStr(String day, SavedDataOperatorInt callback);
     void setGoalByDayStr(String day, int goal, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp);
 
