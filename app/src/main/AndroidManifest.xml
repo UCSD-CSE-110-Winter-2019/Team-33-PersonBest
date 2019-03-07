@@ -1,34 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.personbest">
+          package="com.android.personbest">
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.READ_PROFILE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".BefriendActivity"></activity>
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme">
         <activity
-            android:name=".ProgressChart"
-            android:label="@string/title_activity_progress_chart"
-            android:launchMode="singleInstance"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.android.personbest.MainActivity" />
-        </activity>
-        <activity android:name=".SetGoalActivity"></activity>
-        <activity android:name=".SetUpActivity"></activity>
-        <activity android:name=".PlannedExerciseSummary"></activity>
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                android:name=".LoginActivity"
+                android:label="@string/app_name">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                        <category android:name="android.intent.category.LAUNCHER"/>
+                    </intent-filter>
+        </activity>
+        <activity android:name=".BefriendActivity"/>
+        <activity
+                android:name=".ProgressChart"
+                android:label="@string/title_activity_progress_chart"
+                android:launchMode="singleInstance"
+                android:parentActivityName=".MainActivity"
+                android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.android.personbest.MainActivity"/>
+        </activity>
+        <activity android:name=".SetGoalActivity"/>
+        <activity android:name=".SetUpActivity"/>
+        <activity android:name=".PlannedExerciseSummary"/>
+        <activity android:name=".MainActivity">
         </activity>
     </application>
 
