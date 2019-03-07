@@ -52,7 +52,7 @@ public interface SavedDataManager {
     // return a list of IStatistics
     // 28 days before the day in the argument
     List<IStatistics> getLastMonthStat(String day, SavedDataOperatorListIStat callback);
-    List<IStatistics> getFriendMonthlyStat(String email, SavedDataOperatorListIStat callback);
+    List<IStatistics> getFriendMonthlyStat(String email, String day, SavedDataOperatorListIStat callback);
 
     //////////////////////////////////////////////////////////////////////////////
 

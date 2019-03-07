@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
+import com.android.personbest.Timer.ITimer;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -14,10 +15,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// TODO: might want to replace all the default goals with current goal
 public class SavedDataManagerFirestore implements SavedDataManager {
 
     private static final int GOAL_INIT = 0;
@@ -45,6 +48,8 @@ public class SavedDataManagerFirestore implements SavedDataManager {
     private static final String FIEKEY_EMAIL = "email";
     private static final String FIEKEY_HEIGHT = "height";
     private static final String KEY_VAL = "val";
+
+    private static final String KEY_DAYSTAMP = "daystamp";
 
     private Activity activity;
     private SavedDataManagerSharedPreference sdsp;
@@ -131,6 +136,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 Integer height = (Integer) document.getData().get(FIEKEY_HEIGHT);
+                                if(height == null) height = 0;
                                 Log.d(TAG, "DocumentSnapshot data: " + height);
                                 cb.op(height);
                             } else {
@@ -163,7 +169,9 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                Integer val = (Integer) document.getData().get(FIEKEY_CUR_GOAL);
+                                Long va = (Long) document.getData().get(FIEKEY_CUR_GOAL);
+                                if(va == null) va = (long) DEFAULT_GOAL;
+                                Integer val = (int) (long) va;
                                 Log.d(TAG, "DocumentSnapshot data: " + val);
                                 cb.op(val);
                             } else {
@@ -260,13 +268,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                                     Map<String, Object> val = document.getData();
                                     Log.d(TAG, "DocumentSnapshot data: " + val);
 
-                                    int goal = (int) val.get(D_KEY_GOALS);
-                                    int totalSteps = (int) val.get(D_KEY_STEPS);
-                                    int intentionalSteps = (int) val.get(D_KEY_INTE_STEPS);
-                                    Float MPH = (float) val.get(D_KEY_MPH);
-                                    Long timeWalked = (long) val.get(D_KEY_EXER_TIME);
-
-                                    cb.op(new DailyStat(goal, totalSteps, intentionalSteps, timeWalked, MPH));
+                                    cb.op(createIstatFromMap(val));
                                 } else {
                                     Log.d(TAG, "No such document");
                                     cb.op(null);
@@ -282,13 +284,18 @@ public class SavedDataManagerFirestore implements SavedDataManager {
     }
 
     public List<IStatistics> getLastWeekSteps(String day, SavedDataOperatorListIStat callback) {
+        getDataBatchIstat(ffCurUserDataHist, ITimer.getDayStampWeekBefore(day), callback);
         return sdsp.getLastWeekSteps(day,null);
     }
     public List<IStatistics> getLastMonthStat(String day, SavedDataOperatorListIStat callback) {
+        getDataBatchIstat(ffCurUserDataHist, ITimer.getDayStampMonthBefore(day), callback);
         return sdsp.getLastMonthStat(day,null);
     }
 
-    public List<IStatistics> getFriendMonthlyStat(String email, SavedDataOperatorListIStat callback) {
+    public List<IStatistics> getFriendMonthlyStat(String email, String day, SavedDataOperatorListIStat callback) {
+        getIdByEmail(email, id -> {
+            getDataBatchIstat(ffCurUserData.collection(id), ITimer.getDayStampMonthBefore(day), callback);
+        });
         return null;
     }
 
@@ -348,7 +355,8 @@ public class SavedDataManagerFirestore implements SavedDataManager {
     //////////////////////////////////////////////////////////////////////
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        Log.d(TAG, "firebaseAuthWithGoogle: " + acct.getId());
+        Log.d(TAG, "firebaseAuthWithGoogleIdToken: " + acct.getIdToken());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
@@ -403,6 +411,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 Integer val = (Integer) document.getData().get(col_key);
+                                if(val == null) val = default_val;
                                 Log.d(TAG, "DocumentSnapshot data: " + val);
                                 cb.op(val);
                             } else {
@@ -427,7 +436,8 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                long val = (long) document.getData().get(col_key);
+                                Long val = (Long) document.getData().get(col_key);
+                                if(val == null) val = default_val;
                                 Log.d(TAG, "DocumentSnapshot data: " + val);
                                 cb.op(val);
                             } else {
@@ -452,7 +462,8 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                float val = (float) document.getData().get(col_key);
+                                Float val = (float) document.getData().get(col_key);
+                                if(val == null) val = default_val;
                                 Log.d(TAG, "DocumentSnapshot data: " + val);
                                 cb.op(val);
                             } else {
@@ -467,18 +478,58 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                 });
     }
 
+    private void getDataBatchIstat(CollectionReference col, String dayStamp, SavedDataOperatorListIStat callback) {
+        if(col != null && callback != null) {
+            final SavedDataOperatorListIStat cb = callback;
+            Query query = col.orderBy(KEY_DAYSTAMP).whereGreaterThanOrEqualTo(KEY_DAYSTAMP, dayStamp);
+            query.get()
+                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                     @Override
+                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                         if (task.isSuccessful()) {
+                             ArrayList<IStatistics> toReturn = new ArrayList<>();
+
+                             DocumentReference doc;
+                             for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                 Map<String, Object> val = document.getData();
+                                 Log.d(TAG, "QueryDocumentSnapshot data: " + val);
+
+                                 toReturn.add(createIstatFromMap(val));
+                             }
+
+                             cb.op(toReturn);
+                         } else {
+                             Log.d(TAG, "get failed with ", task.getException());
+                             cb.op(null);
+                         }
+                     }
+                 });
+        }
+    }
+
+    private IStatistics createIstatFromMap(Map<String, Object> val) {
+        int goal = val.containsKey(D_KEY_GOALS) ? (int) (long) val.get(D_KEY_GOALS) : DEFAULT_GOAL;
+        int totalSteps = val.containsKey(D_KEY_STEPS) ? (int) (long) val.get(D_KEY_STEPS) : DEFAULT_STEPS;
+        int intentionalSteps = val.containsKey(D_KEY_INTE_STEPS) ? (int) (long) val.get(D_KEY_INTE_STEPS) : DEFAULT_STEPS;
+        Float MPH = val.containsKey(D_KEY_MPH) ? (float) val.get(D_KEY_MPH) : DEFAULT_MPH;
+        Long timeWalked = val.containsKey(D_KEY_EXER_TIME) ? (long) val.get(D_KEY_EXER_TIME) : DEFAULT_TIME;
+        return (new DailyStat(goal, totalSteps, intentionalSteps, timeWalked, MPH));
+    }
+
     private void setData(final String col_key, String day, Object val, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         final SavedDataOperatorString suc = onSuccessStrOp, fai = onFailureStrOp;
         final Object fval = val; final String fday = day;
 
         Map<String, Object> data = new HashMap<>();
+        data.put(KEY_DAYSTAMP, ITimer.getDayStamp(day));
         data.put(col_key, val);
         ffCurUserDataHist.document(day)
                 .set(data, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully written!");
+                        Log.d(TAG, "Document successfully written for day: " + day);
                         if(suc != null) {
                             suc.op("[SUCCEED] " + col_key + " : " + fday + " : " + String.valueOf(fval));
                         }

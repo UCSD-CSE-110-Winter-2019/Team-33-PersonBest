@@ -61,7 +61,7 @@ public abstract class ITimer {
 
         ArrayList<String> toReturn = new ArrayList<>();
         for(int i = 1; i <= ITimer.LAST_MONTH_DAYS; ++i) {
-            toReturn.add(DateTimeFormatter.ofPattern("MM/dd/yyyy").format(
+            toReturn.add(DateTimeFormatter.ofPattern("MM-dd-yyyy").format(
                     ZonedDateTime.of(
                         getYearFromDayStr(day),
                         getMonthFromDayStr(day),
@@ -75,7 +75,7 @@ public abstract class ITimer {
 
     public static String getDayStrDayBefore(String day, int n) {
         if(!isValidDayStr(day)) throw new IllegalArgumentException("argument day in day wrong format");
-        return (DateTimeFormatter.ofPattern("MM/dd/yyyy").format(
+        return (DateTimeFormatter.ofPattern("MM-dd-yyyy").format(
                 ZonedDateTime.of(
                     getYearFromDayStr(day),
                     getMonthFromDayStr(day),
@@ -83,6 +83,38 @@ public abstract class ITimer {
                     1,1,1,1, ZonedDateTime.now().getZone()
                 ).minusDays(n)
         ));
+    }
+
+    public static String getDayStamp(String day) {
+        if(!isValidDayStr(day)) throw new IllegalArgumentException("argument day in day wrong format");
+        return (DateTimeFormatter.ofPattern("yyyyMMdd").format(
+                ZonedDateTime.of(
+                    getYearFromDayStr(day),
+                    getMonthFromDayStr(day),
+                    getDayFromDayStr(day),
+                    1,1,1,1, ZonedDateTime.now().getZone()
+                )
+        ));
+    }
+
+    public static String getDayStampDayBefore(String day, int n) {
+        if(!isValidDayStr(day)) throw new IllegalArgumentException("argument day in day wrong format");
+        return (DateTimeFormatter.ofPattern("yyyyMMdd").format(
+                ZonedDateTime.of(
+                    getYearFromDayStr(day),
+                    getMonthFromDayStr(day),
+                    getDayFromDayStr(day),
+                    1,1,1,1, ZonedDateTime.now().getZone()
+                ).minusDays(n)
+        ));
+    }
+
+    public static String getDayStampWeekBefore(String day) {
+        return getDayStampDayBefore(day, LAST_WEEK_DAYS);
+    }
+
+    public static String getDayStampMonthBefore(String day) {
+        return getDayStampDayBefore(day, LAST_MONTH_DAYS);
     }
 
     public abstract boolean isLateToday();

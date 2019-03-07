@@ -13,7 +13,7 @@ public class SavedDataManagerTest implements SavedDataManager {
     }
 
     @Override
-    public List<IStatistics> getFriendMonthlyStat(String email, SavedDataOperatorListIStat callback) {
+    public List<IStatistics> getFriendMonthlyStat(String email, String day, SavedDataOperatorListIStat callback) {
         return null;
     }
 

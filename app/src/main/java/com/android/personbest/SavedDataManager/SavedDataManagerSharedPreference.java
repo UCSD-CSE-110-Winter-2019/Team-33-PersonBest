@@ -147,7 +147,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     // shared preference will NEVER know about the friends
-    public List<IStatistics> getFriendMonthlyStat(String email, SavedDataOperatorListIStat callback) {
+    public List<IStatistics> getFriendMonthlyStat(String email, String day, SavedDataOperatorListIStat callback) {
         return null;
     }
 
