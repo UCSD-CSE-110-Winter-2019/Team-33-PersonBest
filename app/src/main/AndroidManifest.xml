@@ -37,8 +37,8 @@
         <activity android:name=".SetGoalActivity"/>
         <activity android:name=".SetUpActivity"/>
         <activity android:name=".PlannedExerciseSummary"/>
-        <activity android:name=".MainActivity">
-            android:parentActivityName=".LoginActivity"
+        <activity android:name=".MainActivity"
+            android:parentActivityName=".LoginActivity">
         </activity>
     </application>
 

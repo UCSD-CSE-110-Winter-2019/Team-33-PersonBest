@@ -73,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
+        findViewById(R.id.sign_in_progress).setVisibility(View.VISIBLE);
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
