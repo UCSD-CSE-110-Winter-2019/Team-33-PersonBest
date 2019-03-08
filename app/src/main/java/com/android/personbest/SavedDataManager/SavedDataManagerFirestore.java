@@ -71,12 +71,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
 
         mAuth = FirebaseAuth.getInstance();
         curAccount = GoogleSignIn.getLastSignedInAccount(activity);
-        curFirebaseUser = mAuth.getCurrentUser();
-        if (curFirebaseUser == null) {
-            firebaseAuthWithGoogle(curAccount);
-            curFirebaseUser = mAuth.getCurrentUser();
-            initUserData(curAccount);
-        }
+
 
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setPersistenceEnabled(true)
@@ -86,13 +81,22 @@ public class SavedDataManagerFirestore implements SavedDataManager {
         ffUserData = ff.collection("user_data");
         ffCurUserData = ff.document("user_data/"+String.valueOf(curUsrID));
         ffCurUserDataHist = ff.document("user_data/"+String.valueOf(curUsrID)).collection(DOCKEY_HIST);
+
+        // check firebase auth *should be* enough to check if the user used this app before
+        // but **failed** to do so even in development
+        curFirebaseUser = mAuth.getCurrentUser();
+        if (curFirebaseUser == null) {
+            firebaseAuthWithGoogle(curAccount);
+            curFirebaseUser = mAuth.getCurrentUser();
+            initUserData(curAccount);
+        }
     }
 
     // online lookup
     // user is downloading the whole map data
     // TODO: optimize this
     public void getIdByEmail(String email, SavedDataOperatorString callback) {
-        final String query = email;
+        final String query = cleanEmailStr(email);
         final SavedDataOperatorString cb = callback;
         ffUserData.document(DOCKEY_EMAILS)
                 .get()
@@ -379,22 +383,53 @@ public class SavedDataManagerFirestore implements SavedDataManager {
 
     private void initUserData(GoogleSignInAccount acct) {
         curUsrID = acct.getId();
-        ffUserData = ff.collection("user_data");
-        ffCurUserData = ff.document("user_data/"+String.valueOf(curUsrID));
 
-        // will fail if document not exist!!!
+        // will fail if "email_map" document not exist
+        // will fail if the email has '.' char in it
         ffUserData.document("emails")
                 .update(
-                        "email_map."+acct.getEmail(), acct.getId()
+                        "email_map."+cleanEmailStr(acct.getEmail()), acct.getId()
                 );
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("current-goal", sdsp.getCurrentGoal(null));
-        data.put("email", acct.getEmail());
-        data.put("height", sdsp.getUserHeight(null));
-        ffCurUserData.set(data);
+        // will initialize user in user_data if not pre-exist
+        ffCurUserData.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            Map<String, Object> data = new HashMap<>();
+                            // user is FREE TO SET THE NEW HEIGHT
+                            // BUT THE GOAL WILL BE PRESERVED
+                            Object theGoal = document.get(FIEKEY_CUR_GOAL);
+                            if (document.exists() && theGoal != null) {
+                                // current goal should always exist if the document exists
+                                // don't know if check if necessary
+                                Log.d(TAG, "Retrieving GOAL of old user...");
+                                setCurrentGoal((int)(long)theGoal, null, null);
+                                data.put(FIEKEY_CUR_GOAL, theGoal);
+                            } else {
+                                Log.d(TAG, "Initialize user-data for new user...");
+                                data.put(FIEKEY_CUR_GOAL, sdsp.getCurrentGoal(null));
+                            }
+                            data.put(FIEKEY_EMAIL, acct.getEmail());
+                            data.put(FIEKEY_HEIGHT, sdsp.getUserHeight(null));
+                            ffCurUserData.set(data);
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                });
 
-        // create the sub-collections here?
+
+        // create the sub-collections here? -> No
+    }
+
+    // assume email address is in a@b.c.d format
+    // will return a@b-c-d
+    // due to constrain of firestore
+    private String cleanEmailStr(String email) {
+        return email.replace('.','_');
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -516,6 +551,7 @@ public class SavedDataManagerFirestore implements SavedDataManager {
         int intentionalSteps = val.containsKey(D_KEY_INTE_STEPS) ? (int) (long) val.get(D_KEY_INTE_STEPS) : DEFAULT_STEPS;
         Float MPH = val.containsKey(D_KEY_MPH) ? (float) (double) val.get(D_KEY_MPH) : DEFAULT_MPH;
         Long timeWalked = val.containsKey(D_KEY_EXER_TIME) ? (long) val.get(D_KEY_EXER_TIME) : DEFAULT_TIME;
+        Log.d(TAG, "Creating a IStat object: " + goal + " " + totalSteps + " " + intentionalSteps + " " + timeWalked + " " + MPH);
         return (new DailyStat(goal, totalSteps, intentionalSteps, timeWalked, MPH));
     }
 
