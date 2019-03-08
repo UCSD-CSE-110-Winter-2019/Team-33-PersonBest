@@ -29,12 +29,17 @@ public class FriendListActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
         initLayouts();
-        adapter.startListening();
     }
 
     protected void initLayouts() {
         initRefresh();
         initRecycler();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        adapter.startListening();
     }
 
     @Override
