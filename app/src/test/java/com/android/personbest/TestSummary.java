@@ -1,11 +1,11 @@
 package com.android.personbest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.TextView;
 
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.StepCounter;
 import com.android.personbest.StepCounter.StepCounterFactory;
 import com.android.personbest.StepCounter.StepCounterGoogleFit;
@@ -31,6 +31,7 @@ public class TestSummary {
     private TextView displaySteps;
     private TextView displayTime;
     private TextView displayMph;
+    private SavedDataManager sd;
 
     @Before
     public void setup() {
@@ -41,13 +42,13 @@ public class TestSummary {
             }
         });
 
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
+
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
-        SharedPreferences sp = mainActivity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("Height", 72);
-        editor.apply();
+        sd = new SavedDataManagerSharedPreference(mainActivity);
+        sd.setUserHeight(72, null, null);
 
         Intent summary = new Intent(mainActivity, PlannedExerciseSummary.class);
         summary.putExtra("timeElapsed", TWO_MIN);

@@ -1,6 +1,7 @@
 package com.android.personbest;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -9,8 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
-import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.*;
@@ -19,16 +20,15 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.StackedValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
-import java.security.InvalidParameterException;
 import java.time.DayOfWeek;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class ProgressChart extends AppCompatActivity {
+    private static ExecMode.EMode test_mode;
+    private List<IStatistics> stepStats;
     private List<BarEntry> barEntries;
     private List<Entry> lineEntries;
     private SavedDataManager savedDataManager;
@@ -37,6 +37,8 @@ public class ProgressChart extends AppCompatActivity {
     private CombinedData data;
     private ArrayList<String> xAxisLabel;
     private String stats;
+    private SharedPreferences sp;
+    private String todayStr = "03/02/2019"; // Default day
     private final String[] DAYOFWEEK = {
             DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
             DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
@@ -57,7 +59,22 @@ public class ProgressChart extends AppCompatActivity {
 
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
-        savedDataManager = new SavedDataManagerSharedPreference(this);
+
+        String tmpTodayStr = getIntent().getStringExtra("todayStr");
+        if(tmpTodayStr != null)
+            todayStr = tmpTodayStr;
+
+        // we testing?
+        test_mode = ExecMode.getExecMode();
+        if(test_mode == ExecMode.EMode.TEST_CLOUD) {
+            savedDataManager = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+        } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
+            savedDataManager = new SavedDataManagerSharedPreference(this);
+        }
+        else {
+            // set saved data manager
+            savedDataManager = new SavedDataManagerFirestore(this);
+        }
 
         final Activity self = this;
 
@@ -66,28 +83,34 @@ public class ProgressChart extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                ((ProgressChart) self).setDate((ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() + 1) % 7);
+                ((ProgressChart) self).setDate(todayStr);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         progressChart = findViewById(R.id.progressChart);
 
-        setDate((ZonedDateTime.now(ZoneId.systemDefault()).getDayOfWeek().getValue() + 1) % 7);
+        this.setDate(todayStr);
     }
 
     public void setManager(SavedDataManager manager) {
         savedDataManager = manager;
     }
 
-    public void setDate(int date) {
-        if (date < 1 || date >= 8)
-            throw new InvalidParameterException("Date expected between 0 and 6, but got" + date);
-        this.date = date;
+    public void setDate(String today) {
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            savedDataManager.getLastWeekSteps(today, ss -> {
+                stepStats = ss;
+                setBarChart(stepStats);
+                showChart();
+            });
+        }
+        else {
+            stepStats = savedDataManager.getLastWeekSteps(today, null);
+            setBarChart(stepStats);
+            showChart();
+        }
 
-        List<IStatistics> stepStats = /*new ArrayList<>();*/savedDataManager.getLastWeekSteps(date);
-        setBarChart(stepStats);
-        showChart();
     }
 
 
