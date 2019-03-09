@@ -10,7 +10,7 @@ android {
     testOptions.unitTests.includeAndroidResources = true
     defaultConfig {
         applicationId "com.android.personbest"
-        minSdkVersion 26
+        minSdkVersion 28
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -22,15 +22,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
     }
-
-
-
     lintOptions {
         warningsAsErrors = true
         abortOnError false
@@ -39,6 +35,8 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    productFlavors {
     }
 }
 

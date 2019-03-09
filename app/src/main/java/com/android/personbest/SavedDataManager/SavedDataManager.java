@@ -41,4 +41,5 @@ public interface SavedDataManager {
     void setCheckedYesterdaySubGoal(String today);
     boolean isShownYesterdaySubGoal(String today);
     void setShownYesterdaySubGoal(String today);
+
 }

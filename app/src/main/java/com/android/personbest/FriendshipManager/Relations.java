@@ -1,5 +1,7 @@
 package com.android.personbest.FriendshipManager;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.util.Pair;
 
@@ -15,6 +17,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,25 +25,21 @@ import java.util.Map;
 
 import static android.support.constraint.Constraints.TAG;
 
-public class Relations implements FriendshipManager {
+public class Relations implements FriendshipManager,Serializable {
     public CollectionReference chat;
 
-    String COLLECTION_KEY = "FriendList";
-    String MESSAGE_KEY = "messages";
-    String FROM_KEY = "from";
-    String TEXT_KEY = "text";
-    String TIMESTAMP_KEY = "timestamp";
-
     SavedDataManager sdm;
+    FFireBaseAdapter fireBaseAdapter;
 
     String from;
 
     public Relations(MainActivity main, SavedDataManager sdm) {
         if(GoogleSignIn.getLastSignedInAccount(main) == null) this.from = "Unknown";
         else this.from = GoogleSignIn.getLastSignedInAccount(main).getId();
-
+        this.fireBaseAdapter = new FriendFireBaseAdapter(chat,from);
         this.sdm = sdm;
     }
+
 
     /*public void addConvo(String email) {
         String DOCUMENT_KEY;
@@ -60,17 +59,11 @@ public class Relations implements FriendshipManager {
         String friendId = sdm.getIdByEmail(email);
         if(friendId == null) return;
 
-        CollectionReference ref = FirebaseFirestore.getInstance()
-                .collection(COLLECTION_KEY)
-                .document(from)
-                .collection("friends");
+        fireBaseAdapter.addFriend(friendId);
+    }
 
-        Map<String,String> map = new HashMap<String, String>();
-        map.put(from,friendId);
-
-        ref.add(map).addOnSuccessListener(result -> {}).addOnFailureListener(error -> {
-            Log.e(TAG, error.getLocalizedMessage());
-        });
+    public void setFriendFireBase(FFireBaseAdapter fFireBaseAdapter){
+        this.fireBaseAdapter = fFireBaseAdapter;
     }
 
     /*public List<String> getFriends() {
