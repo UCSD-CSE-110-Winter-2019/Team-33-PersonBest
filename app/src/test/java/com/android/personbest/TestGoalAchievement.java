@@ -291,7 +291,9 @@ public class TestGoalAchievement {
 
     @After
     public void reset() {
-        mockTimer.setTime(TEST_DAY_HOUR);
+        if (mockTimer != null) {
+            mockTimer.setTime(TEST_DAY_HOUR);
+        }
     }
 
     private class TestFitnessService extends StepCounterGoogleFit {
