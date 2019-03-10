@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
     private Button addFriend;
-
+    private Button viewFriends;
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -267,6 +267,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
             @Override
             public void onClick(View v) {
                 launchAddFriendActivity();
+            }
+        });
+
+        this.viewFriends = findViewById(R.id.viewFriends);
+        this.viewFriends.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchViewFriends();
             }
         });
 
@@ -562,5 +570,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public void launchSetGoalActivity() {
         Intent intent = new Intent(this, SetGoalActivity.class);
         startActivityForResult(intent,0);
+    }
+
+    public void launchViewFriends() {
+        Intent intent = new Intent(this, FriendListActivity.class);
+        startActivity(intent);
     }
 }
