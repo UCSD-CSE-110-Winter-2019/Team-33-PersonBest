@@ -1,22 +1,18 @@
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
-import org.junit.After;
+import com.android.personbest.Timer.ITimer;
+import com.android.personbest.Timer.TimerMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
-
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -27,7 +23,6 @@ public class TestSavedDataManagerSharedPreference {
     private static final String TEST_SERVICE = "TEST_SERVICE";
 
     private MainActivity activity;
-    private SharedPreferences sp;
     private SavedDataManager sd;
     private SharedPreferences.Editor editor;
     private int nextStepCount;
@@ -43,80 +38,23 @@ public class TestSavedDataManagerSharedPreference {
             }
         });
 
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
+
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
 
         sd = new SavedDataManagerSharedPreference(activity);
-        sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        editor = sp.edit();
-        editor.clear();
-        editor.apply();
+        sd.clearData();
         nextStepCount = 1337;
     }
 
     @Test
-    public void testGetYesterday(){
-        IDate iDate = new DateCalendar(5);
-        int day = iDate.getDay();
-        SharedPreferences sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("4_TotalSteps",1000);
-        editor.apply();
-        assertEquals(sd.getYesterdaySteps(day),1000);
-    }
-
-    @Test
-    public void testGetLastWeeksStep(){
-        SharedPreferences sp = activity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        for( Integer i = 0; i < 7; i++ ){
-            editor.putInt(i.toString()+"_TotalSteps",3000);
-            editor.putInt(i.toString()+"_IntentionalSteps",2000);
-            editor.putInt(i.toString()+"_Goal",4000);
-            editor.putFloat(i.toString()+"_AverageMPH", (float)2.1);
-            editor.apply();
-        }
-
-        IDate iDate =  new DateCalendar(3);
-        int day = iDate.getDay();
-        List<IStatistics> history = sd.getLastWeekSteps(day);
-        assertEquals(history.size(),3);
-        for ( IStatistics i: history){
-            assertEquals(i.getGoal(), 4000);
-            assertEquals(i.getIncidentWalk(),1000);
-            assertEquals(i.getIntentionalWalk(),2000);
-            assertEquals(i.getStats(),"Steps:  2000 Dist: 0.0mi Time: 0.0 hrs MPH: 2.1");
-        }
-    }
-
-    @Test
-    public void testGetStepsDaysBefore() {
-        for( Integer i = 0; i < 7; i++ ){
-            editor.putInt(i.toString()+"_TotalSteps",i);
-            editor.apply();
-        }
-
-        IDate iDate =  new DateCalendar(3);
-        int day = iDate.getDay();
-        assertEquals(3,sd.getStepsDaysBefore(3,0));
-        assertEquals(2,sd.getStepsDaysBefore(day,1));
-        assertEquals(1,sd.getStepsDaysBefore(day,2));
-    }
-
-    @Test
-    public void testGetGoalDaysBefore() {
-        for( Integer i = 0; i < 7; i++ ){
-            editor.putInt(i.toString()+"_Goal",i);
-            editor.apply();
-        }
-
-        IDate iDate =  new DateCalendar(3);
-        int day = iDate.getDay();
-        assertEquals(3,sd.getGoalDaysBefore(3,0));
-        assertEquals(2,sd.getGoalDaysBefore(day,1));
-        assertEquals(1,sd.getGoalDaysBefore(day,2));
+    public void testYesterdaySteps(){
+        ITimer timer = new TimerMock(0, "03/03/2019", "03/02/2019");
+        sd.setStepsByDayStr(timer.getYesterdayString(), 1000, null, null);
+        assertEquals(sd.getStepsByDayStr(timer.getYesterdayString(), null),1000);
     }
 
     @Test

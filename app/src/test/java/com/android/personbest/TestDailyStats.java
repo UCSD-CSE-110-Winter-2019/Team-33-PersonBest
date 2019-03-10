@@ -1,21 +1,19 @@
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
 
+import com.android.personbest.Timer.ITimer;
+import com.android.personbest.Timer.TimerMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
-
-import java.util.Calendar;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,12 +24,11 @@ public class TestDailyStats {
     private MainActivity mainActivity;
     private static final int TEN_K = 10000;
     private static final int FIVE_K = 5000;
-    private IDate theDate;
+    private SavedDataManager sd;
+    private ITimer timer;
 
     @Before
     public void setup() {
-
-        theDate = new DateCalendar();
 
         StepCounterFactory.put(TEST_SERVICE, new StepCounterFactory.BluePrint() {
             @Override
@@ -40,24 +37,21 @@ public class TestDailyStats {
             }
         });
 
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
+
+        timer = new TimerMock(0, "03/03/2019", "02/03/2019");
+
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
         mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
-    }
-
-    @Test
-    public void testGetGoal() {
-        SharedPreferences sp = mainActivity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        assertEquals(sp.getInt(String.valueOf(theDate.getDay()) + "_Goal", 0), 5000);
-        assertEquals(sp.getInt(String.valueOf((theDate.getDay() + 1) % 7) + "_Goal", 0), 0);
+        sd = new SavedDataManagerSharedPreference(mainActivity);
+        mainActivity.setTimer(timer);
     }
 
     @Test
     public void testSetGoal() {
-        SharedPreferences sp = mainActivity.getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        assertEquals(sp.getInt(String.valueOf(theDate.getDay()) + "_Goal", 0), FIVE_K);
         mainActivity.setGoal(10000);
-        assertEquals(sp.getInt(String.valueOf(theDate.getDay()) + "_Goal", 0), TEN_K);
+        assertEquals(TEN_K, sd.getGoalByDayStr(timer.getTodayString(), null));
     }
 }
