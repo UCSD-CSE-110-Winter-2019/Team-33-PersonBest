@@ -26,6 +26,15 @@ public class FriendFireBaseAdapter implements FFireBaseAdapter, Serializable {
                 .document(user)
                 .collection("friends");
 
+        CollectionReference pending = FirebaseFirestore.getInstance()
+                .collection(COLLECTION_KEY)
+                .document(user)
+                .collection("pending");
+
+        // Check if the user is already in the friend's request.
+        boolean bePendingFriend = false;
+
+
         Map<String,String> map = new HashMap<>();
         map.put(id,name);
 
@@ -34,4 +43,15 @@ public class FriendFireBaseAdapter implements FFireBaseAdapter, Serializable {
         });
     }
 
+    private boolean isPendingFriend(String user, String friend){
+
+        CollectionReference friendPending = FirebaseFirestore.getInstance()
+                .collection(COLLECTION_KEY)
+                .document(friend)
+                .collection("pending");
+
+
+
+        return false;
+    }
 }
