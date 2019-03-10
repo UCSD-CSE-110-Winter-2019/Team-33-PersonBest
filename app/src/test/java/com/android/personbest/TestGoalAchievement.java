@@ -63,7 +63,7 @@ public class TestGoalAchievement {
         ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
 
         Intent intent = new Intent(application, MainActivity.class);
-        intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
+        //intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         shadowActivity = Shadows.shadowOf(activity);
 
