@@ -13,10 +13,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
-import java.io.Serializable;
 import java.util.HashMap;
 
-public class EmailLookUper implements Email2Id, Serializable {
+public class EmailLookUper implements Email2Id {
 
     private FirebaseFirestore ff;
     private static final String DOCKEY_EMAILS = "emails";
