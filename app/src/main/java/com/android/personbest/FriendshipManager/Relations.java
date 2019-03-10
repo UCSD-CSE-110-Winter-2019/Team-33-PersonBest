@@ -1,55 +1,36 @@
 package com.android.personbest.FriendshipManager;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
-import android.util.Pair;
+public class Relations implements FriendshipManager{
 
-import com.android.personbest.MainActivity;
-import com.android.personbest.SavedDataManager.SavedDataManager;
-import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.messaging.FirebaseMessaging;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static android.support.constraint.Constraints.TAG;
-
-public class Relations implements FriendshipManager,Serializable {
-    public CollectionReference chat;
-
-    SavedDataManager sdm;
+    Email2Id email2Id;
     FFireBaseAdapter fireBaseAdapter;
 
     String from;
 
-    public Relations(MainActivity main, SavedDataManager sdm) {
-        if(GoogleSignIn.getLastSignedInAccount(main) == null) this.from = "Unknown";
-        else this.from = GoogleSignIn.getLastSignedInAccount(main).getId();
-        this.fireBaseAdapter = new FriendFireBaseAdapter(chat,from);
-        this.sdm = sdm;
+    public Relations(String from) {
+        this.fireBaseAdapter = new FriendFireBaseAdapter(from);
+        this.email2Id = new EmailLookUper();
     }
 
-    public void addFriend(String email) {
-        sdm.getIdByEmail(email, friendId -> {
-            if(friendId != null) {
-                fireBaseAdapter.addFriendById(friendId);
+    public void addFriend(String name,String email) {
+        System.err.println(email);
+        email2Id.getIdByEmail(email, friendId -> {
+            if(friendId != null && !friendId.equals("Unknown")) {
+                fireBaseAdapter.addFriendById(name,friendId);
+                System.err.println(friendId);
+            }
+            else{
+                System.err.println("NULL USER");
             }
         });
     }
 
     public void setFriendFireBase(FFireBaseAdapter fFireBaseAdapter){
         this.fireBaseAdapter = fFireBaseAdapter;
+    }
+
+    public void setId(String Id){
+        this.from = Id;
     }
 
     /*public List<String> getFriends() {
