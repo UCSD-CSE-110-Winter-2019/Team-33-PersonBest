@@ -30,7 +30,7 @@
                 app:layout_constraintTop_toTopOf="@+id/setup_goal_recomanded_text"
                 app:layout_constraintBottom_toBottomOf="@+id/setup_goal_recomanded_text"/>
         <TextView
-                android:text="Recommanded: "
+                android:text="Recommended: "
                 android:layout_width="wrap_content"
                 android:layout_height="34dp" android:id="@+id/setup_goal_recomanded_text"
                 android:textSize="25sp"
