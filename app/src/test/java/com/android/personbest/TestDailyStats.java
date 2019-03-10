@@ -47,6 +47,7 @@ public class TestDailyStats {
         mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         sd = new SavedDataManagerSharedPreference(mainActivity);
         mainActivity.setTimer(timer);
+        
     }
 
     @Test
