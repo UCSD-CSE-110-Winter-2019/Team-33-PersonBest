@@ -21,7 +21,7 @@ public class FriendFireBaseAdapter implements FFireBaseAdapter {
         this.user = user;
     }
 
-    public void addFriend(String id){
+    public void addFriendById(String id){
         CollectionReference ref = FirebaseFirestore.getInstance()
                 .collection(COLLECTION_KEY)
                 .document(user)

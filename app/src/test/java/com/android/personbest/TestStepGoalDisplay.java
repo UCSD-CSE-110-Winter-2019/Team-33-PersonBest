@@ -36,6 +36,8 @@ public class TestStepGoalDisplay {
             }
         });
 
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
+
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();

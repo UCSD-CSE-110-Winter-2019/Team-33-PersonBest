@@ -43,3 +43,7 @@ output.json
 # ignore unncessary idea files
 .idea/misc.xml
 .idea/codeStyles/codeStyleConfig.xml
+
+.vscode
+
+.idea/dictionaries/

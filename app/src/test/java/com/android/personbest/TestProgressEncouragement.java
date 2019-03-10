@@ -16,6 +16,11 @@ import static org.junit.Assert.assertEquals;
 public class TestProgressEncouragement {
     private MainActivity mainActivity;
 
+    @Before
+    public void setup() {
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
+    }
+
     @Test
     public void testProgressMade() {
         ProgressEncouragement progressEncouragement = new ProgressEncouragement(mainActivity);

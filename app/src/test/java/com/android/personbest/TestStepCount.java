@@ -2,7 +2,6 @@ package com.android.personbest;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -45,6 +44,8 @@ public class TestStepCount {
                 return new TestFitnessService(stepCountActivity);
             }
         });
+
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
 
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);

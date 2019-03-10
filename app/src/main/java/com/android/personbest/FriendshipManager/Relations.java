@@ -40,26 +40,12 @@ public class Relations implements FriendshipManager,Serializable {
         this.sdm = sdm;
     }
 
-
-    /*public void addConvo(String email) {
-        String DOCUMENT_KEY;
-        if(from.compareTo(email) < 0) DOCUMENT_KEY = from + " " + email;
-        else DOCUMENT_KEY = email + " " + from;
-
-        FirebaseFirestore.getInstance()
-                .collection(COLLECTION_KEY)
-                .document(DOCUMENT_KEY)
-                .collection(MESSAGE_KEY);
-
-        initMessageUpdateListener();
-        subscribeToNotificationsTopic(DOCUMENT_KEY);
-    }*/
-
     public void addFriend(String email) {
-        String friendId = sdm.getIdByEmail(email);
-        if(friendId == null) return;
-
-        fireBaseAdapter.addFriend(friendId);
+        sdm.getIdByEmail(email, friendId -> {
+            if(friendId != null) {
+                fireBaseAdapter.addFriendById(friendId);
+            }
+        });
     }
 
     public void setFriendFireBase(FFireBaseAdapter fFireBaseAdapter){
