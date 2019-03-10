@@ -31,6 +31,7 @@ import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements Observer {
 
+    public static final String UNKNOWN = "Unknown";
     private static final int GOAL_INIT = 5000; // default
     private static final int STEP_INIT = 0;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             sd = new SavedDataManagerFirestore(this);
         }
 
-        if(GoogleSignIn.getLastSignedInAccount(this) == null) this.userId = "Unknown";
+        if(GoogleSignIn.getLastSignedInAccount(this) == null) this.userId = UNKNOWN;
         else this.userId = GoogleSignIn.getLastSignedInAccount(this).getId();
         // Initialize friendshipManager
         this.friendshipManager = new Relations(this.userId);
@@ -538,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public void launchAddFriendActivity(){
         Intent intent = new Intent(this, BefriendActivity.class);
         String id;
-        if(GoogleSignIn.getLastSignedInAccount(this) == null) id = "Unknown";
+        if(GoogleSignIn.getLastSignedInAccount(this) == null) id = UNKNOWN;
         else id = GoogleSignIn.getLastSignedInAccount(this).getId();
         this.friendshipManager.setId(id);
         intent.putExtra("id", id);
