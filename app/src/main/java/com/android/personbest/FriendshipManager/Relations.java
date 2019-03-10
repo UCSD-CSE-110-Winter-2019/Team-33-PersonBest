@@ -1,47 +1,107 @@
 package com.android.personbest.FriendshipManager;
 
-import com.android.personbest.MainActivity;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+public class Relations implements FriendshipManager{
 
-import java.util.List;
+    Email2Id email2Id;
+    FFireBaseAdapter fireBaseAdapter;
 
-public class Relations implements FriendshipManager {
-    public CollectionReference chat;
-    StringBuilder sb;
+    String from;
 
-    String COLLECTION_KEY = "PersonBestChats";
-    String MESSAGE_KEY = "messages";
-    String FROM_KEY;
-    String TIMESTAMP_KEY = "timestamp";
-
-    public Relations(MainActivity main) {
-        if(GoogleSignIn.getLastSignedInAccount(main) == null) this.FROM_KEY = "Unknown";
-        else this.FROM_KEY = GoogleSignIn.getLastSignedInAccount(main).getEmail();
+    public Relations(String from) {
+        this.fireBaseAdapter = new FriendFireBaseAdapter(from);
+        this.email2Id = new EmailLookUper();
     }
 
-    public void addConvo(String email) {
-        String DOCUMENT_KEY;
-        if(FROM_KEY.compareTo(email) < 0) DOCUMENT_KEY = FROM_KEY + email;
-        else DOCUMENT_KEY = email + FROM_KEY;
+    public void addFriend(String name,String email) {
+        System.err.println(email);
+        email2Id.getIdByEmail(email, friendId -> {
+            if(friendId != null && !friendId.equals("Unknown")) {
+                fireBaseAdapter.addFriendById(name,friendId);
+                System.err.println(friendId);
+            }
+            else{
+                System.err.println("NULL USER");
+            }
+        });
+    }
 
-        chat = FirebaseFirestore.getInstance()
+    public void setFriendFireBase(FFireBaseAdapter fFireBaseAdapter){
+        this.fireBaseAdapter = fFireBaseAdapter;
+    }
+
+    public void setId(String Id){
+        this.from = Id;
+    }
+
+    /*public List<String> getFriends() {
+        CollectionReference ref = FirebaseFirestore.getInstance()
+                .collection(COLLECTION_KEY)
+                .document(from)
+                .collection("friends");
+
+        ArrayList<String> list = new ArrayList<String>();
+
+        ref.addSnapshotListener((newChatSnapShot, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, error.getLocalizedMessage());
+                        return;
+                    }
+
+                    if (newChatSnapShot != null && !newChatSnapShot.isEmpty()) {
+                        List<DocumentChange> documentChanges = newChatSnapShot.getDocumentChanges();
+                        documentChanges.forEach(change -> {
+                            QueryDocumentSnapshot document = change.getDocument();
+                            list.add((String)document.get(from));
+                        });
+                    }
+                });
+
+        return list;
+    }
+
+    public CollectionReference getChatHistory(String email1, String email2) {
+        String DOCUMENT_KEY;
+        if(email1.compareTo(email2) < 0) DOCUMENT_KEY = email1 + " " + email2;
+        else DOCUMENT_KEY = email2 + " " + email1;
+
+        return FirebaseFirestore.getInstance()
                 .collection(COLLECTION_KEY)
                 .document(DOCUMENT_KEY)
                 .collection(MESSAGE_KEY);
     }
 
-    public void addFriend(String email) {
+    private void initMessageUpdateListener() {
+        chat.orderBy(TIMESTAMP_KEY, Query.Direction.ASCENDING)
+                .addSnapshotListener((newChatSnapShot, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, error.getLocalizedMessage());
+                        return;
+                    }
 
+                    if (newChatSnapShot != null && !newChatSnapShot.isEmpty()) {
+                        StringBuilder sb = new StringBuilder();
+                        List<DocumentChange> documentChanges = newChatSnapShot.getDocumentChanges();
+                        documentChanges.forEach(change -> {
+                            QueryDocumentSnapshot document = change.getDocument();
+                            sb.append(document.get(FROM_KEY));
+                            sb.append(":\n");
+                            sb.append(document.get(TEXT_KEY));
+                            sb.append("\n");
+                            sb.append("---\n");
+                        });
+                    }
+                });
     }
 
-    public List<String> getFriends(){
-        return null;
-    }
-
-    public CollectionReference getChatHistory(String email1, String email2){
-        return null;
-    }
+    private void subscribeToNotificationsTopic(String DOCUMENT_KEY) {
+        FirebaseMessaging.getInstance().subscribeToTopic(DOCUMENT_KEY)
+                .addOnCompleteListener(task -> {
+                            String msg = "Subscribed to notifications";
+                            if (!task.isSuccessful()) {
+                                msg = "Subscribe to notifications failed";
+                            }
+                            Log.d(TAG, msg);
+                        }
+                );
+    }*/
 }

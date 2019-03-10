@@ -14,14 +14,19 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.personbest.FriendshipManager.FFireBaseAdapter;
+import com.android.personbest.FriendshipManager.FriendshipManager;
+import com.android.personbest.FriendshipManager.Relations;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.*;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerSystem;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.firebase.FirebaseApp;
 
+import java.io.Serializable;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements Observer {
@@ -47,12 +52,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private StepCounterGoogleFit stepCounter;
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
     private SavedDataManager sd;
+    private Relations friendshipManager;
     private SharedPreferences sp;
     private ITimer theTimer;
     private ProgressEncouragement progressEncouragement;
     private IDate theDate;
     private String today;
     private Integer todayInt;
+    private String userId;
 
 //    private FirebaseAuth mAuth;
 //    private GoogleSignInAccount curAccount;
@@ -70,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedStepValue;
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
+    private Button addFriend;
 
 
     public void update(Observable o, Object arg) {
@@ -134,6 +142,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
             // set saved data manager
             sd = new SavedDataManagerFirestore(this);
         }
+
+        if(GoogleSignIn.getLastSignedInAccount(this) == null) this.userId = "Unknown";
+        else this.userId = GoogleSignIn.getLastSignedInAccount(this).getId();
+        // Initialize friendshipManager
+        this.friendshipManager = new Relations(this.userId);
 
         theTimer = new TimerSystem();
         progressEncouragement = new ProgressEncouragement(this);
@@ -248,6 +261,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if(theTimer.isLateToday()) {
             checkSubGoalReach();
         }
+
+        this.addFriend = findViewById(R.id.AddFriend);
+        this.addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchAddFriendActivity();
+            }
+        });
 
         // the user should be signed in by here
         //if(test_mode == ExecMode.EMode.DEFAULT) {
@@ -504,6 +525,20 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // for test
     public void setFitnessServiceKey(String fitnessServiceKey) {
         this.fitnessServiceKey = fitnessServiceKey;
+    }
+
+    public void launchAddFriendActivity(){
+        Intent intent = new Intent(this, BefriendActivity.class);
+        String id;
+        if(GoogleSignIn.getLastSignedInAccount(this) == null) id = "Unknown";
+        else id = GoogleSignIn.getLastSignedInAccount(this).getId();
+        this.friendshipManager.setId(id);
+        intent.putExtra("id", id);
+        /*getIntent().getSerializableExtra("MyClass");
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("FriendshipManager", this.friendshipManager);
+        intent.putExtras(bundle);*/
+        startActivity(intent);
     }
 
     public void launchProgressChart(View view) {
