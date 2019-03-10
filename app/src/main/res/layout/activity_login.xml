@@ -8,7 +8,7 @@
                                                    tools:context=".LoginActivity" android:id="@+id/linearLayout">
 
     <TextView
-            android:text="Personal Best"
+            android:text="Person Best"
             android:layout_width="0dp"
             android:layout_height="0dp" android:id="@+id/textView2" android:textAlignment="center"
             android:textSize="36sp" android:paddingTop="50dp"

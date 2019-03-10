@@ -47,3 +47,5 @@ output.json
 .vscode
 
 .idea/dictionaries/
+
+gcloud-output.txt

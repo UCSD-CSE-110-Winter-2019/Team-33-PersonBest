@@ -10,6 +10,7 @@ import java.util.List;
 // will pass null or -1 to callback when failure //
 // get todayStr from `theTimer.getTodayString()` //
 ///////////////////////////////////////////////////
+
 public interface SavedDataManager {
     // data only available in the cloud
     // pass a callback function to use the result
@@ -76,4 +77,5 @@ public interface SavedDataManager {
     void setCheckedYesterdaySubGoal(String today);
     boolean isShownYesterdaySubGoal(String today);
     void setShownYesterdaySubGoal(String today);
+
 }
