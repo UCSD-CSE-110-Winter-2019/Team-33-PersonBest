@@ -7,12 +7,18 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import com.android.personbest.FriendshipManager.FFireBaseAdapter;
+import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-public class FriendListActivity extends ListActivity {
+public class FriendListActivity extends ListActivity implements Observer {
     private List<String> list;
+    FFireBaseAdapter fireBaseAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +32,12 @@ public class FriendListActivity extends ListActivity {
                 finish();
             }
         });
-
+        String idCurrentUser = getIntent().getStringExtra("id");
+        this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
+        ((FriendFireBaseAdapter)(this.fireBaseAdapter)).addObserver(this);
+        this.fireBaseAdapter.getFriendlist();
         list = new ArrayList<String>();
-        list.add("Alice");
-        list.add("Bob");
-        list.add("Cindy");
-        list.add("Dick");
-        list.add("Eric");
+        list.add("ruben");
 
         ArrayAdapter<String> myAdapter = new ArrayAdapter <String>(this,
                 R.layout.row_layout, R.id.listText, list);
@@ -40,8 +45,20 @@ public class FriendListActivity extends ListActivity {
         setListAdapter(myAdapter);
     }
 
+
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
         super.onListItemClick(list, view, position, id);
+    }
+
+
+    @Override
+    public void update(Observable o, Object arg) {
+        String friend = (String) arg;
+        list.add(friend);
+        ArrayAdapter<String> myAdapter = new ArrayAdapter <String>(this,
+                R.layout.row_layout, R.id.listText, list);
+
+        setListAdapter(myAdapter);
     }
 }

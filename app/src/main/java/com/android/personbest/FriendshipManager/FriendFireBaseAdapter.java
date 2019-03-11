@@ -18,12 +18,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
-public class FriendFireBaseAdapter implements FFireBaseAdapter, Serializable {
+public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapter {
     String COLLECTION_KEY = "FriendList";
     String user;
 
@@ -115,7 +113,28 @@ public class FriendFireBaseAdapter implements FFireBaseAdapter, Serializable {
                 }
             }
         });
+    }
 
+    public void getFriendlist(){
+        CollectionReference ref = FirebaseFirestore.getInstance()
+                .collection(COLLECTION_KEY)
+                .document(user)
+                .collection("friends");
 
+        ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    for (QueryDocumentSnapshot document: task.getResult()){
+                        setChanged();
+                        notifyObservers(document.getData().get("name"));
+                        Log.e(TAG, document.getId() + "=>" + document.getData());
+                    }
+                }
+                else{
+                    Log.e(TAG,"Error getting documents: " , task.getException());
+                }
+            }
+        });
     }
 }

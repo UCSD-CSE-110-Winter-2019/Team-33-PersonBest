@@ -574,6 +574,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchViewFriends() {
         Intent intent = new Intent(this, FriendListActivity.class);
+        String id;
+        if(GoogleSignIn.getLastSignedInAccount(this) == null) id = "Unknown";
+        else id = GoogleSignIn.getLastSignedInAccount(this).getId();
+        this.friendshipManager.setId(id);
+        intent.putExtra("id", id);
         startActivity(intent);
     }
 }
