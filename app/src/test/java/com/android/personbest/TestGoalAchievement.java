@@ -66,8 +66,9 @@ public class TestGoalAchievement {
         //intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         try {
             activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
-        } catch (IllegalStateException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
+            activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         }
         shadowActivity = Shadows.shadowOf(activity);
 
@@ -80,6 +81,7 @@ public class TestGoalAchievement {
         activity.setToday(TEST_DAY);
 
         sd.clearData();
+        sd.setFirstTimeUser(false);
         sd.setUserHeight(HEIGHT, null, null);
         sd.setCurrentGoal(GOAL_INIT, null, null);
         nextStepCount = NEXT_STEP_COUNT;
