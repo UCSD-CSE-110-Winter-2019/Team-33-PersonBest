@@ -56,7 +56,7 @@ public class FriendFireBaseAdapter implements FFireBaseAdapter, Serializable {
                 .document(id)
                 .collection("friends");
 
-        Map<String,String> map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>();
         map.put("name", name);
         /*Log.e(TAG, "Here Added");
         ref.add(map).addOnSuccessListener(result -> {
@@ -78,17 +78,37 @@ public class FriendFireBaseAdapter implements FFireBaseAdapter, Serializable {
 
                         Map<String,Object> friendMap = document.getData();
 
-                        ref.document(id).set(map);
-                        friendRef.document(user).set(friendMap);
+                        ref.document(id).set(map)
+                                .addOnSuccessListener(result->{
+                                    Log.d(TAG, "Update User Friend List");
+                                })
+                                .addOnFailureListener(error->{
+                                    Log.e(TAG, "Failed to Update user friendlist");
+                                });
+                        friendRef.document(user).set(friendMap)
+                                .addOnSuccessListener(result->{
+                                    Log.d(TAG,"Add user to friend's friendlist");
+                                })
+                                .addOnFailureListener(error ->{
+                                    Log.e(TAG, error.getLocalizedMessage());
+                                });
 
                         friendPending.document(user)
-                                .delete();
-                        Log.d(TAG, "Successfully add both as friends");
+                                .delete()
+                                .addOnSuccessListener(result->{
+                                    Log.d(TAG,"Modify the friend's pending list");
+                                })
+                                .addOnFailureListener(error ->{
+                                    Log.e(TAG, error.getLocalizedMessage());
+                                });
                     } else {
-
-                        pending.document(id).set(map);
-
-                        Log.d(TAG, "Add to Pending");
+                        pending.document(id).set(map)
+                                .addOnSuccessListener(result ->{
+                                    Log.d(TAG, "Add to Pending");
+                                })
+                                .addOnFailureListener(error->{
+                                    Log.e(TAG, error.getLocalizedMessage());
+                                });
                     }
                 } else {
                     Log.d(TAG, "Failed Connection ", task.getException());
