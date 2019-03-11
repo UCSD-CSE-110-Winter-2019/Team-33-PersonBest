@@ -16,6 +16,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.Serializable;
 import java.util.*;
@@ -91,6 +92,10 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
                                     Log.e(TAG, error.getLocalizedMessage());
                                 });
 
+                        // Subscribe to user
+                        String topic = generateIDChat(id);
+                        subscribeToTopic(topic);
+
                         friendPending.document(user)
                                 .delete()
                                 .addOnSuccessListener(result->{
@@ -107,6 +112,10 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
                                 .addOnFailureListener(error->{
                                     Log.e(TAG, error.getLocalizedMessage());
                                 });
+
+                        // Subscribe to user
+                        String topic = generateIDChat(id);
+                        subscribeToTopic(topic);
                     }
                 } else {
                     Log.d(TAG, "Failed Connection ", task.getException());
@@ -137,7 +146,7 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
             }
         });
     }
-    public void generateIDChat(String idFriend) {
+    public String generateIDChat(String idFriend) {
         String chatId = "";
         if (user.compareTo(idFriend)<0){
             chatId = user+idFriend;
@@ -146,5 +155,14 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
             chatId = idFriend+user;
         }
 
+        return chatId;
+
+    }
+
+    public void subscribeToTopic(String topic){
+        FirebaseMessaging.getInstance().subscribeToTopic(topic)
+                .addOnCompleteListener(task -> {
+                    Log.d(TAG, "Subscribe to " + topic); }
+                );
     }
 }
