@@ -66,8 +66,9 @@ public class TestGoalAchievement {
         //intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
         try {
             activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
-        } catch (IllegalStateException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
+            activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         }
         shadowActivity = Shadows.shadowOf(activity);
 
