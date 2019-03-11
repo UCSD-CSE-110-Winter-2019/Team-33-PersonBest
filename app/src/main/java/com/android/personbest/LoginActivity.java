@@ -178,7 +178,7 @@ public class LoginActivity extends AppCompatActivity {
         // will fail if the email has '.' char in it
         ffUserData.document("emails")
                 .update(
-                        "email_map."+cleanEmailStr(acct.getEmail()), acct.getId()
+                        "email_map."+cleanEmailStr(acct.getEmail()), curUsrID
                 );
 
         // will initialize user in user_data if not pre-exist
