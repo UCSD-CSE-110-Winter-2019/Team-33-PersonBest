@@ -578,4 +578,5 @@ public class MainActivity extends AppCompatActivity implements Observer {
         intent.putExtra("id", this.userId);
         startActivity(intent);
     }
+
 }

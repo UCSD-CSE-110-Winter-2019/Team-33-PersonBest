@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.*;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +67,7 @@ public class ChatBoxActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
+        this.subscribeToNotificationsTopic();
     }
 
     private void sendMessage() {
@@ -112,4 +114,11 @@ public class ChatBoxActivity extends AppCompatActivity {
             }
         });
     }
+    private void  subscribeToNotificationsTopic() {
+        FirebaseMessaging. getInstance ().subscribeToTopic( CHAT_ID ) .addOnCompleteListener(task -> {
+            String msg =  "Subscribed to notifications" ;  if  (!task.isSuccessful()) {
+                msg =  "Subscribe to notifications failed" ; }
+            Log. d ( TAG , msg);
+            Toast. makeText(  ChatBoxActivity.this , msg, Toast.LENGTH_SHORT)  .show(); }
+        ); }
 }
