@@ -195,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if(sd.isFirstTimeUser()) {
             startActivity(new Intent(this, SetUpActivity.class));
             sd.setFirstTimeUser(false);
-            sd.setCurrentGoal(GOAL_INIT, null, null);
         }
 
         goalNum = sd.getCurrentGoal(null); // use goal num to initialize goal first TODO

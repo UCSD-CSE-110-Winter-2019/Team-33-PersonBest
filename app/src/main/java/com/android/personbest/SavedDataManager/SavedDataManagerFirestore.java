@@ -77,19 +77,13 @@ public class SavedDataManagerFirestore implements SavedDataManager {
                 .setPersistenceEnabled(true)
                 .build();
         ff.setFirestoreSettings(settings);
-        curUsrID = curAccount.getId();
+
+        curFirebaseUser = mAuth.getCurrentUser();
+        curUsrID = curFirebaseUser.getUid(); // **rely on** login activity will auth the firebase correctly
+
         ffUserData = ff.collection("user_data");
         ffCurUserData = ff.document("user_data/"+String.valueOf(curUsrID));
         ffCurUserDataHist = ff.document("user_data/"+String.valueOf(curUsrID)).collection(DOCKEY_HIST);
-
-        // check firebase auth *should be* enough to check if the user used this app before
-        // but **failed** to do so even in development
-        curFirebaseUser = mAuth.getCurrentUser();
-        if (curFirebaseUser == null) {
-            firebaseAuthWithGoogle(curAccount);
-            curFirebaseUser = mAuth.getCurrentUser();
-            initUserData(curAccount);
-        }
     }
 
     // online lookup
@@ -358,72 +352,6 @@ public class SavedDataManagerFirestore implements SavedDataManager {
 
     //////////////////////////////////////////////////////////////////////
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle: " + acct.getId());
-        Log.d(TAG, "firebaseAuthWithGoogleIdToken: " + acct.getIdToken());
-
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            //updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            //updateUI(null);
-                        }
-                    }
-                });
-    }
-
-    private void initUserData(GoogleSignInAccount acct) {
-        curUsrID = acct.getId();
-
-        // will fail if "email_map" document not exist
-        // will fail if the email has '.' char in it
-        ffUserData.document("emails")
-                .update(
-                        "email_map."+cleanEmailStr(acct.getEmail()), acct.getId()
-                );
-
-        // will initialize user in user_data if not pre-exist
-        ffCurUserData.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            Map<String, Object> data = new HashMap<>();
-                            // user is FREE TO SET THE NEW HEIGHT
-                            // BUT THE GOAL WILL BE PRESERVED
-                            Object theGoal = document.get(FIEKEY_CUR_GOAL);
-                            if (document.exists() && theGoal != null) {
-                                // current goal should always exist if the document exists
-                                // don't know if check if necessary
-                                Log.d(TAG, "Retrieving GOAL of old user...");
-                                setCurrentGoal((int)(long)theGoal, null, null);
-                                data.put(FIEKEY_CUR_GOAL, theGoal);
-                            } else {
-                                Log.d(TAG, "Initialize user-data for new user...");
-                                data.put(FIEKEY_CUR_GOAL, sdsp.getCurrentGoal(null));
-                            }
-                            data.put(FIEKEY_EMAIL, acct.getEmail());
-                            data.put(FIEKEY_HEIGHT, sdsp.getUserHeight(null));
-                            ffCurUserData.set(data);
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
-                        }
-                    }
-                });
-
-
-        // create the sub-collections here? -> No
-    }
 
     // assume email address is in a@b.c.d format
     // will return a@b-c-d

@@ -152,7 +152,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     public boolean isFirstTimeUser() {
-        return (sp.getAll().isEmpty());
+        return (sp.getBoolean("is_first_time_user", true));
     }
     public void setFirstTimeUser(boolean isFirstTime) {
         editor.putBoolean("is_first_time_user", false);
