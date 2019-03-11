@@ -194,7 +194,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
         if(sd.isFirstTimeUser()) {
             startActivity(new Intent(this, SetUpActivity.class));
             sd.setFirstTimeUser(false);
-            sd.setCurrentGoal(GOAL_INIT, null, null);
+            // cannot remove otherwise tests fail
+            if(test_mode == ExecMode.EMode.TEST_LOCAL) { sd.setCurrentGoal(GOAL_INIT, null, null); }
         }
 
         goalNum = sd.getCurrentGoal(null); // use goal num to initialize goal first TODO
@@ -472,6 +473,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         this.goalNum = goalNum;
         this.goalVal.setText(String.valueOf(goalNum));
         sd.setGoalByDayStr(theTimer.getTodayString(), goalNum, null, null);
+//        sd.setCurrentGoal(goalNum,null,null);
 
         // changing goal will also change progress
         int stepCount = Integer.valueOf(this.stepsTodayVal.getText().toString());

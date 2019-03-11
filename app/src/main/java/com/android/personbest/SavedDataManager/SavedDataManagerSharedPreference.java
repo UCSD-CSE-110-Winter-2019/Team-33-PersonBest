@@ -72,7 +72,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     public float getAvgMPHByDayStr(String day, SavedDataOperatorFloat callback) {
-        return sp.getLong("average_mph:" + day, 0);
+        return sp.getFloat("average_mph:" + day, 0);
     }
     public void setAvgMPHByDayStr(String day, float mph, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
         editor.putFloat("average_mph:" + day, mph);
@@ -152,7 +152,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
     }
 
     public boolean isFirstTimeUser() {
-        return (sp.getAll().isEmpty());
+        return (sp.getBoolean("is_first_time_user", true));
     }
     public void setFirstTimeUser(boolean isFirstTime) {
         editor.putBoolean("is_first_time_user", false);
