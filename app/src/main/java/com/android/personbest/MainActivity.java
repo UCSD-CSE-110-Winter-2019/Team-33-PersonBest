@@ -145,11 +145,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
             sd = new SavedDataManagerFirestore(this);
         }
 
-        FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
+        /*FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
         String curFireBaseUid = curFirebaseUsr.getUid();
         this.userId = curFireBaseUid;
         // Initialize friendshipManager
-        this.friendshipManager = new Relations(this.userId);
+        this.friendshipManager = new Relations(this.userId);*/
 
         theTimer = new TimerSystem();
         progressEncouragement = new ProgressEncouragement(this);
@@ -541,6 +541,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void launchAddFriendActivity(){
+        FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
+        String curFireBaseUid = curFirebaseUsr.getUid();
+        this.userId = curFireBaseUid;
+        // Initialize friendshipManager
         Intent intent = new Intent(this, BefriendActivity.class);
         intent.putExtra("id", this.userId);
         /*getIntent().getSerializableExtra("MyClass");
@@ -574,6 +578,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void launchViewFriends() {
+        FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
+        String curFireBaseUid = curFirebaseUsr.getUid();
+        this.userId = curFireBaseUid;
         Intent intent = new Intent(this, FriendListActivity.class);
         intent.putExtra("id", this.userId);
         startActivity(intent);
