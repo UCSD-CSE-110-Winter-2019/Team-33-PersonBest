@@ -36,7 +36,7 @@ public class ChatBoxActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.activity_chat_box);
-        SharedPreferences sharedpreferences = getSharedPreferences("FirebaseLabApp", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = getSharedPreferences("chats", Context.MODE_PRIVATE);
         from = sharedpreferences.getString(FROM_KEY, null);
 
         chat = FirebaseFirestore.getInstance()
