@@ -63,8 +63,12 @@ public class TestGoalAchievement {
         ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
 
         Intent intent = new Intent(application, MainActivity.class);
-        intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
-        activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        //intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
+        try {
+            activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        } catch (IllegalStateException e) {
+            System.err.println(e.getMessage());
+        }
         shadowActivity = Shadows.shadowOf(activity);
 
         sd = new SavedDataManagerSharedPreference(activity);
@@ -291,7 +295,9 @@ public class TestGoalAchievement {
 
     @After
     public void reset() {
-        mockTimer.setTime(TEST_DAY_HOUR);
+        if (mockTimer != null) {
+            mockTimer.setTime(TEST_DAY_HOUR);
+        }
     }
 
     private class TestFitnessService extends StepCounterGoogleFit {
