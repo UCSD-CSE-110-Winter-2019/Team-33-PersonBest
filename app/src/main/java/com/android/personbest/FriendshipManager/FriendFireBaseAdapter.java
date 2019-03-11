@@ -58,15 +58,43 @@ public class FriendFireBaseAdapter implements FFireBaseAdapter, Serializable {
 
         Map<String,String> map = new HashMap<>();
         map.put("name", name);
-        Log.e(TAG, "Here Added");
+        /*Log.e(TAG, "Here Added");
         ref.add(map).addOnSuccessListener(result -> {
             Log.e(TAG, "Success added");
         }).addOnFailureListener(error -> {
             Log.e(TAG, error.getLocalizedMessage());
         });
-        Log.e(TAG,"ADD FINISH");
+        Log.e(TAG,"ADD FINISH");*/
 
+        DocumentReference docRef = friendPending.document(user);
 
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    // User already in pending list
+                    if (document.exists()) {
+
+                        Map<String,Object> friendMap = document.getData();
+
+                        ref.document(id).set(map);
+                        friendRef.document(user).set(friendMap);
+
+                        friendPending.document(user)
+                                .delete();
+                        Log.d(TAG, "Successfully add both as friends");
+                    } else {
+
+                        pending.document(id).set(map);
+
+                        Log.d(TAG, "Add to Pending");
+                    }
+                } else {
+                    Log.d(TAG, "Failed Connection ", task.getException());
+                }
+            }
+        });
 
 
     }
