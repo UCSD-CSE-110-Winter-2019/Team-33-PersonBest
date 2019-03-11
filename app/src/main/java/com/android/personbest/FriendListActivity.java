@@ -52,7 +52,7 @@ public class FriendListActivity extends ListActivity implements Observer {
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
         Intent intent = new Intent(this, ChatBoxActivity.class);
-        String friendId = this.list.get(position);
+        String friendId = this.listId.get(position);
         String chatId = ((FriendFireBaseAdapter)(this.fireBaseAdapter)).generateIDChat(friendId);
         intent.putExtra("chatId", chatId);
         startActivity(intent);
