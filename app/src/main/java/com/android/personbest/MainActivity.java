@@ -25,6 +25,8 @@ import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerSystem;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.Serializable;
 import java.util.*;
@@ -143,8 +145,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
             sd = new SavedDataManagerFirestore(this);
         }
 
-        if(GoogleSignIn.getLastSignedInAccount(this) == null) this.userId = "Unknown";
-        else this.userId = GoogleSignIn.getLastSignedInAccount(this).getId();
+        FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
+        String curFireBaseUid = curFirebaseUsr.getUid();
+        this.userId = curFireBaseUid;
         // Initialize friendshipManager
         this.friendshipManager = new Relations(this.userId);
 
@@ -539,11 +542,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchAddFriendActivity(){
         Intent intent = new Intent(this, BefriendActivity.class);
-        String id;
-        if(GoogleSignIn.getLastSignedInAccount(this) == null) id = "Unknown";
-        else id = GoogleSignIn.getLastSignedInAccount(this).getId();
-        this.friendshipManager.setId(id);
-        intent.putExtra("id", id);
+        intent.putExtra("id", this.userId);
         /*getIntent().getSerializableExtra("MyClass");
         Bundle bundle = new Bundle();
         bundle.putSerializable("FriendshipManager", this.friendshipManager);
@@ -576,11 +575,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchViewFriends() {
         Intent intent = new Intent(this, FriendListActivity.class);
-        String id;
-        if(GoogleSignIn.getLastSignedInAccount(this) == null) id = "Unknown";
-        else id = GoogleSignIn.getLastSignedInAccount(this).getId();
-        this.friendshipManager.setId(id);
-        intent.putExtra("id", id);
+        intent.putExtra("id", this.userId);
         startActivity(intent);
     }
 }
