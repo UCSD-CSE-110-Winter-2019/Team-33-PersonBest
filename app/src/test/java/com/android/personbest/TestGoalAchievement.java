@@ -80,6 +80,7 @@ public class TestGoalAchievement {
         activity.setToday(TEST_DAY);
 
         sd.clearData();
+        sd.setFirstTimeUser(false);
         sd.setUserHeight(HEIGHT, null, null);
         sd.setCurrentGoal(GOAL_INIT, null, null);
         nextStepCount = NEXT_STEP_COUNT;
