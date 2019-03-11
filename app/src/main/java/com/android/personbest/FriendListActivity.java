@@ -19,6 +19,7 @@ import java.util.Observer;
 public class FriendListActivity extends ListActivity implements Observer {
     private List<String> list;
     FFireBaseAdapter fireBaseAdapter;
+    String idCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,16 +33,13 @@ public class FriendListActivity extends ListActivity implements Observer {
                 finish();
             }
         });
-        String idCurrentUser = getIntent().getStringExtra("id");
+        idCurrentUser = getIntent().getStringExtra("id");
         this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
         ((FriendFireBaseAdapter)(this.fireBaseAdapter)).addObserver(this);
         this.fireBaseAdapter.getFriendlist();
         list = new ArrayList<String>();
-        list.add("ruben");
-
         ArrayAdapter<String> myAdapter = new ArrayAdapter <String>(this,
                 R.layout.row_layout, R.id.listText, list);
-
         setListAdapter(myAdapter);
     }
 
@@ -61,4 +59,5 @@ public class FriendListActivity extends ListActivity implements Observer {
 
         setListAdapter(myAdapter);
     }
+
 }

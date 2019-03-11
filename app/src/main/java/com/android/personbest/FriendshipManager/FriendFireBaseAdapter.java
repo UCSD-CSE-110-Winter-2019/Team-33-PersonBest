@@ -137,4 +137,14 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
             }
         });
     }
+    public void generateIDChat(String idFriend) {
+        String chatId = "";
+        if (user.compareTo(idFriend)<0){
+            chatId = user+idFriend;
+        }
+        else {
+            chatId = idFriend+user;
+        }
+
+    }
 }
