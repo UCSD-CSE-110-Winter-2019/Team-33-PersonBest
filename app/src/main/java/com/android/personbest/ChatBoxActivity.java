@@ -21,7 +21,7 @@ public class ChatBoxActivity extends AppCompatActivity {
     String TAG = MainActivity.class.getSimpleName();
 
     String COLLECTION_KEY = "chats";
-    String DOCUMENT_KEY = "chat1";
+    String CHAT_ID;
     String MESSAGES_KEY = "messages";
     String FROM_KEY = "from";
     String TEXT_KEY = "text";
@@ -39,9 +39,10 @@ public class ChatBoxActivity extends AppCompatActivity {
         SharedPreferences sharedpreferences = getSharedPreferences("chats", Context.MODE_PRIVATE);
         from = sharedpreferences.getString(FROM_KEY, null);
 
+        CHAT_ID = getIntent().getStringExtra("chatId");
         chat = FirebaseFirestore.getInstance()
                 .collection(COLLECTION_KEY)
-                .document(DOCUMENT_KEY)
+                .document(CHAT_ID)
                 .collection(MESSAGES_KEY);
 
         initMessageUpdateListener();

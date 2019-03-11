@@ -1,6 +1,7 @@
 package com.android.personbest;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,8 @@ import java.util.Observer;
 
 public class FriendListActivity extends ListActivity implements Observer {
     private List<String> list;
+    private List<String> listName;
+    private List<String> listId;
     FFireBaseAdapter fireBaseAdapter;
     String idCurrentUser;
 
@@ -38,6 +41,8 @@ public class FriendListActivity extends ListActivity implements Observer {
         ((FriendFireBaseAdapter)(this.fireBaseAdapter)).addObserver(this);
         this.fireBaseAdapter.getFriendlist();
         list = new ArrayList<String>();
+        listId = new ArrayList<String>();
+        listName = new ArrayList<String>();
         ArrayAdapter<String> myAdapter = new ArrayAdapter <String>(this,
                 R.layout.row_layout, R.id.listText, list);
         setListAdapter(myAdapter);
@@ -46,14 +51,22 @@ public class FriendListActivity extends ListActivity implements Observer {
 
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
-        super.onListItemClick(list, view, position, id);
+        Intent intent = new Intent(this, ChatBoxActivity.class);
+        String friendId = this.list.get(position);
+        String chatId = ((FriendFireBaseAdapter)(this.fireBaseAdapter)).generateIDChat(friendId);
+        intent.putExtra("chatId", chatId);
+        startActivity(intent);
     }
 
 
     @Override
     public void update(Observable o, Object arg) {
         String friend = (String) arg;
-        list.add(friend);
+        String idFriend = friend.split("_")[0];
+        String nameFriend = friend.split("_")[1];
+        list.add(nameFriend);
+        listName.add(nameFriend);
+        listId.add(idFriend);
         ArrayAdapter<String> myAdapter = new ArrayAdapter <String>(this,
                 R.layout.row_layout, R.id.listText, list);
 

@@ -136,7 +136,7 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
                 if (task.isSuccessful()){
                     for (QueryDocumentSnapshot document: task.getResult()){
                         setChanged();
-                        notifyObservers(document.getData().get("name"));
+                        notifyObservers(document.getId() + "_" +document.getData().get("name"));
                         Log.e(TAG, document.getId() + "=>" + document.getData());
                     }
                 }
@@ -156,7 +156,6 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
         }
 
         return chatId;
-
     }
 
     public void subscribeToTopic(String topic){
