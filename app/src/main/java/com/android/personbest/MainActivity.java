@@ -145,11 +145,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
             sd = new SavedDataManagerFirestore(this);
         }
 
-        /*FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
-        String curFireBaseUid = curFirebaseUsr.getUid();
-        this.userId = curFireBaseUid;
-        // Initialize friendshipManager
-        this.friendshipManager = new Relations(this.userId);*/
 
         theTimer = new TimerSystem();
         progressEncouragement = new ProgressEncouragement(this);
