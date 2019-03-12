@@ -25,13 +25,14 @@ import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerSystem;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.Serializable;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements Observer {
 
-    public static final String UNKNOWN = "Unknown";
     private static final int GOAL_INIT = 5000; // default
     private static final int STEP_INIT = 0;
     private static final long MILLISECONDS_IN_A_MINUTE = 60000;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private TextView plannedMPHValue;
     private ProgressBar progressBar;
     private Button addFriend;
-
+    private Button viewFriends;
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -144,10 +145,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
             sd = new SavedDataManagerFirestore(this);
         }
 
-        if(GoogleSignIn.getLastSignedInAccount(this) == null) this.userId = UNKNOWN;
-        else this.userId = GoogleSignIn.getLastSignedInAccount(this).getId();
-        // Initialize friendshipManager
-        this.friendshipManager = new Relations(this.userId);
 
         theTimer = new TimerSystem();
         progressEncouragement = new ProgressEncouragement(this);
@@ -269,6 +266,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
             @Override
             public void onClick(View v) {
                 launchAddFriendActivity();
+            }
+        });
+
+        this.viewFriends = findViewById(R.id.viewFriends);
+        this.viewFriends.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchViewFriends();
             }
         });
 
@@ -531,12 +536,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void launchAddFriendActivity(){
+        FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
+        String curFireBaseUid = curFirebaseUsr.getUid();
+        this.userId = curFireBaseUid;
+        // Initialize friendshipManager
         Intent intent = new Intent(this, BefriendActivity.class);
-        String id;
-        if(GoogleSignIn.getLastSignedInAccount(this) == null) id = UNKNOWN;
-        else id = GoogleSignIn.getLastSignedInAccount(this).getId();
-        this.friendshipManager.setId(id);
-        intent.putExtra("id", id);
+        intent.putExtra("id", this.userId);
         /*getIntent().getSerializableExtra("MyClass");
         Bundle bundle = new Bundle();
         bundle.putSerializable("FriendshipManager", this.friendshipManager);
@@ -566,4 +571,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
         Intent intent = new Intent(this, SetGoalActivity.class);
         startActivityForResult(intent,0);
     }
+
+    public void launchViewFriends() {
+        FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
+        String curFireBaseUid = curFirebaseUsr.getUid();
+        this.userId = curFireBaseUid;
+        Intent intent = new Intent(this, FriendListActivity.class);
+        intent.putExtra("id", this.userId);
+        startActivity(intent);
+    }
+
 }
