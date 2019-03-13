@@ -7,13 +7,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.android.personbest.FriendshipManager.FriendshipManager;
 import com.android.personbest.FriendshipManager.Relations;
 
 public class BefriendActivity extends AppCompatActivity {
     private Button connect;
     private EditText nameInput;
     private EditText emailInput;
-    private Relations relations;
+    private FriendshipManager relations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,5 +40,13 @@ public class BefriendActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    public FriendshipManager getRelations() {
+        return this.relations;
+    }
+
+    public void setRelations(FriendshipManager fm) {
+        this.relations = fm;
     }
 }
