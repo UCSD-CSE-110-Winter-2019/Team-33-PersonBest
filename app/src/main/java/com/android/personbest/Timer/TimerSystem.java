@@ -13,10 +13,10 @@ public class TimerSystem extends ITimer {
     }
 
     public String getTodayString() {
-       return DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now());
+       return DateTimeFormatter.ofPattern("MM-dd-yyyy").format(ZonedDateTime.now());
     }
 
     public String getYesterdayString() {
-        return DateTimeFormatter.ofPattern("MM/dd/yyyy").format(ZonedDateTime.now().plusDays(-1));
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy").format(ZonedDateTime.now().plusDays(-1));
     }
 }

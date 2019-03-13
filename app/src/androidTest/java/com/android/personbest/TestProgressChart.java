@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class TestProgressChart {
     SavedDataManager manager;
+    private static final boolean dummy = ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
 
     @Rule
     public ActivityTestRule<ProgressChart> progressChartTestRule = new ActivityTestRule<>(ProgressChart.class);
@@ -28,6 +28,7 @@ public class TestProgressChart {
 
     @Before
     public void setUp() {
+
 
         // Mock data
         List<IStatistics> stepStats = new ArrayList<>();
@@ -39,7 +40,6 @@ public class TestProgressChart {
         stepStats.add(new DailyStat(7500, 9934, 9225, 1200000, 4.0f));
         stepStats.add(new DailyStat(8500, 7633, 6706, 1200000, 4.0f));
         manager = new SavedDataManagerTest(stepStats);
-
         // Get activity
         progressChart = progressChartTestRule.getActivity();
         progressChart.setManager(manager);
@@ -62,7 +62,7 @@ public class TestProgressChart {
 
         // Set different date
         int date = 7;
-        List<IStatistics> stepStats = manager.getLastWeekSteps(date);
+        List<IStatistics> stepStats = manager.getLastWeekSteps("03/02/2019", null);
         progressChart.setBarChart(stepStats);
 
         // Get data

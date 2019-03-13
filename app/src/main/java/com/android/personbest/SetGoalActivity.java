@@ -4,7 +4,6 @@
 
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -14,21 +13,41 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
+import com.android.personbest.Timer.ITimer;
 
 public class SetGoalActivity extends AppCompatActivity {
+    private static ExecMode.EMode test_mode;
 
-    Button cancelButton;
-    Button acceptButton;
-    Button setButton;
-    EditText editText;
+    private Button cancelButton;
+    private Button acceptButton;
+    private Button setButton;
+    private EditText editText;
+    private SavedDataManager sd;
+    private SharedPreferences sp;
+    private ITimer theTimer;
 
-    TextView goalRecommandation;
-    int stepGoal = 555;
+    private TextView goalRecommandation;
+    private int stepGoal = 555;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_goal);
+
+        // we testing?
+        test_mode = ExecMode.getExecMode();
+        if(test_mode == ExecMode.EMode.TEST_CLOUD) {
+            sd = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+        } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
+            sd = new SavedDataManagerSharedPreference(this);
+        }
+        else {
+            // set saved data manager
+            sd = new SavedDataManagerFirestore(this);
+        }
 
         initGoal();
         initViews();
@@ -81,18 +100,31 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     public void initGoal() {
-        int steps = 0;
-        SharedPreferences sharedPreferences = this.getApplicationContext().getSharedPreferences("user_data", MODE_PRIVATE);
-
-        steps = sharedPreferences.getInt("Current Goal", 0);
-        // overflow check, will not change if overflow
-        long tmpSteps = (long) steps + 500;
-        if(tmpSteps == (int)tmpSteps) steps += 500;
-        setGoal(steps);
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            sd.getCurrentGoal(steps -> {
+                long tmpSteps = (long) steps + 500;
+                if (tmpSteps == (int) tmpSteps) steps += 500;
+                setGoal(steps);
+            });
+        }
+        else {
+            int steps = sd.getCurrentGoal(null);
+            // overflow check, will not change if overflow
+            long tmpSteps = (long) steps + 500;
+            if (tmpSteps == (int) tmpSteps) steps += 500;
+            setGoal(steps);
+        }
     }
 
     public void setGoal(int num) {
         this.stepGoal = num;
+        goalRecommandation = findViewById(R.id.recommanded_goal);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                goalRecommandation.setText(stepGoal + "");
+            }
+        });
     }
 
     public int getGoal() {
@@ -100,11 +132,7 @@ public class SetGoalActivity extends AppCompatActivity {
     }
 
     public void save(int stepNumber) {
-        SharedPreferences sharedPref = getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        editor.putInt("Current Goal", stepNumber);
-        editor.apply();
+        sd.setCurrentGoal(stepNumber, null, null);
     }
 
     public void goBack() {

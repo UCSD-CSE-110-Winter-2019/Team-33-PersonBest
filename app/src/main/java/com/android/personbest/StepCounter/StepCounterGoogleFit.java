@@ -1,7 +1,6 @@
 package com.android.personbest.StepCounter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.service.autofill.Dataset;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -35,7 +34,6 @@ public class StepCounterGoogleFit extends Observable implements StepCounter {
     private final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = System.identityHashCode(this) & 0xFFFF;
     private final String TAG = "GoogleFitAdapter";
     private static final long UPDATE_INTERVAL = 1000;
-    private SharedPreferences sp;
 
     protected MainActivity activity;
     private TimerTask updateSteps;

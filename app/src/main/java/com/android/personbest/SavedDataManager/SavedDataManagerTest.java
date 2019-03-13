@@ -7,18 +7,25 @@ import java.util.List;
 
 public class SavedDataManagerTest implements SavedDataManager {
     List<IStatistics> steps;
+
     public SavedDataManagerTest(List<IStatistics> data) {
         steps = data;
     }
+
     @Override
-    public int getYesterdaySteps(int day) {
-        return -1;
+    public List<IStatistics> getFriendMonthlyStat(String email, String day, SavedDataOperatorListIStat callback) {
+        return null;
     }
+
     @Override
-    public int getYesterdayGoal(int day) {
-        return -1;
+    public void getIdByEmail(String email, SavedDataOperatorString callback) {
     }
+
     @Override
+    public List<IStatistics> getLastWeekSteps(String day, SavedDataOperatorListIStat callback) {
+        return steps;
+    }
+
     public List<IStatistics> getLastWeekSteps(int day) {
         List<IStatistics> toRet = new ArrayList<>();
         for(int i = 1; i <=day; ++i) {
@@ -26,7 +33,12 @@ public class SavedDataManagerTest implements SavedDataManager {
         }
         return toRet;
     }
-    public List<IStatistics> getLastMonthStat(String day) {
+
+    public void clearData() {
+
+    }
+
+    public List<IStatistics> getLastMonthStat(String day, SavedDataOperatorListIStat callback) {
         return null;
     }
     public int getStepsDaysBefore(int today, int days) {
@@ -42,25 +54,71 @@ public class SavedDataManagerTest implements SavedDataManager {
         return null;
     }
 
-    public int getStepsByDayStr(String day) {
+    public int getStepsByDayStr(String day, SavedDataOperatorInt callback) {
         return -1;
     }
-    public boolean setStepsByDayStr(String day, int step) {
-        return true;
+    public void setStepsByDayStr(String day, int step, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
     }
-    public int getGoalByDayStr(String day) {
+    public int getGoalByDayStr(String day, SavedDataOperatorInt callback) {
         return -1;
     }
-    public boolean setGoalByDayStr(String day, int goal) {
-        return true;
+    public void setGoalByDayStr(String day, int goal, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
     }
-    public IStatistics getStatByDayStr(String day) {
+    public IStatistics getStatByDayStr(String day, SavedDataOperatorIStat callback) {
         return null;
     }
     public boolean setStatByDayStr(String day, IStatistics stat) {
         return true;
     }
 
+    @Override
+    public boolean isFirstTimeUser() {
+        return false;
+    }
+
+    @Override
+    public void setFirstTimeUser(boolean isFirstTime) {
+
+    }
+
+    @Override
+    public void setUserHeight(int height, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
+    }
+
+    @Override
+    public int getUserHeight(SavedDataOperatorInt callback) {
+        return 0;
+    }
+
+    @Override
+    public void setExerciseTimeByDayStr(String day, long time, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
+    }
+
+    @Override
+    public long getExerciseTimeByDayStr(String day, SavedDataOperatorLong callback) {
+        return 0;
+    }
+
+    @Override
+    public void setIntentionalStepsByDayStr(String day, int step, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
+    }
+
+    @Override
+    public int getIntentionalStepsByDayStr(String day, SavedDataOperatorInt callback) {
+        return 0;
+    }
+
+    @Override
+    public void setAvgMPHByDayStr(String day, float mph, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) {
+    }
+
+    @Override
+    public float getAvgMPHByDayStr(String day, SavedDataOperatorFloat callback) {
+        return 0;
+    }
+
+    public void setCurrentGoal(int goal, SavedDataOperatorString onSuccessStrOp, SavedDataOperatorString onFailureStrOp) { }
+    public int getCurrentGoal(SavedDataOperatorInt callback) { return 0; }
 
     public boolean isShownGoal(String today) {
         return false;

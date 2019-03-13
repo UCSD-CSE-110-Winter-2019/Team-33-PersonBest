@@ -1,0 +1,95 @@
+{
+  "project_info": {
+    "project_number": "998924189833",
+    "firebase_url": "https://team-33-personbest-69e43.firebaseio.com",
+    "project_id": "team-33-personbest-69e43",
+    "storage_bucket": "team-33-personbest-69e43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:998924189833:android:e75a7b44d652de8a",
+        "android_client_info": {
+          "package_name": "com.android.personbest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "998924189833-p7ntgum9o6l18pms8c7csur7dch22qs5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "7384a83100d93fe2ca5493358db129c35729e08d"
+          }
+        },
+        {
+          "client_id": "998924189833-6mb45t9urf21iveau96bn2ir0d8289bd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "a4cb5d548568a74bef7a1f59ccecc77294d09efb"
+          }
+        },
+        {
+          "client_id": "998924189833-vmphpu2sv48v7qmcvbjd2tuuhbfsfihc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "f769c2b3a3b1df720968821a22c70974856ccd15"
+          }
+        },
+        {
+          "client_id": "998924189833-ltps5r0enjp8ahg6gmg016jlspdfuki6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "47b11838a430a59b29451c68f73ebc69e788ffee"
+          }
+        },
+        {
+          "client_id": "998924189833-cv4id4ndpnd06tvegiahia8jkkigga1f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "554b2cb61a6eaf26b32ade66af447df661ad236c"
+          }
+        },
+        {
+          "client_id": "998924189833-00busrksmr13v0mmn9iau7d4pdu8th6u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "9e460fc287cd82811b6a4a12e7ae0043e10ea741"
+          }
+        },
+        {
+          "client_id": "998924189833-s9u9gl4nkb8sc1ciepofjtvbshf7pe6q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_W1FU-IKIcs_XOgGFsGkskRg5eRmC8ZQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "998924189833-s9u9gl4nkb8sc1ciepofjtvbshf7pe6q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
