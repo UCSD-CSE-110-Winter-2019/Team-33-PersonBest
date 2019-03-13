@@ -43,8 +43,11 @@ public class TestDailyStats {
 
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
-        //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
-        mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        try {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        } catch (Exception e) {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        }
         sd = new SavedDataManagerSharedPreference(mainActivity);
         mainActivity.setTimer(timer);
     }
