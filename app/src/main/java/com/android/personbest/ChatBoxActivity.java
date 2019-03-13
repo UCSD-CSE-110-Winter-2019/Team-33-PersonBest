@@ -67,7 +67,7 @@ public class ChatBoxActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-        this.subscribeToNotificationsTopic();
+        //this.subscribeToNotificationsTopic();
     }
 
     private void sendMessage() {
