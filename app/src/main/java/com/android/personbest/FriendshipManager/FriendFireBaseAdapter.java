@@ -171,6 +171,6 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
             String msg =  "Subscribed to notifications" ;  if  (!task.isSuccessful()) {
                 msg =  "Subscribe to notifications failed" ; }
             Log. d ( TAG , msg); }
-        ); }
+        );
     }
 }
