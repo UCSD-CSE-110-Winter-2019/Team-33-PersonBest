@@ -92,7 +92,7 @@ public class ChartBuilder {
         return this;
     }
 
-    public ChartBuilder setLegend(ArrayList<Pair<String, Integer>> entries) {
+    public ChartBuilder setLegend(List<Pair<String, Integer>> entries) {
         Log.i(TAG, "Set custom legend entries");
 
         legendEntries = new ArrayList<>();
@@ -105,7 +105,7 @@ public class ChartBuilder {
         return this;
     }
 
-    public ChartBuilder setXAxisLabel(ArrayList<String> xAxisLabel) {
+    public ChartBuilder setXAxisLabel(List<String> xAxisLabel) {
         Log.i(TAG, "Set custom x axis");
 
         progressChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
@@ -161,7 +161,17 @@ public class ChartBuilder {
             lineEntries.add(new Entry(i, stat.getGoal()));
         }
     }
-
+/*
+    public String createStatsStr(List<IStatistics> stepStats) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Intentional Work Statistics\n");
+        for(int i = 0; i < stepStats.size(); ++i) {
+            sb.append(DAYOFWEEK[i] + ": ");
+            sb.append(stepStats.get(i).getStats() + '\n');
+        }
+        return sb.toString();
+    }
+*/
     public LineData getLineData() {
         return data.getLineData();
     }

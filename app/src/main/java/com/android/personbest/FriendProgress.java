@@ -24,7 +24,7 @@ public class FriendProgress extends AppCompatActivity {
 
     private SavedDataManager savedDataManager;
     private ArrayList<String> xAxisLabel;
-    private ArrayList<Pair<String, Integer>> entries;
+    private List<Pair<String, Integer>> entries;
     private String user;
     private String chatId;
     private ITimer timer;
@@ -54,7 +54,7 @@ public class FriendProgress extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Create legend entries, this never changes after creation
-        createLegendEntries();
+        entries = ProgressUtils.createLegendEntries();
 
         // Query and create chart
         user = getIntent().getStringExtra("userId");
@@ -67,32 +67,26 @@ public class FriendProgress extends AppCompatActivity {
             startActivity(intent);
         });
 
-        queryData(user);
+        quaryData(user);
     }
 
-    public void queryData(String user) {
+    public void quaryData(String user) {
 
         if(test_mode == ExecMode.EMode.DEFAULT) {
-            savedDataManager.getFriendMonthlyStat(user, updateTime(), ss -> {
-                List<IStatistics> stats = ss;
-                ChartBuilder builder = new ChartBuilder(this);
-                builder.setData(stats, NUM_DAYS_M)
-                        .setXAxisLabel(xAxisLabel)
-                        .setLegend(entries)
-                        .useOptimalConfig()
-                        .show();
-
-            });
+            savedDataManager.getFriendMonthlyStat(user, updateTime(), this::buildChart);
         }
         else {
-            List<IStatistics> stats = savedDataManager.getLastWeekSteps(updateTime(), null);
-            ChartBuilder builder = new ChartBuilder(this);
-            builder.setData(stats, NUM_DAYS_M)
-                    .setXAxisLabel(xAxisLabel)
-                    .setLegend(entries)
-                    .useOptimalConfig()
-                    .show();
+            buildChart(savedDataManager.getFriendMonthlyStat(user, updateTime(), null));
         }
+    }
+
+    public void buildChart(List<IStatistics> stats) {
+        ChartBuilder builder = new ChartBuilder(this);
+        builder.setData(stats, NUM_DAYS_M)
+                .setXAxisLabel(xAxisLabel)
+                .setLegend(entries)
+                .useOptimalConfig()
+                .show();
     }
 
     private void createAxisLabels(String today) {
@@ -104,13 +98,6 @@ public class FriendProgress extends AppCompatActivity {
             dateSB.insert(6, '/');
             xAxisLabel.add(dateSB.substring(4));
         }
-    }
-
-    private void createLegendEntries() {
-        // Create legend entries
-        entries = new ArrayList<>();
-        entries.add(new Pair<>("Incidental Walk", Color.rgb(0, 92, 175)));
-        entries.add(new Pair<>("Intentional Walk", Color.rgb(123, 144, 210)));
     }
 
     private String updateTime() {

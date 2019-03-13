@@ -1,24 +1,19 @@
 package com.android.personbest;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.View;
-import android.widget.TextView;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.IStatistics;
-import com.github.mikephil.charting.charts.CombinedChart;
-import com.github.mikephil.charting.components.*;
-import com.github.mikephil.charting.data.*;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.StackedValueFormatter;
-import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.android.personbest.Timer.ITimer;
+import com.android.personbest.Timer.TimerSystem;
 
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
@@ -28,17 +23,11 @@ import java.util.Locale;
 
 public class ProgressChart extends AppCompatActivity {
     private static ExecMode.EMode test_mode;
-    private List<IStatistics> stepStats;
-    private List<BarEntry> barEntries;
-    private List<Entry> lineEntries;
+    private ProgressUtils.IntervalMode mode;
     private SavedDataManager savedDataManager;
-    private int date;
-    private CombinedChart progressChart;
-    private CombinedData data;
     private ArrayList<String> xAxisLabel;
-    private String stats;
-    private SharedPreferences sp;
-    private String todayStr = "03/02/2019"; // Default day
+    private List<Pair<String, Integer>> entries;
+    private ITimer timer;
     private final String[] DAYOFWEEK = {
             DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
             DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
@@ -57,12 +46,8 @@ public class ProgressChart extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        barEntries = new ArrayList<>();
-        lineEntries = new ArrayList<>();
-
-        String tmpTodayStr = getIntent().getStringExtra("todayStr");
-        if(tmpTodayStr != null)
-            todayStr = tmpTodayStr;
+        mode = getIntent().getStringExtra("mode").equals("week") ? ProgressUtils.IntervalMode.WEEK :
+                ProgressUtils.IntervalMode.MONTH;
 
         // we testing?
         test_mode = ExecMode.getExecMode();
@@ -76,6 +61,12 @@ public class ProgressChart extends AppCompatActivity {
             savedDataManager = new SavedDataManagerFirestore(this);
         }
 
+        // New Timer
+        timer = new TimerSystem();
+
+        // Create legend entries, this never changes after creation
+        entries = ProgressUtils.createLegendEntries();
+
         final Activity self = this;
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -83,187 +74,61 @@ public class ProgressChart extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                ((ProgressChart) self).setDate(todayStr);
+                ((ProgressChart) self).quaryData();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        progressChart = findViewById(R.id.progressChart);
-
-        this.setDate(todayStr);
+        this.quaryData();
     }
 
     public void setManager(SavedDataManager manager) {
         savedDataManager = manager;
     }
 
-    public void setDate(String today) {
+    public void quaryData() {
         if(test_mode == ExecMode.EMode.DEFAULT) {
-            savedDataManager.getLastWeekSteps(today, ss -> {
-                stepStats = ss;
-                setBarChart(stepStats);
-                showChart();
-            });
+            if(mode == ProgressUtils.IntervalMode.WEEK) {
+                savedDataManager.getLastWeekSteps(updateTime(), this::buildChart);
+            }
+            else {
+                savedDataManager.getLastMonthStat(updateTime(), this::buildChart);
+            }
         }
         else {
-            stepStats = savedDataManager.getLastWeekSteps(today, null);
-            setBarChart(stepStats);
-            showChart();
+            if(mode == ProgressUtils.IntervalMode.WEEK) {
+                buildChart(savedDataManager.getLastWeekSteps(updateTime(), null));
+            }
+            else {
+                buildChart(savedDataManager.getLastMonthStat(updateTime(), null));
+            }
         }
 
     }
 
+    public void buildChart(List<IStatistics> stats) {
+        ChartBuilder builder = new ChartBuilder(this);
+        builder.setData(stats, 28)
+                .setXAxisLabel(xAxisLabel)
+                .setLegend(entries)
+                .useOptimalConfig()
+                .show();
+    }
 
-    // Some of the configuration ideas (like axis) used this tutorial
-    // https://www.studytutorial.in/android-combined-line-and-bar-chart-using-mpandroid-library-android-tutorial
-    // as reference
-    public void setBarChart(List<IStatistics> stepStats) {
-
-        createEntries(stepStats);
-
+    private void createAxisLabels(String today) {
         // Create Axis
         xAxisLabel = new ArrayList<>();
         xAxisLabel.add("");
-        int j = 6;
-        for(BarEntry be: barEntries) {
-            j = j % 7 + 1;
-            xAxisLabel.add(DayOfWeek.of(j).getDisplayName(TextStyle.SHORT, Locale.US));
-        }
-
-        // Add daily stats
-        stats = createStatsStr(stepStats);
-
-        // Set data
-        data = new CombinedData();
-        data.setData(createBarData());
-        data.setData(createLineData());
-
-        // Draw options
-        progressChart.setDrawOrder(new CombinedChart.DrawOrder[]{CombinedChart.DrawOrder.BAR,
-                                                                  CombinedChart.DrawOrder.LINE});
-        progressChart.setDrawGridBackground(false);
-
-        // Legend options
-        ArrayList<LegendEntry> legendEntries = new ArrayList<>();
-        legendEntries.add(new LegendEntry("Incidental Walk", Legend.LegendForm.DEFAULT,
-                Float.NaN, Float.NaN, null, Color.rgb(0, 92, 175)));
-        legendEntries.add(new LegendEntry("Intentional Walk", Legend.LegendForm.DEFAULT,
-                Float.NaN, Float.NaN, null, Color.rgb(123, 144, 210)));
-
-        Legend legend = progressChart.getLegend();
-        legend.setCustom(legendEntries);
-
-        //Axis options
-        YAxis rightAxis = progressChart.getAxisRight();
-        rightAxis.setDrawGridLines(false);
-        rightAxis.setAxisMinimum(0f);
-
-        YAxis leftAxis = progressChart.getAxisLeft();
-        leftAxis.setDrawGridLines(false);
-        leftAxis.setAxisMinimum(0f);
-
-        XAxis xAxis = progressChart.getXAxis();
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setAxisMinimum(0.6f);
-        xAxis.setGranularity(1f);
-        xAxis.setAxisMaximum(data.getXMax() + 0.4f);
-
-        progressChart.getDescription().setEnabled(false);
-
-        progressChart.setData(data);
-        progressChart.invalidate();
-    }
-
-    private void showChart() {
-        progressChart.setData(data);
-        progressChart.invalidate();
-        ((TextView)findViewById(R.id.statsView)).setText(stats);
-    }
-
-    private void createEntries(List<IStatistics> stepStats) {
-        barEntries.clear();
-        lineEntries.clear();
-        int i = 0;
-        for (IStatistics stat : stepStats) {
-            i += 1;
-            float[] tempArr = new float[2];
-            tempArr[0] = stat.getIncidentWalk();
-            tempArr[1] = stat.getIntentionalWalk();
-            barEntries.add(new BarEntry(i, tempArr));
-            lineEntries.add(new Entry(i, stat.getGoal()));
+        for(int i = 0; i < 28; ++i) {
+            StringBuilder dateSB = new StringBuilder(String.valueOf(timer.getDayStampDayBefore(today, 28 - i)));
+            dateSB.insert(6, '/');
+            xAxisLabel.add(dateSB.substring(4));
         }
     }
 
-    private BarData createBarData() {
-        BarDataSet stepDataSet = new BarDataSet(barEntries, "Steps Current Week");
-        stepDataSet.setColors(Color.rgb(0, 92, 175), Color.rgb(123, 144, 210));
-        stepDataSet.setValueTextSize(8f);
-        stepDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-
-        BarData bd =  new BarData(stepDataSet);
-        bd.setBarWidth(0.4f);
-        return bd;
-    }
-
-    private LineData createLineData() {
-        LineDataSet goalDataSet = new LineDataSet(lineEntries, "Goals Current Week");
-        goalDataSet.setColors(Color.rgb(8, 25, 45));
-        goalDataSet.setCircleColor(Color.rgb(190, 194, 63));
-        goalDataSet.setCircleRadius(3f);
-        goalDataSet.setFillColor(Color.rgb(218, 201, 166));
-        goalDataSet.setValueTextSize(8f);
-        goalDataSet.setValueTextColor(Color.rgb(54, 86, 60));
-        goalDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
-
-        goalDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-        return new LineData(goalDataSet);
-    }
-
-    public String createStatsStr(List<IStatistics> stepStats) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Intentional Work Statistics\n");
-        for(int i = 0; i < stepStats.size(); ++i) {
-            sb.append(DAYOFWEEK[i] + ": ");
-            sb.append(stepStats.get(i).getStats() + '\n');
-        }
-        return sb.toString();
-    }
-
-    public LineData getLineData() {
-        return data.getLineData();
-    }
-
-    public BarData getBarData() {
-        return data.getBarData();
-    }
-
-    public ArrayList<String> getXAxisLabel() {
-        return xAxisLabel;
-    }
-
-    // Not used for now, but will keep this in case we need it in the future
-    public static class EnhancedStackedValueFormatter extends StackedValueFormatter {
-        private String[] appendices;
-        public EnhancedStackedValueFormatter(String[] appendices) {
-            super(false, null, 0);
-            this.appendices = appendices;
-        }
-
-        @Override
-        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-            float[] vals = ((BarEntry)entry).getYVals();
-
-            if (vals != null) {
-                // find out if we are on top of the stack
-                if (vals[vals.length - 1] == value) {
-
-                    return appendices[(int)entry.getX() - 1];
-                } else {
-                    return ""; // return empty
-                }
-            }
-            return null;
-        }
+    private String updateTime() {
+        String today = timer.getTodayString();
+        createAxisLabels(today);
+        return today;
     }
 }
