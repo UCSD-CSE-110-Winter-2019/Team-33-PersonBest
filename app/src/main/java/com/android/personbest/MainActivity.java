@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.personbest.FriendshipManager.FFireBaseAdapter;
+import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
 import com.android.personbest.FriendshipManager.FriendshipManager;
 import com.android.personbest.FriendshipManager.Relations;
 import com.android.personbest.SavedDataManager.SavedDataManager;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
     private SavedDataManager sd;
     private Relations friendshipManager;
+    private FFireBaseAdapter fFireBaseAdapter;
     private SharedPreferences sp;
     private ITimer theTimer;
     private ProgressEncouragement progressEncouragement;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String today;
     private Integer todayInt;
     private String userId;
+    private Boolean hasFriend;
 
 //    private FirebaseAuth mAuth;
 //    private GoogleSignInAccount curAccount;
@@ -198,6 +201,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         goalNum = sd.getCurrentGoal(null); // use goal num to initialize goal first TODO
 
+
+        // setup user id
+        this.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         if(test_mode == ExecMode.EMode.DEFAULT) {
             sd.getCurrentGoal(gl -> {
                 goalNum = gl;
@@ -245,21 +252,27 @@ public class MainActivity extends AppCompatActivity implements Observer {
         setToday(theTimer.getTodayString());
         todayInt = theDate.getDay();
 
-        // yesterday
-        // only once since data of yesterday never changes today
-        if(!sd.isCheckedYesterdayGoal(today)) {
-           sd.setCheckedYesterdayGoal(today);
-            checkYesterdayGoalReach();
-        }
-        // not show sub-goal if goal met yesterday
-        if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today)) {
-            sd.setCheckedYesterdaySubGoal(today);
-            checkYesterdaySubGoalReach();
-        }
+        hasFriend = false;
+        fFireBaseAdapter = new FriendFireBaseAdapter(this.userId);
+        fFireBaseAdapter.hasFriend(b -> {
+            hasFriend = b;
+            if(b) return;
+            // yesterday
+            // only once since data of yesterday never changes today
+            if(!sd.isCheckedYesterdayGoal(today)) {
+               sd.setCheckedYesterdayGoal(today);
+                checkYesterdayGoalReach();
+            }
+            // not show sub-goal if goal met yesterday
+            if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today)) {
+                sd.setCheckedYesterdaySubGoal(today);
+                checkYesterdaySubGoalReach();
+            }
 
-        if(theTimer.isLateToday()) {
-            checkSubGoalReach();
-        }
+            if(theTimer.isLateToday()) {
+                checkSubGoalReach();
+            }
+        });
 
         this.addFriend = findViewById(R.id.AddFriend);
         this.addFriend.setOnClickListener(new View.OnClickListener() {
@@ -276,17 +289,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 launchViewFriends();
             }
         });
-
-        // the user should be signed in by here
-        //if(test_mode == ExecMode.EMode.DEFAULT) {
-        //    mAuth = FirebaseAuth.getInstance();
-        //    curAccount = GoogleSignIn.getLastSignedInAccount(this);
-        //    curFirebaseUser = mAuth.getCurrentUser();
-        //    if (curFirebaseUser == null) {
-        //        firebaseAuthWithGoogle(curAccount);
-        //        curFirebaseUser = mAuth.getCurrentUser();
-        //    }
-        //}
     }
     @Override
     protected void onResume() {
@@ -338,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // has prompted goal???
     // has made progress?
     public void checkSubGoalReach() {
+        if(hasFriend) return;
         int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
 
         if(test_mode == ExecMode.EMode.DEFAULT) {
@@ -368,6 +371,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // check if goal reached yesterday
     // need to be called only once per day
     protected void checkYesterdayGoalReach() {
+        if(hasFriend) return;
         String yesterday = theTimer.getYesterdayString();
 
         if(test_mode == ExecMode.EMode.DEFAULT) {
@@ -401,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // check if sub goal reached yesterday
     // need to be called only once per day
     protected void checkYesterdaySubGoalReach() {
+        if(hasFriend) return;
         String yesterday = theTimer.getYesterdayString();
 
         if (test_mode == ExecMode.EMode.DEFAULT) {
@@ -437,6 +442,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     protected void goalReached(boolean isYesterday) {
+        if(hasFriend) return;
         Log.d(TAG,"Goal reached");
         Log.d(TAG,"Reached goal is yesterday's? " + isYesterday);
         String title = "You Reached the Goal";
@@ -573,9 +579,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void launchViewFriends() {
-        FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
-        String curFireBaseUid = curFirebaseUsr.getUid();
-        this.userId = curFireBaseUid;
         Intent intent = new Intent(this, FriendListActivity.class);
         intent.putExtra("id", this.userId);
         startActivity(intent);
