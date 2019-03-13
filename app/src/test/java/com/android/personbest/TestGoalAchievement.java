@@ -67,7 +67,6 @@ public class TestGoalAchievement {
         try {
             activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
             activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         }
         shadowActivity = Shadows.shadowOf(activity);
