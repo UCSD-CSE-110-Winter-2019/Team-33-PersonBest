@@ -2,10 +2,12 @@ package com.android.personbest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String today;
     private Integer todayInt;
     private String userId;
+    private AsyncTaskRunner asyncTaskRunner;
 
 //    private FirebaseAuth mAuth;
 //    private GoogleSignInAccount curAccount;
@@ -81,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ProgressBar progressBar;
     private Button addFriend;
     private Button viewFriends;
+
+
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -276,6 +281,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 launchViewFriends();
             }
         });
+
+
+        this.asyncTaskRunner = new AsyncTaskRunner();
+        asyncTaskRunner.execute("1");
 
         // the user should be signed in by here
         //if(test_mode == ExecMode.EMode.DEFAULT) {
@@ -579,6 +588,46 @@ public class MainActivity extends AppCompatActivity implements Observer {
         Intent intent = new Intent(this, FriendListActivity.class);
         intent.putExtra("id", this.userId);
         startActivity(intent);
+    }
+
+    private class AsyncTaskRunner extends AsyncTask<String, String, String >{
+        boolean currentStage = false;
+        boolean prevStage = false;
+        @Override
+        protected String doInBackground(String... strings) {
+            Log.e(TAG, "background");
+            Integer steps = -1;
+            Integer goal = 0;
+            while (true) {
+                try {
+                    int time = 1000;
+                    Thread.sleep(time);
+                    steps = Integer.parseInt(stepsTodayVal.getText().toString());
+                    goal = Integer.parseInt(goalVal.getText().toString());
+                } catch (Exception e) {
+                    Log.e(TAG, "error processing goal value");
+                    continue;
+                }
+                this.prevStage = this.currentStage;
+                if (steps >= goal) {
+                    this.currentStage = true;
+                }
+                else{
+                    this.currentStage = false;
+                }
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            if ( !this.prevStage && this.currentStage){
+                // Call Notification
+                Log.d(TAG, "Achieve the Goal");
+            }
+            else{
+                Log.d(TAG, "Not Achieve the goal");
+            }
+        }
     }
 
 }
