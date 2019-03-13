@@ -46,8 +46,8 @@
         </activity>
         <activity android:name=".SetGoalActivity"/>
         <activity android:name=".SetUpActivity"/>
-        <activity android:name=".MonthlyChart"
-                  android:label="@string/title_activity_monthly_chart"
+        <activity android:name=".FriendProgress"
+                  android:label="@string/title_activity_friend_progress"
                   android:launchMode="singleInstance"
                   android:parentActivityName=".FriendListActivity">
             <meta-data

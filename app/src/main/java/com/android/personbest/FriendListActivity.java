@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -12,9 +11,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import com.android.personbest.FriendshipManager.FFireBaseAdapter;
 import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -62,7 +59,7 @@ public class FriendListActivity extends ListActivity implements Observer {
         builder.setTitle(R.string.title_Choose_Action)
                 .setPositiveButton(R.string.activity_btn, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(self, MonthlyChart.class);
+                        Intent intent = new Intent(self, FriendProgress.class);
                         intent.putExtra("userId", friendId);
                         startActivity(intent);
                     }
