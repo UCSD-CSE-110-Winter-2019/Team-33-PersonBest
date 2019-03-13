@@ -53,20 +53,21 @@ public class FriendListActivity extends ListActivity implements Observer {
 
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
-
         String friendId = this.listId.get(position);
+        String chatId = ((FriendFireBaseAdapter)(fireBaseAdapter)).generateIDChat(friendId);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
         builder.setTitle(R.string.title_Choose_Action)
                 .setPositiveButton(R.string.activity_btn, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(self, FriendProgress.class);
                         intent.putExtra("userId", friendId);
+                        intent.putExtra("chatId", chatId);
                         startActivity(intent);
                     }
                 }).setNeutralButton(R.string.message_btn, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(self, ChatBoxActivity.class);
-                        String chatId = ((FriendFireBaseAdapter)(fireBaseAdapter)).generateIDChat(friendId);
                         intent.putExtra("chatId", chatId);
                         startActivity(intent);
                     }

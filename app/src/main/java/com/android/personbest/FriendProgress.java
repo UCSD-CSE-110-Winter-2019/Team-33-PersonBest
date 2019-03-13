@@ -1,10 +1,12 @@
 package com.android.personbest;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
+import android.widget.Button;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -24,6 +26,7 @@ public class FriendProgress extends AppCompatActivity {
     private ArrayList<String> xAxisLabel;
     private ArrayList<Pair<String, Integer>> entries;
     private String user;
+    private String chatId;
     private ITimer timer;
 
     @Override
@@ -55,6 +58,14 @@ public class FriendProgress extends AppCompatActivity {
 
         // Query and create chart
         user = getIntent().getStringExtra("userId");
+        chatId = getIntent().getStringExtra("chatId");
+
+        Button send = findViewById(R.id.msg_button);
+        send.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ChatBoxActivity.class);
+            intent.putExtra("chatId", chatId);
+            startActivity(intent);
+        });
 
         queryData(user);
     }
