@@ -9,6 +9,7 @@
     <string name="step_counter_parcel_key">STEP_COUNTER_PARCEL</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_friend_list">FriendListActivity</string>
+    <string name="title_activity_monthly_chart">MonthlyChart</string>
     <string name="test_mode">test_mode</string>
     <string name="test_cloud">test_cloud</string>
     <string name="test_local">test_local</string>
@@ -24,4 +25,11 @@
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
     <string name="web_client_id">998924189833-s9u9gl4nkb8sc1ciepofjtvbshf7pe6q.apps.googleusercontent.com</string>
+    <!-- Strings for message and activity dialog-->
+    <string name="title_Choose_Action">Please choose an action</string>
+    <string name="message_btn">Send message</string>
+    <string name="activity_btn">See activity</string>
+    <string name="cancel">Cancel</string>
+    <!-- Strings for activity chart-->
+    <string name="encmsg">Send encouragement</string>
 </resources>

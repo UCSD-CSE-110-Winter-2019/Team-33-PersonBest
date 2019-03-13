@@ -4,8 +4,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.EditText;
 import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
@@ -18,17 +20,18 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.*;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.StackedValueFormatter;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 public class MonthlyChart extends AppCompatActivity {
+    private static final String TAG = "Monthly Chart";
+    private static final int NUM_DAYS_M = 28;
+    private static ExecMode.EMode test_mode;
+    private List<IStatistics> stepStats;
     private List<BarEntry> barEntries;
     private List<Entry> lineEntries;
     private SavedDataManager savedDataManager;
@@ -36,7 +39,7 @@ public class MonthlyChart extends AppCompatActivity {
     private CombinedData data;
     private ArrayList<String> xAxisLabel;
     private String stats;
-    private String user = "jinghao@eugen.ucsd.edu";
+    private String user;
     private ITimer timer;
 
     @Override
@@ -45,20 +48,29 @@ public class MonthlyChart extends AppCompatActivity {
         setContentView(R.layout.activity_monthly_chart);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         EditText msg = findViewById(R.id.msg_box);
 
 
+        // we testing?
+        test_mode = ExecMode.getExecMode();
+        if(test_mode == ExecMode.EMode.TEST_CLOUD) {
+            savedDataManager = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+        } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
+            savedDataManager = new SavedDataManagerSharedPreference(this);
+        }
+        else {
+            // set saved data manager
+            savedDataManager = new SavedDataManagerFirestore(this);
+        }
+
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
-        savedDataManager = new SavedDataManagerSharedPreference(this);
         timer = new TimerSystem();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         progressChart = findViewById(R.id.progressChart);
-
+        user = getIntent().getStringExtra("userId");
         queryData(timer.getTodayString(), user);
     }
 
@@ -70,31 +82,39 @@ public class MonthlyChart extends AppCompatActivity {
         timer = tm;
     }
 
-    public void queryData(String date, String user) {
-        Random rand = new Random();
-
-        List<IStatistics> stepStats = new ArrayList<>();//savedDataManager.getLastWeekSteps(date);
-        for(int i = 0; i < 28; ++i)
-            stepStats.add(new DailyStat((int)(rand.nextDouble() * 5000) + 5000, (int)(rand.nextDouble() * 5000) + 5000, 0, 0, 0));
-        setBarChart(stepStats);
-        showChart();
+    public void queryData(String today, String user) {
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            savedDataManager.getFriendMonthlyStat(user, today, ss -> {
+                stepStats = ss;
+                setBarChart();
+                showChart();
+            });
+        }
+        else {
+            stepStats = savedDataManager.getLastWeekSteps(today, null);
+            setBarChart();
+            showChart();
+        }
     }
 
 
     // Some of the configuration ideas (like axis) used this tutorial
     // https://www.studytutorial.in/android-combined-line-and-bar-chart-using-mpandroid-library-android-tutorial
     // as reference
-    public void setBarChart(List<IStatistics> stepStats) {
+    public void setBarChart() {
+        if(stepStats.size() < NUM_DAYS_M) {
+            padZero();
+        }
 
         createEntries(stepStats);
 
         // Create Axis
         xAxisLabel = new ArrayList<>();
         xAxisLabel.add("");
-        int j = 6;
-        for(BarEntry be: barEntries) {
-            j = j % 7 + 1;
-            xAxisLabel.add(DayOfWeek.of(j).getDisplayName(TextStyle.SHORT, Locale.US));
+
+        for(int i = 0; i < barEntries.size(); ++i) {
+            String date = "" + ITimer.getDayStampDayBefore(timer.getTodayString(), NUM_DAYS_M - i);
+            xAxisLabel.add(date.substring(4));
         }
 
         // Set data
@@ -125,13 +145,12 @@ public class MonthlyChart extends AppCompatActivity {
         leftAxis.setAxisMinimum(0f);
 
         XAxis xAxis = progressChart.getXAxis();
-        //xAxis.setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setAxisMinimum(0.6f);
         xAxis.setGranularity(1f);
         xAxis.setAxisMaximum(data.getXMax() + 0.4f);
-
-        //progressChart.getDescription().setEnabled(false);
+        progressChart.getDescription().setEnabled(false);
     }
 
     private void showChart() {
@@ -188,5 +207,16 @@ public class MonthlyChart extends AppCompatActivity {
 
     public ArrayList<String> getXAxisLabel() {
         return xAxisLabel;
+    }
+
+    private void padZero() {
+        ArrayList<IStatistics> zeros = new ArrayList<>();
+        for(int i = 0; i < NUM_DAYS_M - stepStats.size(); ++i) {
+            zeros.add(new DailyStat(0,0,0,1,0));
+        }
+        for(IStatistics iStat: stepStats) {
+            zeros.add(iStat);
+        }
+        stepStats = zeros;
     }
 }

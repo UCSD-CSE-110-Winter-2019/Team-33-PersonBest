@@ -1,6 +1,8 @@
 package com.android.personbest;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import com.android.personbest.FriendshipManager.FFireBaseAdapter;
 import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
+import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -23,6 +26,7 @@ public class FriendListActivity extends ListActivity implements Observer {
     private List<String> listId;
     FFireBaseAdapter fireBaseAdapter;
     String idCurrentUser;
+    FriendListActivity self;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +50,30 @@ public class FriendListActivity extends ListActivity implements Observer {
         ArrayAdapter<String> myAdapter = new ArrayAdapter <String>(this,
                 R.layout.row_layout, R.id.listText, list);
         setListAdapter(myAdapter);
+        self = this;
     }
 
 
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
-        Intent intent = new Intent(this, ChatBoxActivity.class);
+
         String friendId = this.listId.get(position);
-        String chatId = ((FriendFireBaseAdapter)(this.fireBaseAdapter)).generateIDChat(friendId);
-        intent.putExtra("chatId", chatId);
-        startActivity(intent);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        builder.setTitle(R.string.title_Choose_Action)
+                .setPositiveButton(R.string.activity_btn, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(self, MonthlyChart.class);
+                        intent.putExtra("userId", friendId);
+                        startActivity(intent);
+                    }
+                }).setNeutralButton(R.string.message_btn, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(self, ChatBoxActivity.class);
+                        String chatId = ((FriendFireBaseAdapter)(fireBaseAdapter)).generateIDChat(friendId);
+                        intent.putExtra("chatId", chatId);
+                        startActivity(intent);
+                    }
+                }).show();
     }
 
 
