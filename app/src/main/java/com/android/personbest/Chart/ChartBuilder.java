@@ -1,12 +1,13 @@
-package com.android.personbest;
+package com.android.personbest.Chart;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.util.Pair;
+import com.android.personbest.R;
 import com.android.personbest.StepCounter.DailyStat;
 import com.android.personbest.StepCounter.IStatistics;
+import com.android.personbest.Timer.ITimer;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
@@ -18,41 +19,39 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.max;
+
 public class ChartBuilder {
     private static final String TAG = "Chart Builder";
     private List<IStatistics> stepStats;
     private List<BarEntry> barEntries;
     private List<Entry> lineEntries;
     private List<LegendEntry> legendEntries;
+    private List<Pair<String, Integer>> entries;
+    private ArrayList<String> xAxisLabel;
     private CombinedChart progressChart;
     private CombinedData data;
-    private int length;
-    private Activity activity;
+    private int length = 28;
+    private String today;
 
     public ChartBuilder(Activity act) {
-        activity = act;
-        progressChart = activity.findViewById(R.id.progressChart);
+        progressChart = act.findViewById(R.id.progressChart);
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
     }
 
-    public ChartBuilder setData(List<IStatistics> stats, int periodLength) {
-        Log.i(TAG, "Set data, length=" + periodLength);
+    public ChartBuilder setData(List<IStatistics> stats) {
+        Log.i(TAG, "Set data=" + stats.toString());
 
         stepStats = stats;
-        length = periodLength;
-        if(stepStats.size() < length) {
-            padZero();
-        }
+        return this;
+    }
 
-        // Create data entries
-        createEntries(stepStats);
-
-        // Set data
-        data = new CombinedData();
-        data.setData(createBarData());
-        data.setData(createLineData());
-
+    public ChartBuilder setInterval(IntervalMode mode, String endDate) {
+        Log.i(TAG, "Set interval, length=" + this.length + ", end_date=" + this.today);
+        length = mode == IntervalMode.MONTH ? 28 : 7;
+        today = endDate;
+        processData();
         return this;
     }
 
@@ -92,9 +91,13 @@ public class ChartBuilder {
         return this;
     }
 
-    public ChartBuilder setLegend(List<Pair<String, Integer>> entries) {
-        Log.i(TAG, "Set custom legend entries");
+    public ChartBuilder buildWalkEntryLegends() {
+        Log.i(TAG, "Build intentional and incidental walk legend entries");
 
+        // Create legend entries
+        entries = new ArrayList<>();
+        entries.add(new Pair<>("Incidental Walk", Color.rgb(0, 92, 175)));
+        entries.add(new Pair<>("Intentional Walk", Color.rgb(123, 144, 210)));
         legendEntries = new ArrayList<>();
 
         for(int i = 0; i < entries.size(); ++i) {
@@ -105,12 +108,22 @@ public class ChartBuilder {
         return this;
     }
 
-    public ChartBuilder setXAxisLabel(List<String> xAxisLabel) {
-        Log.i(TAG, "Set custom x axis");
+    public ChartBuilder buildTimeAxisLabel() {
+        Log.i(TAG, "Build time (x) axis labels");
+
+        // Create Axis
+        xAxisLabel = new ArrayList<>();
+        xAxisLabel.add("");
+        for(int i = 0; i < 28; ++i) {
+            StringBuilder dateSB = new StringBuilder(String.valueOf(ITimer.getDayStampDayBefore(today, 28 - i)));
+            dateSB.insert(6, '/');
+            xAxisLabel.add(dateSB.substring(4));
+        }
 
         progressChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
         return this;
     }
+
 
     private BarData createBarData() {
         BarDataSet stepDataSet = new BarDataSet(barEntries, "Steps Current Week");
@@ -138,14 +151,6 @@ public class ChartBuilder {
     }
 
     private void padZero() {
-        ArrayList<IStatistics> zeros = new ArrayList<>();
-        for(int i = 0; i < length - stepStats.size(); ++i) {
-            zeros.add(new DailyStat(0,0,0,1,0));
-        }
-        for(IStatistics iStat: stepStats) {
-            zeros.add(iStat);
-        }
-        stepStats = zeros;
     }
 
     private void createEntries(List<IStatistics> stepStats) {
@@ -178,5 +183,29 @@ public class ChartBuilder {
 
     public BarData getBarData() {
         return data.getBarData();
+    }
+
+    private void genChartEntryData() {
+        // Create data entries
+        createEntries(stepStats);
+
+        // Set data
+        data = new CombinedData();
+        data.setData(createBarData());
+        data.setData(createLineData());
+    }
+
+    private void processData() {
+        ArrayList<IStatistics> zeros = new ArrayList<>();
+        for(int i = 0; i < length - stepStats.size(); ++i) {
+            zeros.add(new DailyStat(0,0,0,1,0));
+        }
+        int start = max(0, stepStats.size() - length);
+        for(int i = start; i < stepStats.size(); ++i) {
+            zeros.add(stepStats.get(i));
+        }
+        stepStats = zeros;
+
+        genChartEntryData();
     }
 }

@@ -1,13 +1,13 @@
 package com.android.personbest;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.View;
+import com.android.personbest.Chart.*;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -17,15 +17,14 @@ import com.android.personbest.Timer.TimerSystem;
 
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class ProgressChart extends AppCompatActivity {
     private static ExecMode.EMode test_mode;
-    private ProgressUtils.IntervalMode mode;
+    private IntervalMode mode;
     private SavedDataManager savedDataManager;
-    private ArrayList<String> xAxisLabel;
+
     private List<Pair<String, Integer>> entries;
     private ITimer timer;
     private final String[] DAYOFWEEK = {
@@ -46,8 +45,8 @@ public class ProgressChart extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mode = getIntent().getStringExtra("mode").equals("week") ? ProgressUtils.IntervalMode.WEEK :
-                ProgressUtils.IntervalMode.MONTH;
+        mode = getIntent().getStringExtra("mode").equals("week") ? IntervalMode.WEEK :
+                IntervalMode.MONTH;
 
         // we testing?
         test_mode = ExecMode.getExecMode();
@@ -64,9 +63,6 @@ public class ProgressChart extends AppCompatActivity {
         // New Timer
         timer = new TimerSystem();
 
-        // Create legend entries, this never changes after creation
-        entries = ProgressUtils.createLegendEntries();
-
         final Activity self = this;
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -82,53 +78,31 @@ public class ProgressChart extends AppCompatActivity {
         this.quaryData();
     }
 
-    public void setManager(SavedDataManager manager) {
-        savedDataManager = manager;
-    }
-
     public void quaryData() {
         if(test_mode == ExecMode.EMode.DEFAULT) {
-            if(mode == ProgressUtils.IntervalMode.WEEK) {
-                savedDataManager.getLastWeekSteps(updateTime(), this::buildChart);
-            }
-            else {
-                savedDataManager.getLastMonthStat(updateTime(), this::buildChart);
-            }
+            savedDataManager.getLastMonthStat(timer.getTodayString(), this::buildChart);
         }
         else {
-            if(mode == ProgressUtils.IntervalMode.WEEK) {
-                buildChart(savedDataManager.getLastWeekSteps(updateTime(), null));
-            }
-            else {
-                buildChart(savedDataManager.getLastMonthStat(updateTime(), null));
-            }
+            buildChart(savedDataManager.getLastMonthStat(timer.getTodayString(), null));
         }
 
     }
 
     public void buildChart(List<IStatistics> stats) {
         ChartBuilder builder = new ChartBuilder(this);
-        builder.setData(stats, 28)
-                .setXAxisLabel(xAxisLabel)
-                .setLegend(entries)
+        builder.setData(stats)
+                .setInterval(mode, timer.getTodayString())
+                .buildTimeAxisLabel()
+                .buildWalkEntryLegends()
                 .useOptimalConfig()
                 .show();
     }
 
-    private void createAxisLabels(String today, ProgressUtils.IntervalMode mode) {
-        // Create Axis
-        xAxisLabel = new ArrayList<>();
-        xAxisLabel.add("");
-        for(int i = 0; i < 28; ++i) {
-            StringBuilder dateSB = new StringBuilder(String.valueOf(timer.getDayStampDayBefore(today, 28 - i)));
-            dateSB.insert(6, '/');
-            xAxisLabel.add(dateSB.substring(4));
-        }
+    public void setManager(SavedDataManager manager) {
+        savedDataManager = manager;
     }
 
-    private String updateTime() {
-        String today = timer.getTodayString();
-        createAxisLabels(today);
-        return today;
+    public void setTimer(ITimer tm) {
+        timer = tm;
     }
 }
