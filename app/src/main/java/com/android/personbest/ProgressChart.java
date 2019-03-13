@@ -115,7 +115,7 @@ public class ProgressChart extends AppCompatActivity {
                 .show();
     }
 
-    private void createAxisLabels(String today) {
+    private void createAxisLabels(String today, ProgressUtils.IntervalMode mode) {
         // Create Axis
         xAxisLabel = new ArrayList<>();
         xAxisLabel.add("");

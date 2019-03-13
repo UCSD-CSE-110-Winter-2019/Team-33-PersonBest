@@ -20,5 +20,8 @@ public final class ProgressUtils {
         entries.add(new Pair<>("Intentional Walk", Color.rgb(123, 144, 210)));
         return entries;
     }
+
+
+
     // TODO more axils and legend stuff here
 }
