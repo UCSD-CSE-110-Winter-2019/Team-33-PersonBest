@@ -1,12 +1,12 @@
 package com.android.personbest;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.widget.Button;
+import com.android.personbest.Chart.*;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -24,7 +24,7 @@ public class FriendProgress extends AppCompatActivity {
 
     private SavedDataManager savedDataManager;
     private ArrayList<String> xAxisLabel;
-    private ArrayList<Pair<String, Integer>> entries;
+    private List<Pair<String, Integer>> entries;
     private String user;
     private String chatId;
     private ITimer timer;
@@ -53,9 +53,6 @@ public class FriendProgress extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Create legend entries, this never changes after creation
-        createLegendEntries();
-
         // Query and create chart
         user = getIntent().getStringExtra("userId");
         chatId = getIntent().getStringExtra("chatId");
@@ -67,57 +64,28 @@ public class FriendProgress extends AppCompatActivity {
             startActivity(intent);
         });
 
-        queryData(user);
+        quaryData(user);
     }
 
-    public void queryData(String user) {
-
+    public void quaryData(String user) {
         if(test_mode == ExecMode.EMode.DEFAULT) {
-            savedDataManager.getFriendMonthlyStat(user, updateTime(), ss -> {
-                List<IStatistics> stats = ss;
-                ChartBuilder builder = new ChartBuilder(this);
-                builder.setData(stats, NUM_DAYS_M)
-                        .setXAxisLabel(xAxisLabel)
-                        .setLegend(entries)
-                        .useOptimalConfig()
-                        .show();
-
-            });
+            savedDataManager.getFriendMonthlyStat(user, timer.getTodayString(), this::buildChart);
         }
         else {
-            List<IStatistics> stats = savedDataManager.getLastWeekSteps(updateTime(), null);
-            ChartBuilder builder = new ChartBuilder(this);
-            builder.setData(stats, NUM_DAYS_M)
-                    .setXAxisLabel(xAxisLabel)
-                    .setLegend(entries)
-                    .useOptimalConfig()
-                    .show();
+            buildChart(savedDataManager.getFriendMonthlyStat(user, timer.getTodayString(), null));
         }
     }
 
-    private void createAxisLabels(String today) {
-        // Create Axis
-        xAxisLabel = new ArrayList<>();
-        xAxisLabel.add("");
-        for(int i = 0; i < NUM_DAYS_M; ++i) {
-            StringBuilder dateSB = new StringBuilder(String.valueOf(timer.getDayStampDayBefore(today, NUM_DAYS_M - i)));
-            dateSB.insert(6, '/');
-            xAxisLabel.add(dateSB.substring(4));
-        }
+    public void buildChart(List<IStatistics> stats) {
+        ChartBuilder builder = new ChartBuilder(this);
+        builder.setData(stats)
+                .setInterval(IntervalMode.MONTH, timer.getTodayString())
+                .buildTimeAxisLabel()
+                .buildWalkEntryLegends()
+                .useOptimalConfig()
+                .show();
     }
 
-    private void createLegendEntries() {
-        // Create legend entries
-        entries = new ArrayList<>();
-        entries.add(new Pair<>("Incidental Walk", Color.rgb(0, 92, 175)));
-        entries.add(new Pair<>("Intentional Walk", Color.rgb(123, 144, 210)));
-    }
-
-    private String updateTime() {
-        String today = timer.getTodayString();
-        createAxisLabels(today);
-        return today;
-    }
 
     public void setManager(SavedDataManager manager) {
         savedDataManager = manager;

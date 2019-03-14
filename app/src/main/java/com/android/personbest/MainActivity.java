@@ -560,8 +560,24 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchProgressChart(View view) {
         Intent intent = new Intent(this, ProgressChart.class);
-        intent.putExtra("todayStr", theTimer.getTodayString());
-        startActivity(intent);
+
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        builder.setTitle(R.string.title_select_summary)
+                .setMessage(R.string.msg_select_summary)
+                .setPositiveButton(R.string.weekly_chart, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        intent.putExtra("mode", "week");
+                        startActivity(intent);
+                    }
+                })
+                .setNeutralButton(R.string.monthly_chart, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        intent.putExtra("mode", "month");
+                        startActivity(intent);
+                    }
+                })
+                .show();
     }
 
     public void launchSummary(long timeElapsed, int stepsTaken) {

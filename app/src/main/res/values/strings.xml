@@ -26,10 +26,16 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
     <string name="web_client_id">998924189833-s9u9gl4nkb8sc1ciepofjtvbshf7pe6q.apps.googleusercontent.com</string>
     <!-- Strings for message and activity dialog-->
-    <string name="title_Choose_Action">Please choose an action</string>
+    <string name="title_select_action">Select action</string>
+    <string name="msg_select_action">Please select an action</string>
     <string name="message_btn">Send message</string>
     <string name="activity_btn">See activity</string>
     <string name="cancel">Cancel</string>
     <!-- Strings for activity chart-->
     <string name="encmsg">Send encouragement</string>
+    <string name="weekly_chart">Weekly Chart</string>
+    <string name="monthly_chart">Monthly Chart</string>
+    <string name="title_select_summary">Select summary</string>
+    <string name="msg_select_summary">Please select a summary</string>
+
 </resources>
