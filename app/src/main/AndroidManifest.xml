@@ -46,6 +46,14 @@
         </activity>
         <activity android:name=".SetGoalActivity"/>
         <activity android:name=".SetUpActivity"/>
+        <activity android:name=".FriendProgress"
+                  android:label="@string/title_activity_friend_progress"
+                  android:launchMode="singleInstance"
+                  android:parentActivityName=".FriendListActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.android.personbest.FriendListActivity"/>
+        </activity>
         <activity android:name=".PlannedExerciseSummary"/>
         <activity
                 android:name=".MainActivity"

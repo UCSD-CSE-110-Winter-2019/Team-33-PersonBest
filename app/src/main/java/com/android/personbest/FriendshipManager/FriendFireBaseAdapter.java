@@ -137,7 +137,7 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
                     for (QueryDocumentSnapshot document: task.getResult()){
                         setChanged();
                         notifyObservers(document.getId() + "_" +document.getData().get("name"));
-                        Log.e(TAG, document.getId() + "=>" + document.getData());
+                        Log.i(TAG, document.getId() + "=>" + document.getData());
                     }
                 }
                 else{

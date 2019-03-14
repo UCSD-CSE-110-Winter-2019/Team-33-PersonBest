@@ -44,9 +44,13 @@ public class TestSocialAspect {
 
         ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
 
-        Intent mainIntent = new Intent(RuntimeEnvironment.application, MainActivity.class);
-        mainIntent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
-        this.mainActivity = Robolectric.buildActivity(MainActivity.class, mainIntent).create().get();
+        Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
+        intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
+        try {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        } catch (Exception e) {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        }
         sd = new SavedDataManagerSharedPreference(mainActivity);
         sd.setUserHeight(72, null, null);
     }
