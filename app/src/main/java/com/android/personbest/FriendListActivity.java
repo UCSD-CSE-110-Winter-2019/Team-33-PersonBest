@@ -57,7 +57,8 @@ public class FriendListActivity extends ListActivity implements Observer {
         String chatId = ((FriendFireBaseAdapter)(fireBaseAdapter)).generateIDChat(friendId);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
-        builder.setTitle(R.string.title_Choose_Action)
+        builder.setTitle(R.string.title_select_action)
+                .setMessage(R.string.msg_select_action)
                 .setPositiveButton(R.string.activity_btn, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(self, FriendProgress.class);

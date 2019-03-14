@@ -114,8 +114,8 @@ public class ChartBuilder {
         // Create Axis
         xAxisLabel = new ArrayList<>();
         xAxisLabel.add("");
-        for(int i = 0; i < 28; ++i) {
-            StringBuilder dateSB = new StringBuilder(String.valueOf(ITimer.getDayStampDayBefore(today, 28 - i)));
+        for(int i = 0; i < length; ++i) {
+            StringBuilder dateSB = new StringBuilder(String.valueOf(ITimer.getDayStampDayBefore(today, length - i)));
             dateSB.insert(6, '/');
             xAxisLabel.add(dateSB.substring(4));
         }
@@ -128,7 +128,7 @@ public class ChartBuilder {
     private BarData createBarData() {
         BarDataSet stepDataSet = new BarDataSet(barEntries, "Steps Current Week");
         stepDataSet.setColors(Color.rgb(0, 92, 175), Color.rgb(123, 144, 210));
-        stepDataSet.setValueTextSize(8f);
+        stepDataSet.setValueTextSize(length <= 7 ? 8f : 5f);
         stepDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
         BarData bd =  new BarData(stepDataSet);
@@ -142,7 +142,7 @@ public class ChartBuilder {
         goalDataSet.setCircleColor(Color.rgb(190, 194, 63));
         goalDataSet.setCircleRadius(3f);
         goalDataSet.setFillColor(Color.rgb(218, 201, 166));
-        goalDataSet.setValueTextSize(8f);
+        goalDataSet.setValueTextSize(length <= 7 ? 8f : 5f);
         goalDataSet.setValueTextColor(Color.rgb(54, 86, 60));
         goalDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 

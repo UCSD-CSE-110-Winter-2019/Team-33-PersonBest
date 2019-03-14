@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Pair;
 import android.view.View;
-import com.android.personbest.Chart.*;
+import com.android.personbest.Chart.ChartBuilder;
+import com.android.personbest.Chart.IntervalMode;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -15,27 +15,13 @@ import com.android.personbest.StepCounter.IStatistics;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerSystem;
 
-import java.time.DayOfWeek;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 
 public class ProgressChart extends AppCompatActivity {
     private static ExecMode.EMode test_mode;
     private IntervalMode mode;
     private SavedDataManager savedDataManager;
-
-    private List<Pair<String, Integer>> entries;
     private ITimer timer;
-    private final String[] DAYOFWEEK = {
-            DayOfWeek.of(7).getDisplayName(TextStyle.SHORT, Locale.US),
-            DayOfWeek.of(1).getDisplayName(TextStyle.SHORT, Locale.US),
-            DayOfWeek.of(2).getDisplayName(TextStyle.SHORT, Locale.US),
-            DayOfWeek.of(3).getDisplayName(TextStyle.SHORT, Locale.US),
-            DayOfWeek.of(4).getDisplayName(TextStyle.SHORT, Locale.US),
-            DayOfWeek.of(5).getDisplayName(TextStyle.SHORT, Locale.US),
-            DayOfWeek.of(6).getDisplayName(TextStyle.SHORT, Locale.US)
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
