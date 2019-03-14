@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         setToday(theTimer.getTodayString());
         todayInt = theDate.getDay();
 
-        hasFriend = false;
+        hasFriend = true;
         fFireBaseAdapter = new FriendFireBaseAdapter(this.userId);
         fFireBaseAdapter.hasFriend(b -> {
             hasFriend = b;
