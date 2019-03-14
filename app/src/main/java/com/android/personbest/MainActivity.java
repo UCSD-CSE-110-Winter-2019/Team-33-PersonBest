@@ -14,10 +14,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.personbest.FriendshipManager.FFireBaseAdapter;
-import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
-import com.android.personbest.FriendshipManager.FriendshipManager;
-import com.android.personbest.FriendshipManager.Relations;
+import com.android.personbest.FriendshipManager.*;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -42,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
+    private static final String TEST_CUR_USR_ID = "test-uid";
 
     private static ExecMode.EMode test_mode;
 
@@ -203,7 +201,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
 
         // setup user id
-        this.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            this.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            fFireBaseAdapter = new FriendFireBaseAdapter(this.userId);
+        } else {
+            this.userId = TEST_CUR_USR_ID;
+            fFireBaseAdapter = new MockFirebaseAdapter();
+        }
 
         if(test_mode == ExecMode.EMode.DEFAULT) {
             sd.getCurrentGoal(gl -> {
@@ -253,7 +257,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         todayInt = theDate.getDay();
 
         hasFriend = true;
-        fFireBaseAdapter = new FriendFireBaseAdapter(this.userId);
         fFireBaseAdapter.hasFriend(b -> {
             hasFriend = b;
             if(b) return;
