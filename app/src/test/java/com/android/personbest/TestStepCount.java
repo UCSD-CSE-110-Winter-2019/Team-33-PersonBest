@@ -1,12 +1,9 @@
 package com.android.personbest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.android.personbest.StepCounter.IDate;
-import com.android.personbest.StepCounter.IStatistics;
 //import com.android.personbest.StepCounter.Statistics;
 import com.android.personbest.StepCounter.StepCounter;
 import com.android.personbest.StepCounter.StepCounterFactory;
@@ -22,16 +19,13 @@ import org.robolectric.RuntimeEnvironment;
 //import edu.ucsd.cse110.googlefitapp.fitness.FitnessService;
 //import edu.ucsd.cse110.googlefitapp.fitness.FitnessServiceFactory;
 
-import java.util.IdentityHashMap;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)
 public class TestStepCount {
     private static final String TEST_SERVICE = "TEST_SERVICE";
 
-    private MainActivity activity;
+    private MainActivity mainActivity;
     private TextView textSteps;
     private Button btnUpdateSteps;
     private int nextStepCount;
@@ -49,11 +43,14 @@ public class TestStepCount {
 
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
-        //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
 
-        activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
-        textSteps = activity.findViewById(R.id.stepsTodayVal);
-        btnUpdateSteps = activity.findViewById(R.id.btnUpdateSteps);
+        try {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        } catch (Exception e) {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        }
+        textSteps = mainActivity.findViewById(R.id.stepsTodayVal);
+        btnUpdateSteps = mainActivity.findViewById(R.id.btnUpdateSteps);
         nextStepCount = 1337;
     }
 
