@@ -43,10 +43,9 @@ public class TestStepGoalDisplay {
         try {
             mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
             mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         }
-
+        
         goalText = mainActivity.findViewById(R.id.goalText);
         goalVal = mainActivity.findViewById(R.id.goalVal);
         progressBar = mainActivity.findViewById(R.id.progressBar);
