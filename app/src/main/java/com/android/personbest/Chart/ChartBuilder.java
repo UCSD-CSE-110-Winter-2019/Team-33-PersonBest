@@ -48,9 +48,10 @@ public class ChartBuilder {
     }
 
     public ChartBuilder setInterval(IntervalMode mode, String endDate) {
-        Log.i(TAG, "Set interval, length=" + this.length + ", end_date=" + this.today);
         length = mode == IntervalMode.MONTH ? 28 : 7;
         today = endDate;
+        Log.i(TAG, "Set interval, length=" + this.length + ", end_date=" + this.today);
+
         processData();
         return this;
     }
