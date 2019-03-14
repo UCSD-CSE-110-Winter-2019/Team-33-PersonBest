@@ -151,9 +151,6 @@ public class ChartBuilder {
         return new LineData(goalDataSet);
     }
 
-    private void padZero() {
-    }
-
     private void createEntries(List<IStatistics> stepStats) {
         barEntries.clear();
         lineEntries.clear();
@@ -167,17 +164,7 @@ public class ChartBuilder {
             lineEntries.add(new Entry(i, stat.getGoal()));
         }
     }
-/*
-    public String createStatsStr(List<IStatistics> stepStats) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Intentional Work Statistics\n");
-        for(int i = 0; i < stepStats.size(); ++i) {
-            sb.append(DAYOFWEEK[i] + ": ");
-            sb.append(stepStats.get(i).getStats() + '\n');
-        }
-        return sb.toString();
-    }
-*/
+
     public LineData getLineData() {
         return data.getLineData();
     }
