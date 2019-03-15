@@ -46,6 +46,7 @@ public class StoryTestUserSeesActivityOfOthers {
 
         Intent intent = new Intent(RuntimeEnvironment.application, FriendListActivity.class);
         mfa = new MockFirebaseAdapter();
+        mfa.addFriendById(userIdFriend, userIdFriend);
         intent.putExtra("FFireBaseAdapter", mfa);
         intent.putExtra("id", this.userId);
         intent.putExtra("SavedDataManager", this.sd);
