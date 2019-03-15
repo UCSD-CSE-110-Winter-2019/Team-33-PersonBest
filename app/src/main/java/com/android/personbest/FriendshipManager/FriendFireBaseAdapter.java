@@ -146,6 +146,26 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
             }
         });
     }
+
+    public void hasFriend(OperatorBoolean b){
+        CollectionReference ref = FirebaseFirestore.getInstance()
+                .collection(COLLECTION_KEY)
+                .document(user)
+                .collection("friends");
+
+        ref.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    b.op(!task.getResult().isEmpty()); // null ptr?
+                }
+                else{
+                    Log.e(TAG,"Error getting documents: " , task.getException());
+                }
+            }
+        });
+    }
+
     public String generateIDChat(String idFriend) {
         String chatId = "";
         if (user.compareTo(idFriend)<0){

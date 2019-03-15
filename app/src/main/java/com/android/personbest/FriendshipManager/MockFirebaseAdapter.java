@@ -20,4 +20,8 @@ public class MockFirebaseAdapter implements FFireBaseAdapter {
     public HashMap<String, String> getDb() {
         return this.db;
     }
+
+    public void hasFriend(OperatorBoolean b) {
+        b.op(db.size() > 0);
+    }
 }
