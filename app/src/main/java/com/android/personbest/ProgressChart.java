@@ -66,6 +66,9 @@ public class ProgressChart extends AppCompatActivity {
         if(test_mode == ExecMode.EMode.DEFAULT) {
             savedDataManager.getLastMonthStat(timer.getTodayString(), this::buildChart);
         }
+        else {
+            buildChart(savedDataManager.getLastMonthStat(timer.getTodayString(), null));
+        }
     }
 
     private void buildChart(List<IStatistics> stats) {

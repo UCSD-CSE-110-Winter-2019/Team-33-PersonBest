@@ -549,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         startActivity(intent);
     }
 
-    public void launchProgressChart(View view) {
+    public AlertDialog launchProgressChart(View view) {
         Intent intent = new Intent(this, ProgressChart.class);
 
         AlertDialog.Builder builder =
@@ -567,8 +567,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
                         intent.putExtra("mode", "month");
                         startActivity(intent);
                     }
-                })
-                .show();
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        return dialog;
     }
 
     public void launchSummary(long timeElapsed, int stepsTaken) {
@@ -596,5 +598,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         intent.putExtra("id", this.userId);
         startActivity(intent);
     }
+
 
 }
