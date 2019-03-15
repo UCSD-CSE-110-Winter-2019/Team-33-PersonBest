@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private Button addFriend;
     private Button viewFriends;
 
-    private GoalCheckService goalCheckService;
+    public GoalCheckService goalCheckService;
     private boolean isBound;
 
     public void update(Observable o, Object arg) {

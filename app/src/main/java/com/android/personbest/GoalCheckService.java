@@ -18,8 +18,7 @@ public class GoalCheckService extends Service {
     private final IBinder iBinder = new LocalService();
     private int steps;
     private int goal;
-    private boolean currentStage;
-    private boolean prevStage;
+    public boolean pushed = false;
 
     public GoalCheckService() {
     }
@@ -34,20 +33,16 @@ public class GoalCheckService extends Service {
         this.steps = steps;
         this.goal = goal;
 
-        this.prevStage = this.currentStage;
         if (steps >= goal) {
-            this.currentStage = true;
-        }
-        else{
-            this.currentStage = false;
-        }
-
-        if ( !this.prevStage && this.currentStage){
             // Call Notification
-            Log.d(TAG, "Achieve the Goal");
-            sendNotification();
+            Log.d(TAG, "Achieved Goal");
+            if(!pushed) {
+                pushed = true;
+                sendNotification();
+            }
         }
-        else{
+        else {
+            pushed = false;
             Log.d(TAG, "Not Achieve the goal");
         }
 
@@ -59,7 +54,7 @@ public class GoalCheckService extends Service {
         }
     }
 
-    private void sendNotification(){
+    private void sendNotification() {
         Log.e(TAG,"SEND NOTIFICATION");
         Intent intent = new Intent(this, SetGoalActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -71,7 +66,7 @@ public class GoalCheckService extends Service {
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,"0")
                 .setSmallIcon(R.drawable.ham_2x)
-                .setContentTitle("PersonBest")
+                .setContentTitle("Person Best Goal")
                 .setContentText(this.ACHIEVE_MSG)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
