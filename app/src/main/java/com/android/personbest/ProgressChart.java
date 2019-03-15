@@ -79,4 +79,8 @@ public class ProgressChart extends AppCompatActivity {
                 .useOptimalConfig()
                 .show();
     }
+
+    public void setTimer(ITimer newTimer) {
+        timer = newTimer;
+    }
 }
