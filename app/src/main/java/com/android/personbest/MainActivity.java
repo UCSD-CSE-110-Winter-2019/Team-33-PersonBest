@@ -6,9 +6,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
@@ -22,9 +24,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.personbest.FriendshipManager.FFireBaseAdapter;
-import com.android.personbest.FriendshipManager.FriendshipManager;
-import com.android.personbest.FriendshipManager.Relations;
+import com.android.personbest.FriendshipManager.*;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -39,6 +39,10 @@ import android.support.v4.app.NotificationCompat;
 import java.io.Serializable;
 import java.util.*;
 
+import android.os.IBinder;
+
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
+
 public class MainActivity extends AppCompatActivity implements Observer {
 
     private static final int GOAL_INIT = 5000; // default
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // Const static member
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
+    private static final String TEST_CUR_USR_ID = "test-uid";
 
     private static ExecMode.EMode test_mode;
 
@@ -63,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private IntentionalWalkUtils intentionalWalkUtils = new IntentionalWalkUtils();
     private SavedDataManager sd;
     private Relations friendshipManager;
+    private FFireBaseAdapter fFireBaseAdapter;
     private SharedPreferences sp;
     private ITimer theTimer;
     private ProgressEncouragement progressEncouragement;
@@ -70,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String today;
     private Integer todayInt;
     private String userId;
-    private AsyncTaskRunner asyncTaskRunner;
+    private Boolean hasFriend;
 
 //    private FirebaseAuth mAuth;
 //    private GoogleSignInAccount curAccount;
@@ -91,7 +97,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private Button addFriend;
     private Button viewFriends;
 
-
+    private GoalCheckService goalCheckService;
+    private boolean isBound;
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -113,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 int left = goalNum - totalSoFar;
                 if(left > 0) stepsLeftVal.setText(String.valueOf(left));
                 else stepsLeftVal.setText("0");
+
+                if(goalCheckService != null) updateService();
             }
         });
     }
@@ -209,6 +218,16 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         goalNum = sd.getCurrentGoal(null); // use goal num to initialize goal first TODO
 
+
+        // setup user id
+        if(test_mode == ExecMode.EMode.DEFAULT) {
+            this.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            fFireBaseAdapter = new FriendFireBaseAdapter(this.userId);
+        } else {
+            this.userId = TEST_CUR_USR_ID;
+            fFireBaseAdapter = new MockFirebaseAdapter();
+        }
+
         if(test_mode == ExecMode.EMode.DEFAULT) {
             sd.getCurrentGoal(gl -> {
                 goalNum = gl;
@@ -256,21 +275,28 @@ public class MainActivity extends AppCompatActivity implements Observer {
         setToday(theTimer.getTodayString());
         todayInt = theDate.getDay();
 
-        // yesterday
-        // only once since data of yesterday never changes today
-        if(!sd.isCheckedYesterdayGoal(today)) {
-           sd.setCheckedYesterdayGoal(today);
-            checkYesterdayGoalReach();
-        }
-        // not show sub-goal if goal met yesterday
-        if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today)) {
-            sd.setCheckedYesterdaySubGoal(today);
-            checkYesterdaySubGoalReach();
-        }
+        hasFriend = true;
+        fFireBaseAdapter.hasFriend(b -> {
+            hasFriend = b;
+            // yesterday
+            // only once since data of yesterday never changes today
+            if(!sd.isCheckedYesterdayGoal(today)) {
+               sd.setCheckedYesterdayGoal(today);
+                checkYesterdayGoalReach();
+            }
 
-        if(theTimer.isLateToday()) {
-            checkSubGoalReach();
-        }
+            if(b) return;
+
+            // not show sub-goal if goal met yesterday
+            if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today)) {
+                sd.setCheckedYesterdaySubGoal(today);
+                checkYesterdaySubGoalReach();
+            }
+
+            if(theTimer.isLateToday()) {
+                checkSubGoalReach();
+            }
+        });
 
         this.addFriend = findViewById(R.id.AddFriend);
         this.addFriend.setOnClickListener(new View.OnClickListener() {
@@ -288,20 +314,44 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
+        Intent intent = new Intent(this, GoalCheckService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
 
-        this.asyncTaskRunner = new AsyncTaskRunner(this);
-        asyncTaskRunner.execute("1");
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            GoalCheckService.LocalService localService = (GoalCheckService.LocalService) iBinder;
+            goalCheckService = localService.getService();
+            isBound = true;
+        }
 
-        // the user should be signed in by here
-        //if(test_mode == ExecMode.EMode.DEFAULT) {
-        //    mAuth = FirebaseAuth.getInstance();
-        //    curAccount = GoogleSignIn.getLastSignedInAccount(this);
-        //    curFirebaseUser = mAuth.getCurrentUser();
-        //    if (curFirebaseUser == null) {
-        //        firebaseAuthWithGoogle(curAccount);
-        //        curFirebaseUser = mAuth.getCurrentUser();
-        //    }
-        //}
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isBound = false;
+        }
+    };
+
+    public void updateService() {
+        int steps = 0;
+        try {
+            steps = Integer.parseInt(stepsTodayVal.getText().toString());
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        this.goalCheckService.update(steps, this.goalNum);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(isBound) {
+            unbindService(serviceConnection);
+            isBound = false;
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -354,6 +404,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // has prompted goal???
     // has made progress?
     public void checkSubGoalReach() {
+        if(hasFriend) return;
         int todaySteps = Integer.parseInt(stepsTodayVal.getText().toString());
 
         if(test_mode == ExecMode.EMode.DEFAULT) {
@@ -417,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // check if sub goal reached yesterday
     // need to be called only once per day
     protected void checkYesterdaySubGoalReach() {
+        if(hasFriend) return;
         String yesterday = theTimer.getYesterdayString();
 
         if (test_mode == ExecMode.EMode.DEFAULT) {
@@ -567,8 +619,24 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
     public void launchProgressChart(View view) {
         Intent intent = new Intent(this, ProgressChart.class);
-        intent.putExtra("todayStr", theTimer.getTodayString());
-        startActivity(intent);
+
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        builder.setTitle(R.string.title_select_summary)
+                .setMessage(R.string.msg_select_summary)
+                .setPositiveButton(R.string.weekly_chart, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        intent.putExtra("mode", "week");
+                        startActivity(intent);
+                    }
+                })
+                .setNeutralButton(R.string.monthly_chart, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        intent.putExtra("mode", "month");
+                        startActivity(intent);
+                    }
+                })
+                .show();
     }
 
     public void launchSummary(long timeElapsed, int stepsTaken) {
@@ -589,90 +657,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     public void launchViewFriends() {
-        FirebaseUser curFirebaseUsr = FirebaseAuth.getInstance().getCurrentUser();
-        String curFireBaseUid = curFirebaseUsr.getUid();
-        this.userId = curFireBaseUid;
         Intent intent = new Intent(this, FriendListActivity.class);
         intent.putExtra("id", this.userId);
         startActivity(intent);
-    }
-
-    private class AsyncTaskRunner extends AsyncTask<String, String, String >{
-        boolean currentStage = false;
-        boolean prevStage = false;
-        boolean sent = false;
-        MainActivity activity;
-        String ACHIEVE_MSG = "Achieve the Goal! Congrats!";
-
-        public AsyncTaskRunner(MainActivity activity){
-            this.activity = activity;
-
-            CharSequence name = "Goal Check";
-            String description = "Check the goal";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("0", name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            Log.e(TAG, "background");
-            Integer steps = -1;
-            Integer goal = 0;
-            int t = 30;
-            while (true) {
-                try {
-                    int time = 1000;
-                    Thread.sleep(time);
-                    steps = Integer.parseInt(stepsTodayVal.getText().toString());
-                    goal = Integer.parseInt(goalVal.getText().toString());
-                } catch (Exception e) {
-                    Log.e(TAG, "error processing goal value");
-                    continue;
-                }
-                this.prevStage = this.currentStage;
-                if (steps >= goal) {
-                    this.currentStage = true;
-                }
-                else{
-                    this.currentStage = false;
-                }
-
-                t--;
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            if ( !this.prevStage && this.currentStage){
-                // Call Notification
-                Log.d(TAG, "Achieve the Goal");
-                sendNotification();
-            }
-            else{
-                Log.d(TAG, "Not Achieve the goal");
-            }
-        }
-
-
-        private void sendNotification(){
-            Log.e(TAG,"SEND NOTIFICATION");
-            Intent intent = new Intent(this.activity, SetGoalActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this.activity, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this.activity,"0")
-                    .setSmallIcon(R.drawable.ham_2x)
-                    .setContentTitle("PersonBest")
-                    .setContentText(this.ACHIEVE_MSG)
-                    .setAutoCancel(true)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
-            NotificationManager notificationManager = (NotificationManager) getSystemService(this.activity.NOTIFICATION_SERVICE);
-            notificationManager.notify(0, notificationBuilder.build());
-        }
     }
 }

@@ -120,4 +120,20 @@ public class DailyStat implements IStatistics {
     public int getIncidentWalk() {
         return this.totalSteps - this.intentionalSteps;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        else if (other instanceof DailyStat) {
+            DailyStat otherDS = (DailyStat) other;
+            return (goal == otherDS.goal &&
+                    totalSteps == otherDS.totalSteps &&
+                    intentionalSteps == otherDS.intentionalSteps &&
+                    timeWalked == otherDS.timeWalked &&
+                    averageMPH == otherDS.averageMPH);
+        }
+        return false;
+    }
 }

@@ -46,7 +46,11 @@ public class TestSummary {
 
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
-        mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        try {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        } catch (Exception e) {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        }
         sd = new SavedDataManagerSharedPreference(mainActivity);
         sd.setUserHeight(72, null, null);
 

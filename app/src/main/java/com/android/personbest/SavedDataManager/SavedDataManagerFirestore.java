@@ -290,10 +290,8 @@ public class SavedDataManagerFirestore implements SavedDataManager {
         return sdsp.getLastMonthStat(day,null);
     }
 
-    public List<IStatistics> getFriendMonthlyStat(String email, String day, SavedDataOperatorListIStat callback) {
-        getIdByEmail(email, id -> {
-            getDataBatchIstat(ffCurUserData.collection(id), ITimer.getDayStampMonthBefore(day), callback);
-        });
+    public List<IStatistics> getFriendMonthlyStat(String id, String day, SavedDataOperatorListIStat callback) {
+        getDataBatchIstat(ffUserData.document(id).collection(DOCKEY_HIST), ITimer.getDayStampMonthBefore(day), callback);
         return null;
     }
 
@@ -462,7 +460,6 @@ public class SavedDataManagerFirestore implements SavedDataManager {
 
                                  toReturn.add(createIstatFromMap(val));
                              }
-
                              cb.op(toReturn);
                          } else {
                              Log.d(TAG, "get failed with ", task.getException());

@@ -40,9 +40,12 @@ public class TestStepGoalDisplay {
 
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
-        mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
-
-        //mainActivity = Robolectric.setupActivity(MainActivity.class);
+        try {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        } catch (Exception e) {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        }
+        
         goalText = mainActivity.findViewById(R.id.goalText);
         goalVal = mainActivity.findViewById(R.id.goalVal);
         progressBar = mainActivity.findViewById(R.id.progressBar);
