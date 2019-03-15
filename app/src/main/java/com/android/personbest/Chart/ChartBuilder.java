@@ -130,7 +130,7 @@ public class ChartBuilder {
         xAxisLabel = new ArrayList<>();
         xAxisLabel.add("");
         for(int i = 0; i < length; ++i) {
-            StringBuilder dateSB = new StringBuilder(String.valueOf(ITimer.getDayStampDayBefore(today, length - i)));
+            StringBuilder dateSB = new StringBuilder(String.valueOf(ITimer.getDayStampDayBefore(today, length - i - 1)));
             dateSB.insert(6, '/');
             xAxisLabel.add(dateSB.substring(4));
         }
@@ -139,7 +139,17 @@ public class ChartBuilder {
         }
         return this;
     }
-    
+
+    public ChartBuilder buildChartData() {
+        // Create data entries
+        createEntries(stepStats);
+
+        // Set data
+        data = new CombinedData();
+        data.setData(createBarData());
+        data.setData(createLineData());
+        return this;
+    }
 
     private BarData createBarData() {
         BarDataSet stepDataSet = new BarDataSet(barEntries, "Steps Current Week");
@@ -164,17 +174,6 @@ public class ChartBuilder {
 
         goalDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
         return new LineData(goalDataSet);
-    }
-
-    public ChartBuilder buildChartData() {
-        // Create data entries
-        createEntries(stepStats);
-
-        // Set data
-        data = new CombinedData();
-        data.setData(createBarData());
-        data.setData(createLineData());
-        return this;
     }
 
     private void createEntries(List<IStatistics> stepStats) {
