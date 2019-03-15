@@ -56,7 +56,7 @@ public class StoryTestProgressChart {
         Button week = ad.getButton(ad.BUTTON_POSITIVE);
         week.performClick();
         Intent next = Shadows.shadowOf(mainActivity).peekNextStartedActivity();
-        assertEquals(ProgressChart.class.getCanonicalName(), next.getComponent().getClassName());
+        assertEquals(ProgressChart.class.getName(), next.getComponent().getClassName());
         assertEquals("week", next.getStringExtra("mode"));
     }
 
@@ -66,7 +66,7 @@ public class StoryTestProgressChart {
         Button week = ad.getButton(ad.BUTTON_NEUTRAL);
         week.performClick();
         Intent next = Shadows.shadowOf(mainActivity).peekNextStartedActivity();
-        assertEquals(ProgressChart.class.getCanonicalName(), next.getComponent().getClassName());
+        assertEquals(ProgressChart.class.getName(), next.getComponent().getClassName());
         assertEquals("month", next.getStringExtra("mode"));
     }
 
