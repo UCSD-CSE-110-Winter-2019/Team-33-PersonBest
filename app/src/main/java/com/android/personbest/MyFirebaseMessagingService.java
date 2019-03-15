@@ -28,7 +28,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         intent.putExtra("chatId", id);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, id)
+                .setSmallIcon(R.drawable.circularprogressbar)
                 .setContentTitle(NOTIF_TITLE)
                 .setContentText(message)
                 .setAutoCancel(true)

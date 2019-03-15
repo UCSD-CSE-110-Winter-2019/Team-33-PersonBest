@@ -30,7 +30,7 @@ public class ChatBoxActivity extends AppCompatActivity {
 
     CollectionReference chat;
     String from;
-
+    String DB_LINK = "https://console.firebase.google.com/project/team-33-personbest-69e43/database/firestore/data~2FFriendList~2F106271643196003464532";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
