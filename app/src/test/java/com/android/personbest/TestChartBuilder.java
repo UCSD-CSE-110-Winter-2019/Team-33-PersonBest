@@ -50,8 +50,8 @@ public class TestChartBuilder {
 
     @Test
     public void testsSetInterval1() {
-        cb.setData(stepStats);
-        List<IStatistics> stats = cb.setInterval(IntervalMode.WEEK, TODAY).getStepStats();
+        // Get resized stats from builder
+        List<IStatistics> stats = cb.setData(stepStats).setInterval(IntervalMode.WEEK, TODAY).getStepStats();
         assertEquals(7, stats.size());
         for(int i = 0; i < stats.size(); ++i) {
             assertEquals(stepStats.get(i + 1), stats.get(i));
@@ -60,8 +60,8 @@ public class TestChartBuilder {
 
     @Test
     public void testSetInterval2() {
-        cb.setData(stepStats);
-        List<IStatistics> stats = cb.setInterval(IntervalMode.MONTH, TODAY).getStepStats();
+        // Get resized stats from builder
+        List<IStatistics> stats = cb.setData(stepStats).setInterval(IntervalMode.MONTH, TODAY).getStepStats();
         assertEquals(28, stats.size());
         for(int i = 0; i < stats.size(); ++i) {
             if ((i - 20) < 0) {
@@ -75,10 +75,10 @@ public class TestChartBuilder {
 
     @Test
     public void testBuildTimeAxisLabel() {
-        cb.setData(stepStats);
-        List<String> labels = cb.setInterval(IntervalMode.WEEK, TODAY).buildTimeAxisLabel().getxAxisLabel();
+        // Get axis labels from builder
+        List<String> labels = cb.setData(stepStats).setInterval(IntervalMode.WEEK, TODAY).buildTimeAxisLabel().getxAxisLabel();
         String[] tmp = {"", "09/03", "09/04", "09/05", "09/06", "09/07", "09/08", "09/09"};
-        List<String> days =  new ArrayList<String>(Arrays.asList(tmp));
+        List<String> days =  new ArrayList<>(Arrays.asList(tmp));
         assertEquals(days, labels);
     }
 
