@@ -18,15 +18,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="303dp"
                 android:layout_marginTop="39dp"/>
-        <TextView
-                android:text="TextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/statsView" android:layout_weight="1"
-                android:layout_marginTop="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-        />
-
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>
