@@ -27,17 +27,20 @@ public class ChartBuilder {
     private List<BarEntry> barEntries;
     private List<Entry> lineEntries;
     private List<LegendEntry> legendEntries;
-    private List<Pair<String, Integer>> entries;
     private ArrayList<String> xAxisLabel;
     private CombinedChart progressChart;
     private CombinedData data;
     private int length = 28;
     private String today;
 
-    public ChartBuilder(Activity act) {
-        progressChart = act.findViewById(R.id.progressChart);
+    public ChartBuilder() {
         barEntries = new ArrayList<>();
         lineEntries = new ArrayList<>();
+    }
+
+    public ChartBuilder(Activity act) {
+        this();
+        progressChart = act.findViewById(R.id.progressChart);
     }
 
     public ChartBuilder setData(List<IStatistics> stats) {
@@ -52,7 +55,16 @@ public class ChartBuilder {
         today = endDate;
         Log.i(TAG, "Set interval, length=" + this.length + ", end_date=" + this.today);
 
-        processData();
+        ArrayList<IStatistics> zeros = new ArrayList<>();
+        for(int i = 0; i < length - stepStats.size(); ++i) {
+            zeros.add(new DailyStat(0,0,0,1,0));
+        }
+        int start = max(0, stepStats.size() - length);
+        for(int i = start; i < stepStats.size(); ++i) {
+            zeros.add(stepStats.get(i));
+        }
+        stepStats = zeros;
+
         return this;
     }
 
@@ -96,7 +108,7 @@ public class ChartBuilder {
         Log.i(TAG, "Build intentional and incidental walk legend entries");
 
         // Create legend entries
-        entries = new ArrayList<>();
+        List<Pair<String, Integer>> entries = new ArrayList<>();
         entries.add(new Pair<>("Incidental Walk", Color.rgb(0, 92, 175)));
         entries.add(new Pair<>("Intentional Walk", Color.rgb(123, 144, 210)));
         legendEntries = new ArrayList<>();
@@ -105,7 +117,9 @@ public class ChartBuilder {
             legendEntries.add(new LegendEntry(entries.get(i).first, Legend.LegendForm.DEFAULT,
                     Float.NaN, Float.NaN, null, entries.get(i).second));
         }
-        progressChart.getLegend().setCustom(legendEntries);
+        if (progressChart != null) {
+            progressChart.getLegend().setCustom(legendEntries);
+        }
         return this;
     }
 
@@ -116,15 +130,26 @@ public class ChartBuilder {
         xAxisLabel = new ArrayList<>();
         xAxisLabel.add("");
         for(int i = 0; i < length; ++i) {
-            StringBuilder dateSB = new StringBuilder(String.valueOf(ITimer.getDayStampDayBefore(today, length - i)));
+            StringBuilder dateSB = new StringBuilder(String.valueOf(ITimer.getDayStampDayBefore(today, length - i - 1)));
             dateSB.insert(6, '/');
             xAxisLabel.add(dateSB.substring(4));
         }
-
-        progressChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
+        if (progressChart != null) {
+            progressChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
+        }
         return this;
     }
 
+    public ChartBuilder buildChartData() {
+        // Create data entries
+        createEntries(stepStats);
+
+        // Set data
+        data = new CombinedData();
+        data.setData(createBarData());
+        data.setData(createLineData());
+        return this;
+    }
 
     private BarData createBarData() {
         BarDataSet stepDataSet = new BarDataSet(barEntries, "Steps Current Week");
@@ -173,27 +198,15 @@ public class ChartBuilder {
         return data.getBarData();
     }
 
-    private void genChartEntryData() {
-        // Create data entries
-        createEntries(stepStats);
-
-        // Set data
-        data = new CombinedData();
-        data.setData(createBarData());
-        data.setData(createLineData());
+    public List<LegendEntry> getLegendEntries() {
+        return legendEntries;
     }
 
-    private void processData() {
-        ArrayList<IStatistics> zeros = new ArrayList<>();
-        for(int i = 0; i < length - stepStats.size(); ++i) {
-            zeros.add(new DailyStat(0,0,0,1,0));
-        }
-        int start = max(0, stepStats.size() - length);
-        for(int i = start; i < stepStats.size(); ++i) {
-            zeros.add(stepStats.get(i));
-        }
-        stepStats = zeros;
+    public ArrayList<String> getxAxisLabel() {
+        return xAxisLabel;
+    }
 
-        genChartEntryData();
+    public List<IStatistics> getStepStats() {
+        return stepStats;
     }
 }
