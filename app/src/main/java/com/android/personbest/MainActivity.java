@@ -2,10 +2,18 @@ package com.android.personbest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -27,7 +35,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
+import android.support.v4.app.NotificationCompat;
 import java.io.Serializable;
 import java.util.*;
 
@@ -62,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String today;
     private Integer todayInt;
     private String userId;
+    private AsyncTaskRunner asyncTaskRunner;
 
 //    private FirebaseAuth mAuth;
 //    private GoogleSignInAccount curAccount;
@@ -81,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ProgressBar progressBar;
     private Button addFriend;
     private Button viewFriends;
+
+
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -276,6 +287,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 launchViewFriends();
             }
         });
+
+
+        this.asyncTaskRunner = new AsyncTaskRunner(this);
+        asyncTaskRunner.execute("1");
 
         // the user should be signed in by here
         //if(test_mode == ExecMode.EMode.DEFAULT) {
@@ -579,6 +594,86 @@ public class MainActivity extends AppCompatActivity implements Observer {
         Intent intent = new Intent(this, FriendListActivity.class);
         intent.putExtra("id", this.userId);
         startActivity(intent);
+    }
+
+    private class AsyncTaskRunner extends AsyncTask<String, String, String >{
+        boolean currentStage = false;
+        boolean prevStage = false;
+        boolean sent = false;
+        MainActivity activity;
+        String ACHIEVE_MSG = "Achieve the Goal! Congrats!";
+
+        public AsyncTaskRunner(MainActivity activity){
+            this.activity = activity;
+
+            CharSequence name = "Goal Check";
+            String description = "Check the goal";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("0", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            Log.e(TAG, "background");
+            Integer steps = -1;
+            Integer goal = 0;
+            int t = 30;
+            while (true) {
+                try {
+                    int time = 1000;
+                    Thread.sleep(time);
+                    steps = Integer.parseInt(stepsTodayVal.getText().toString());
+                    goal = Integer.parseInt(goalVal.getText().toString());
+                } catch (Exception e) {
+                    Log.e(TAG, "error processing goal value");
+                    continue;
+                }
+                this.prevStage = this.currentStage;
+                if (steps >= goal) {
+                    this.currentStage = true;
+                }
+                else{
+                    this.currentStage = false;
+                }
+
+                t--;
+            }
+            return "";
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            if ( !this.prevStage && this.currentStage){
+                // Call Notification
+                Log.d(TAG, "Achieve the Goal");
+                sendNotification();
+            }
+            else{
+                Log.d(TAG, "Not Achieve the goal");
+            }
+        }
+
+
+        private void sendNotification(){
+            Log.e(TAG,"SEND NOTIFICATION");
+            Intent intent = new Intent(this.activity, SetGoalActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this.activity, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this.activity,"0")
+                    .setSmallIcon(R.drawable.ham_2x)
+                    .setContentTitle("PersonBest")
+                    .setContentText(this.ACHIEVE_MSG)
+                    .setAutoCancel(true)
+                    .setSound(defaultSoundUri)
+                    .setContentIntent(pendingIntent);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(this.activity.NOTIFICATION_SERVICE);
+            notificationManager.notify(0, notificationBuilder.build());
+        }
     }
 
 }

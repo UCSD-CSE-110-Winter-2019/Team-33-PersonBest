@@ -67,7 +67,7 @@ public class ChatBoxActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-        this.subscribeToNotificationsTopic();
+        //this.subscribeToNotificationsTopic();
     }
 
     private void sendMessage() {
@@ -119,6 +119,6 @@ public class ChatBoxActivity extends AppCompatActivity {
             String msg =  "Subscribed to notifications" ;  if  (!task.isSuccessful()) {
                 msg =  "Subscribe to notifications failed" ; }
             Log. d ( TAG , msg);
-            Toast. makeText(  ChatBoxActivity.this , msg, Toast.LENGTH_SHORT)  .show(); }
+            Toast.makeText(  ChatBoxActivity.this , msg, Toast.LENGTH_SHORT)  .show(); }
         ); }
 }
