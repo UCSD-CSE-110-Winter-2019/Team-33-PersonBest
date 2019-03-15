@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
     private static final String TEST_CUR_USR_ID = "test-uid";
+    private static final String ACHIEVE_MSG = "Achieve the Goal! Congrats! Click Here to set a new Goal!";
 
     private static ExecMode.EMode test_mode;
 
@@ -97,8 +98,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private Button addFriend;
     private Button viewFriends;
 
-    public GoalCheckService goalCheckService;
-    private boolean isBound;
+    private boolean pushed;
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -121,7 +121,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 if(left > 0) stepsLeftVal.setText(String.valueOf(left));
                 else stepsLeftVal.setText("0");
 
-                if(goalCheckService != null) updateService();
+                if(totalSoFar > goalNum && !pushed) {
+                    pushed = true;
+                    sendNotification();
+                }
+                else pushed = false;
             }
         });
     }
@@ -314,11 +318,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
-        Intent intent = new Intent(this, GoalCheckService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        //Intent intent = new Intent(this, GoalCheckService.class);
+        //bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    /*private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             GoalCheckService.LocalService localService = (GoalCheckService.LocalService) iBinder;
@@ -352,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             isBound = false;
         }
         super.onDestroy();
-    }
+    }*/
 
     @Override
     protected void onResume() {
@@ -660,5 +664,28 @@ public class MainActivity extends AppCompatActivity implements Observer {
         Intent intent = new Intent(this, FriendListActivity.class);
         intent.putExtra("id", this.userId);
         startActivity(intent);
+    }
+
+    private void sendNotification() {
+        this.pushed = true;
+        Log.e(TAG,"SEND NOTIFICATION");
+        Intent intent = new Intent(this, SetGoalActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        Intent snoozeIntent = new Intent(this, MainActivity.class);
+        PendingIntent snoozePendingIntent =
+                PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,"0")
+                .setSmallIcon(R.drawable.ham_2x)
+                .setContentTitle("Person Best Goal")
+                .setContentText(ACHIEVE_MSG)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .addAction(R.drawable.ham_2x, "Snooze",
+                        snoozePendingIntent);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, notificationBuilder.build());
     }
 }
