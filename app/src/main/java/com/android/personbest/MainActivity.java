@@ -39,6 +39,8 @@ import android.support.v4.app.NotificationCompat;
 import java.io.Serializable;
 import java.util.*;
 
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
+
 public class MainActivity extends AppCompatActivity implements Observer {
 
     private static final int GOAL_INIT = 5000; // default
@@ -601,7 +603,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         boolean prevStage = false;
         boolean sent = false;
         MainActivity activity;
-        String ACHIEVE_MSG = "Achieve the Goal! Congrats!";
+        String ACHIEVE_MSG = "Achieve the Goal! Congrats! Click Here to set a new Goal!";
 
         public AsyncTaskRunner(MainActivity activity){
             this.activity = activity;
@@ -641,9 +643,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     this.currentStage = false;
                 }
 
-                t--;
+                //t--;
             }
-            return "";
+            //sendNotification();
+            //return "";
         }
 
         @Override
@@ -664,15 +667,25 @@ public class MainActivity extends AppCompatActivity implements Observer {
             Intent intent = new Intent(this.activity, SetGoalActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(this.activity, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+
+            Intent snoozeIntent = new Intent(this.activity, MainActivity.class);
+            PendingIntent snoozePendingIntent =
+                    PendingIntent.getBroadcast(this.activity, 0, snoozeIntent, 0);
+
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this.activity,"0")
                     .setSmallIcon(R.drawable.ham_2x)
                     .setContentTitle("PersonBest")
                     .setContentText(this.ACHIEVE_MSG)
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
+                    .setContentIntent(pendingIntent)
+                    .addAction(R.drawable.ham_2x, "Snooze",
+                            snoozePendingIntent);
             NotificationManager notificationManager = (NotificationManager) getSystemService(this.activity.NOTIFICATION_SERVICE);
             notificationManager.notify(0, notificationBuilder.build());
+
+
         }
     }
 
