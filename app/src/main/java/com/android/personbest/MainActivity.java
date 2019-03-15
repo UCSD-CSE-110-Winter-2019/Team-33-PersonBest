@@ -303,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         //    }
         //}
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -643,7 +644,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
                 t--;
             }
-            return "";
         }
 
         @Override
@@ -675,5 +675,4 @@ public class MainActivity extends AppCompatActivity implements Observer {
             notificationManager.notify(0, notificationBuilder.build());
         }
     }
-
 }

@@ -30,7 +30,6 @@ public class ChatBoxActivity extends AppCompatActivity {
 
     CollectionReference chat;
     String from;
-    String DB_LINK = "https://console.firebase.google.com/project/team-33-personbest-69e43/database/firestore/data~2FFriendList~2F106271643196003464532";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +66,7 @@ public class ChatBoxActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-        //this.subscribeToNotificationsTopic();
+        this.subscribeToNotificationsTopic();
     }
 
     private void sendMessage() {
@@ -114,11 +113,13 @@ public class ChatBoxActivity extends AppCompatActivity {
             }
         });
     }
-    private void  subscribeToNotificationsTopic() {
-        FirebaseMessaging. getInstance ().subscribeToTopic( CHAT_ID ) .addOnCompleteListener(task -> {
+
+    private void subscribeToNotificationsTopic() {
+        FirebaseMessaging.getInstance().subscribeToTopic(CHAT_ID).addOnCompleteListener(task -> {
             String msg =  "Subscribed to notifications" ;  if  (!task.isSuccessful()) {
                 msg =  "Subscribe to notifications failed" ; }
-            Log. d ( TAG , msg);
-            Toast.makeText(  ChatBoxActivity.this , msg, Toast.LENGTH_SHORT)  .show(); }
-        ); }
+            Log.d(TAG, msg);
+            Toast.makeText(ChatBoxActivity.this, msg, Toast.LENGTH_SHORT).show(); }
+        );
+    }
 }
