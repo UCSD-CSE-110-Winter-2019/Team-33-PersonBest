@@ -19,6 +19,12 @@ public class TestProgressEncouragement {
     @Before
     public void setup() {
         ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
+        Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
+        try {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        } catch (Exception e) {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        }
     }
 
     @Test
@@ -30,8 +36,6 @@ public class TestProgressEncouragement {
 
     @Test
     public void testToastMessage() {
-        Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
-        mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
         ProgressEncouragement progressEncouragement = new ProgressEncouragement(mainActivity);
         progressEncouragement.showEncouragementMessage(503,3);
         assertEquals( "You've increased your daily steps by 500 steps. Keep up the good work!", ShadowToast.getTextOfLatestToast());

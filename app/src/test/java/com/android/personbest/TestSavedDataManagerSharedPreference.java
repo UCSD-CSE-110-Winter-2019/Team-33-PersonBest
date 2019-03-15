@@ -22,7 +22,7 @@ import static org.junit.Assert.assertFalse;
 public class TestSavedDataManagerSharedPreference {
     private static final String TEST_SERVICE = "TEST_SERVICE";
 
-    private MainActivity activity;
+    private MainActivity mainActivity;
     private SavedDataManager sd;
     private SharedPreferences.Editor editor;
     private int nextStepCount;
@@ -42,10 +42,14 @@ public class TestSavedDataManagerSharedPreference {
 
         Intent intent = new Intent(RuntimeEnvironment.application, MainActivity.class);
         intent.putExtra(MainActivity.FITNESS_SERVICE_KEY, TEST_SERVICE);
-        activity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        try {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        } catch (Exception e) {
+            mainActivity = Robolectric.buildActivity(MainActivity.class, intent).create().get();
+        }
         //System.err.println(MainActivity.FITNESS_SERVICE_KEY);
 
-        sd = new SavedDataManagerSharedPreference(activity);
+        sd = new SavedDataManagerSharedPreference(mainActivity);
         sd.clearData();
         nextStepCount = 1337;
     }

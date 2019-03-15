@@ -1,14 +1,13 @@
 package com.android.personbest;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import com.android.personbest.Chart.ChartBuilder;
-import com.android.personbest.Chart.IntervalMode;
+import android.util.Pair;
+import android.widget.Button;
+import com.android.personbest.Chart.*;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -16,25 +15,25 @@ import com.android.personbest.StepCounter.IStatistics;
 import com.android.personbest.Timer.ITimer;
 import com.android.personbest.Timer.TimerSystem;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ProgressChart extends AppCompatActivity {
-    private static String TAG = "ProgressChart";
+public class FriendProgress extends AppCompatActivity {
+    private static final String TAG = "Monthly Chart";
+    private static final int NUM_DAYS_M = 28;
     private static ExecMode.EMode test_mode;
-    private IntervalMode mode;
+
     private SavedDataManager savedDataManager;
+    private ArrayList<String> xAxisLabel;
+    private List<Pair<String, Integer>> entries;
+    private String user;
+    private String chatId;
     private ITimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_progress_chart);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        mode = getIntent().getStringExtra("mode").equals("week") ? IntervalMode.WEEK :
-                IntervalMode.MONTH;
+        setContentView(R.layout.activity_friend_progress);
 
         // we testing?
         test_mode = ExecMode.getExecMode();
@@ -51,20 +50,26 @@ public class ProgressChart extends AppCompatActivity {
         // New Timer
         timer = new TimerSystem();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(v -> {
-            this.quaryData();
-            Log.i(TAG, "Refreshed");
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        this.quaryData();
+        // Query and create chart
+        user = getIntent().getStringExtra("userId");
+        chatId = getIntent().getStringExtra("chatId");
+
+        Button send = findViewById(R.id.msg_button);
+        send.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ChatBoxActivity.class);
+            intent.putExtra("chatId", chatId);
+            startActivity(intent);
+        });
+
+        quaryData(user);
     }
 
-    private void quaryData() {
-        Log.i(TAG,"Quary data from firebase");
+    private void quaryData(String user) {
+        Log.i(TAG,"Quary data from firebase, friend=" + user);
         if(test_mode == ExecMode.EMode.DEFAULT) {
-            savedDataManager.getLastMonthStat(timer.getTodayString(), this::buildChart);
+            savedDataManager.getFriendMonthlyStat(user, timer.getTodayString(), this::buildChart);
         }
     }
 
@@ -72,7 +77,7 @@ public class ProgressChart extends AppCompatActivity {
         Log.i(TAG,"Build chart");
         ChartBuilder builder = new ChartBuilder(this);
         builder.setData(stats)
-                .setInterval(mode, timer.getTodayString())
+                .setInterval(IntervalMode.MONTH, timer.getTodayString())
                 .buildChartData()
                 .buildTimeAxisLabel()
                 .buildWalkEntryLegends()
