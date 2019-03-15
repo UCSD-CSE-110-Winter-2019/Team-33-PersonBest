@@ -37,6 +37,8 @@ import android.support.v4.app.NotificationCompat;
 import java.io.Serializable;
 import java.util.*;
 
+import android.os.IBinder;
+
 import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 
 public class MainActivity extends AppCompatActivity implements Observer {
@@ -72,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String today;
     private Integer todayInt;
     private String userId;
-    private AsyncTaskRunner asyncTaskRunner;
     private Boolean hasFriend;
 
 //    private FirebaseAuth mAuth;
@@ -308,10 +309,10 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
-        this.asyncTaskRunner = new AsyncTaskRunner(this);
-        asyncTaskRunner.execute("1");
+        Intent intent = new Intent(this, GoalCheckService.class);
 
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -620,7 +621,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         startActivity(intent);
     }
 
-    private class AsyncTaskRunner extends AsyncTask<String, String, String >{
+    /*private class AsyncTaskRunner extends AsyncTask<String, String, String >{
         boolean currentStage = false;
         boolean prevStage = false;
         boolean sent = false;
@@ -709,6 +710,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
 
         }
-    }
+    }*/
 
 }
