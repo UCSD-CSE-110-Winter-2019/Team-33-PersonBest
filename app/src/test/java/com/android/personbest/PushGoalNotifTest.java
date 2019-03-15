@@ -43,6 +43,7 @@ public class PushGoalNotifTest {
         }
         sd = new SavedDataManagerSharedPreference(mainActivity);
         sd.setUserHeight(72, null, null);
+        mainActivity.goalCheckService = new MockService();
         mainActivity.setStepCount(0);
         mainActivity.setGoal(500);
     }
@@ -51,5 +52,12 @@ public class PushGoalNotifTest {
     public void testGoalNotify() {
         this.mainActivity.setStepCount(600);
         assertTrue(this.mainActivity.goalCheckService.pushed);
+    }
+
+    public class MockService extends GoalCheckService {
+        @Override
+        public void update(int steps, int goal) {
+            if(steps >= goal) this.pushed = true;
+        }
     }
 }
