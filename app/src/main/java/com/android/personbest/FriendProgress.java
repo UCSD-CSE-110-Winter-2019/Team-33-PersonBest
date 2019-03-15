@@ -80,6 +80,7 @@ public class FriendProgress extends AppCompatActivity {
         ChartBuilder builder = new ChartBuilder(this);
         builder.setData(stats)
                 .setInterval(IntervalMode.MONTH, timer.getTodayString())
+                .buildChartData()
                 .buildTimeAxisLabel()
                 .buildWalkEntryLegends()
                 .useOptimalConfig()

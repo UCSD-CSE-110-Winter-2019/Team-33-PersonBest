@@ -78,6 +78,7 @@ public class ProgressChart extends AppCompatActivity {
         ChartBuilder builder = new ChartBuilder(this);
         builder.setData(stats)
                 .setInterval(mode, timer.getTodayString())
+                .buildChartData()
                 .buildTimeAxisLabel()
                 .buildWalkEntryLegends()
                 .useOptimalConfig()
