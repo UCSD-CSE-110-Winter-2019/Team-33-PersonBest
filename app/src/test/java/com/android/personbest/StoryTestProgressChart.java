@@ -50,6 +50,12 @@ public class StoryTestProgressChart {
         }
     }
 
+    /*
+     * Given that user is at main screen
+     * When the user press button "Progress Chart"
+     *   and the user clicks "Weekly Chart"
+     * Then the progress chart with 7-day data will be displayed in a new window
+     */
     @Test
     public void testWeekIntent() {
         AlertDialog ad = mainActivity.launchProgressChart(null);
@@ -60,6 +66,12 @@ public class StoryTestProgressChart {
         assertEquals("week", next.getStringExtra("mode"));
     }
 
+    /*
+     * Given that user is at main screen
+     * When the user press button "Progress Chart"
+     *   and the user clicks "Monthly Chart"
+     * Then the progress chart with 28-day data will be displayed in a new window
+     */
     @Test
     public void testMonthIntent() {
         AlertDialog ad = mainActivity.launchProgressChart(null);
@@ -70,6 +82,12 @@ public class StoryTestProgressChart {
         assertEquals("month", next.getStringExtra("mode"));
     }
 
+    /*
+     * Given that user is at main screen
+     * When the user press button "Progress Chart"
+     *   and the user clicks "Weekly Chart"
+     * Then the progress chart with 7-day data will be displayed in a new window
+     */
     @Test
     public void testWeekChartDisplayed() {
         Intent next = new Intent(mainActivity, ProgressChart.class);
@@ -80,6 +98,12 @@ public class StoryTestProgressChart {
         assertEquals(7, cc.getData().getLineData().getEntryCount());
     }
 
+    /*
+     * Given that user is at main screen
+     * When the user press button "Progress Chart"
+     *   and the user clicks "Monthly Chart"
+     * Then the progress chart with 28-day data will be displayed in a new window
+     */
     @Test
     public void testMonthChartDisplayed() {
         Intent next = new Intent(mainActivity, ProgressChart.class);
