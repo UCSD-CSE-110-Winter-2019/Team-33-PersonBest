@@ -1,8 +1,10 @@
 package com.android.personbest.FriendshipManager;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Observable;
 
-public class MockFirebaseAdapter implements FFireBaseAdapter {
+public class MockFirebaseAdapter extends Observable implements FFireBaseAdapter, Serializable {
     HashMap<String, String> db;
 
     public MockFirebaseAdapter() {
@@ -24,4 +26,5 @@ public class MockFirebaseAdapter implements FFireBaseAdapter {
     public void hasFriend(OperatorBoolean b) {
         b.op(db.size() > 0);
     }
+
 }

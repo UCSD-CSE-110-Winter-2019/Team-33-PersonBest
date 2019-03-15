@@ -11,6 +11,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import com.android.personbest.FriendshipManager.FFireBaseAdapter;
 import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
+import com.android.personbest.FriendshipManager.MockFirebaseAdapter;
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerMock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,7 @@ public class FriendListActivity extends ListActivity implements Observer {
     FFireBaseAdapter fireBaseAdapter;
     String idCurrentUser;
     FriendListActivity self;
+    SavedDataManagerMock sd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +41,19 @@ public class FriendListActivity extends ListActivity implements Observer {
                 finish();
             }
         });
+
         idCurrentUser = getIntent().getStringExtra("id");
-        this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
-        ((FriendFireBaseAdapter)(this.fireBaseAdapter)).addObserver(this);
+
+        // test
+        FFireBaseAdapter f = (FFireBaseAdapter) getIntent().getSerializableExtra("FFireBaseAdapter");
+        if (f == null) {
+            this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
+            ((Observable)(this.fireBaseAdapter)).addObserver(this);
+        } else {
+            fireBaseAdapter = f;
+            ((Observable)(this.fireBaseAdapter)).addObserver(this);
+        }
+
         this.fireBaseAdapter.getFriendlist();
         list = new ArrayList<String>();
         listId = new ArrayList<String>();
@@ -48,6 +62,9 @@ public class FriendListActivity extends ListActivity implements Observer {
                 R.layout.row_layout, R.id.listText, list);
         setListAdapter(myAdapter);
         self = this;
+
+        // test
+        sd = (SavedDataManagerMock) getIntent().getSerializableExtra("SavedDataManager");
     }
 
 
@@ -64,6 +81,7 @@ public class FriendListActivity extends ListActivity implements Observer {
                         Intent intent = new Intent(self, FriendProgress.class);
                         intent.putExtra("userId", friendId);
                         intent.putExtra("chatId", chatId);
+                        intent.putExtra("SavedDataManager", sd);
                         startActivity(intent);
                     }
                 }).setNeutralButton(R.string.message_btn, new DialogInterface.OnClickListener() {

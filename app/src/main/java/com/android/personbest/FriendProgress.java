@@ -40,6 +40,8 @@ public class FriendProgress extends AppCompatActivity {
         test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
             savedDataManager = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
+            SavedDataManager m = (SavedDataManager) getIntent().getSerializableExtra("SavedDataManager");
+            if (m != null) savedDataManager = m;
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
             savedDataManager = new SavedDataManagerSharedPreference(this);
         }
