@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             fFireBaseAdapter = new FriendFireBaseAdapter(this.userId);
         } else {
             this.userId = TEST_CUR_USR_ID;
-            fFireBaseAdapter = new MockFirebaseAdapter();
+            fFireBaseAdapter = new MockFirebaseAdapter(TEST_CUR_USR_ID);
         }
 
         if(test_mode == ExecMode.EMode.DEFAULT) {

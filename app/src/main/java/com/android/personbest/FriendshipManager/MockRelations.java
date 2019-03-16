@@ -4,7 +4,7 @@ public class MockRelations implements FriendshipManager {
     MockFirebaseAdapter fba;
 
     public MockRelations() {
-        fba = new MockFirebaseAdapter();
+        fba = new MockFirebaseAdapter("test-uid");
     }
 
     @Override
