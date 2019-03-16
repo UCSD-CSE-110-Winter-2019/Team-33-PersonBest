@@ -139,8 +139,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
         setContentView(R.layout.activity_main);
         final Activity self = this;
 
-        FirebaseApp.initializeApp(this);
-
         // Setup UI
         stepsTodayVal = findViewById(R.id.stepsTodayVal);
         goalVal = findViewById(R.id.goalVal);
@@ -169,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         }
         else {
             // set saved data manager
+            FirebaseApp.initializeApp(this);
             sd = new SavedDataManagerFirestore(this);
         }
 
