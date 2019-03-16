@@ -10,6 +10,8 @@ import android.widget.EditText;
 import com.android.personbest.FriendshipManager.FriendshipManager;
 import com.android.personbest.FriendshipManager.Relations;
 
+import static android.app.Activity.RESULT_OK;
+
 public class BefriendActivity extends AppCompatActivity {
     private Button connect;
     private EditText nameInput;

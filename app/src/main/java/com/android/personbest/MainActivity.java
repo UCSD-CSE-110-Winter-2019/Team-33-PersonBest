@@ -124,11 +124,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 if(left > 0) stepsLeftVal.setText(String.valueOf(left));
                 else stepsLeftVal.setText("0");
 
-                if(totalSoFar > goalNum && !pushed) {
+                if(totalSoFar >= goalNum && !pushed) {
                     pushed = true;
                     iNotification.sendNotification(ACHIEVE_MSG);
                 }
-                else pushed = false;
+                else if (totalSoFar < goalNum) pushed = false;
             }
         });
     }

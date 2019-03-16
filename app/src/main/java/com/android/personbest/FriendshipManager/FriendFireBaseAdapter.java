@@ -187,7 +187,7 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
                     Log.d(TAG, "Subscribe to " + topic); }
                 );*/
 
-        FirebaseMessaging. getInstance ().subscribeToTopic( topic ) .addOnCompleteListener(task -> {
+        FirebaseMessaging.getInstance ().subscribeToTopic( topic ) .addOnCompleteListener(task -> {
             String msg =  "Subscribed to notifications" ;  if  (!task.isSuccessful()) {
                 msg =  "Subscribe to notifications failed" ; }
             Log. d ( TAG , msg); }

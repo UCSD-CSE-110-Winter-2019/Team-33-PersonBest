@@ -87,6 +87,7 @@ public class MessagingServiceTest {
             return true;
         }
 
+        @Override
         public StringBuilder orderBy(){
             StringBuilder sb = new StringBuilder();
             for (Map<String,String> map: history){
@@ -100,6 +101,12 @@ public class MessagingServiceTest {
             notifyObservers(sb.toString());
             return sb;
         }
+
+        @Override
+        public void subscribeToTopic(String topic) {
+            return;
+        }
+
     }
 
 }
