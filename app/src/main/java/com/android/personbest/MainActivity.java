@@ -2,10 +2,19 @@ package com.android.personbest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,6 +24,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.personbest.FriendshipManager.*;
+import com.android.personbest.Notification.INotification;
+import com.android.personbest.Notification.NotificationManager;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -25,9 +36,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
+import android.support.v4.app.NotificationCompat;
 import java.io.Serializable;
 import java.util.*;
+
+import android.os.IBinder;
+
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 
 public class MainActivity extends AppCompatActivity implements Observer {
 
@@ -40,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
     private static final String TEST_CUR_USR_ID = "test-uid";
+    private static final String ACHIEVE_MSG = "Achieve the Goal! Congrats! Click Here to set a new Goal!";
 
     private static ExecMode.EMode test_mode;
 
@@ -64,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String userId;
     private Boolean hasFriend;
 
+    private INotification iNotification;
+
 //    private FirebaseAuth mAuth;
 //    private GoogleSignInAccount curAccount;
 //    private FirebaseUser curFirebaseUser;
@@ -82,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private ProgressBar progressBar;
     private Button addFriend;
     private Button viewFriends;
+
+    private boolean pushed;
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -103,6 +123,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 int left = goalNum - totalSoFar;
                 if(left > 0) stepsLeftVal.setText(String.valueOf(left));
                 else stepsLeftVal.setText("0");
+
+                if(totalSoFar > goalNum && !pushed) {
+                    pushed = true;
+                    iNotification.sendNotification(ACHIEVE_MSG);
+                }
+                else pushed = false;
             }
         });
     }
@@ -294,7 +320,48 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 launchViewFriends();
             }
         });
+
+        this.iNotification = new NotificationManager(this);
+        //Intent intent = new Intent(this, GoalCheckService.class);
+        //bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
+
+    /*private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            GoalCheckService.LocalService localService = (GoalCheckService.LocalService) iBinder;
+            goalCheckService = localService.getService();
+            isBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isBound = false;
+        }
+    };
+
+    public void updateService() {
+        int steps = 0;
+        try {
+            steps = Integer.parseInt(stepsTodayVal.getText().toString());
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        this.goalCheckService.update(steps, this.goalNum);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(isBound) {
+            unbindService(serviceConnection);
+            isBound = false;
+        }
+        super.onDestroy();
+    }*/
+
     @Override
     protected void onResume() {
         super.onResume();
