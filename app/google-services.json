@@ -15,19 +15,19 @@
       },
       "oauth_client": [
         {
+          "client_id": "998924189833-cv4id4ndpnd06tvegiahia8jkkigga1f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "554b2cb61a6eaf26b32ade66af447df661ad236c"
+          }
+        },
+        {
           "client_id": "998924189833-p7ntgum9o6l18pms8c7csur7dch22qs5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.android.personbest",
             "certificate_hash": "7384a83100d93fe2ca5493358db129c35729e08d"
-          }
-        },
-        {
-          "client_id": "998924189833-6mb45t9urf21iveau96bn2ir0d8289bd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.android.personbest",
-            "certificate_hash": "a4cb5d548568a74bef7a1f59ccecc77294d09efb"
           }
         },
         {
@@ -47,19 +47,27 @@
           }
         },
         {
-          "client_id": "998924189833-cv4id4ndpnd06tvegiahia8jkkigga1f.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.android.personbest",
-            "certificate_hash": "554b2cb61a6eaf26b32ade66af447df661ad236c"
-          }
-        },
-        {
           "client_id": "998924189833-00busrksmr13v0mmn9iau7d4pdu8th6u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.android.personbest",
             "certificate_hash": "9e460fc287cd82811b6a4a12e7ae0043e10ea741"
+          }
+        },
+        {
+          "client_id": "998924189833-ch30t3inih98g1ofg7i4a8mmp8fdrfsp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "a4cb5d548568a74bef7a1f59ccecc77294d09efb"
+          }
+        },
+        {
+          "client_id": "998924189833-an4i01a2taciuj5qnv0vip11qpc2bv01.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.personbest",
+            "certificate_hash": "bc8ccd3d4225eb54dfdddf37f5029f7cb6afbf54"
           }
         },
         {
