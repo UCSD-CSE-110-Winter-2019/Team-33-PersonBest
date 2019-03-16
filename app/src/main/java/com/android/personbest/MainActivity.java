@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.android.personbest.FriendshipManager.*;
 import com.android.personbest.Notification.INotification;
-import com.android.personbest.Notification.NotificationManager;
+import com.android.personbest.Notification.PBNotificationManager;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
-        this.iNotification = new NotificationManager(this);
+        this.iNotification = new PBNotificationManager(this);
         //Intent intent = new Intent(this, GoalCheckService.class);
         //bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
