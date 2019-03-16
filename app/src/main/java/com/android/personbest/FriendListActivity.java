@@ -48,11 +48,10 @@ public class FriendListActivity extends ListActivity implements Observer {
         FFireBaseAdapter f = (FFireBaseAdapter) getIntent().getSerializableExtra("FFireBaseAdapter");
         if (f == null) {
             this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
-            ((Observable)(this.fireBaseAdapter)).addObserver(this);
         } else {
             fireBaseAdapter = f;
-            ((Observable)(this.fireBaseAdapter)).addObserver(this);
         }
+        ((Observable)(this.fireBaseAdapter)).addObserver(this);
 
         this.fireBaseAdapter.getFriendlist();
         list = new ArrayList<String>();

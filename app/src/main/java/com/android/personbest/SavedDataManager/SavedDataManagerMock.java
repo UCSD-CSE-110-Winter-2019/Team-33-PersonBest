@@ -9,15 +9,19 @@ import java.util.List;
 public class SavedDataManagerMock implements SavedDataManager, Serializable {
     private List<IStatistics> data;
     private List<IStatistics> dataFriend;
+    private String friendEmail;
+    private String friendID;
 
-    public SavedDataManagerMock(List<IStatistics> data, List<IStatistics> dataFriend) {
+    public SavedDataManagerMock(List<IStatistics> data, List<IStatistics> dataFriend, String friendEmail, String friendID) {
         this.data = data;
         this.dataFriend = dataFriend;
+        this.friendEmail = friendEmail;
+        this.friendID = friendID;
     }
-
 
     @Override
     public void getIdByEmail(String email, SavedDataOperatorString callback) {
+        callback.op(friendID);
     }
 
     @Override
@@ -25,18 +29,10 @@ public class SavedDataManagerMock implements SavedDataManager, Serializable {
         return data;
     }
 
-    public List<IStatistics> getLastWeekSteps(int day) {
-        List<IStatistics> toRet = new ArrayList<>();
-        for(int i = 1; i <=day; ++i) {
-            toRet.add(steps.get(i - 1));
-        }
-        return toRet;
-    }
+    @Override
+    public void clearData() { }
 
-    public void clearData() {
-
-    }
-
+    @Override
     public List<IStatistics> getLastMonthStat(String day, SavedDataOperatorListIStat callback) {
         return null;
     }
