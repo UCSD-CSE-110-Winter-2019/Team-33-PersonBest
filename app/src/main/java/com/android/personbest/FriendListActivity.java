@@ -5,12 +5,16 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import com.android.personbest.FriendshipManager.FFireBaseAdapter;
 import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
+import com.android.personbest.FriendshipManager.MockFirebaseAdapter;
+import com.android.personbest.SavedDataManager.SavedDataManager;
+import com.android.personbest.SavedDataManager.SavedDataManagerMock;
 import com.android.personbest.FriendshipManager.FriendshipManager;
 import com.android.personbest.FriendshipManager.Relations;
 
@@ -26,6 +30,7 @@ public class FriendListActivity extends ListActivity implements Observer {
     FFireBaseAdapter fireBaseAdapter;
     String idCurrentUser;
     FriendListActivity self;
+    SavedDataManagerMock sd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +44,19 @@ public class FriendListActivity extends ListActivity implements Observer {
                 finish();
             }
         });
+
         idCurrentUser = getIntent().getStringExtra("id");
-        this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
-        ((FriendFireBaseAdapter)(this.fireBaseAdapter)).addObserver(this);
-        this.fireBaseAdapter.getFriendlist();
+
+        // test
+        FFireBaseAdapter f = (FFireBaseAdapter) getIntent().getSerializableExtra("FFireBaseAdapter");
+        if (f == null) {
+            this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
+        } else {
+            System.out.println("Testing mode, using passed F firebase adapter");
+            fireBaseAdapter = f;
+        }
+        ((Observable)(this.fireBaseAdapter)).addObserver(this);
+
         list = new ArrayList<String>();
         listId = new ArrayList<String>();
         listName = new ArrayList<String>();
@@ -50,13 +64,18 @@ public class FriendListActivity extends ListActivity implements Observer {
                 R.layout.row_layout, R.id.listText, list);
         setListAdapter(myAdapter);
         self = this;
+
+        this.fireBaseAdapter.getFriendlist();
+        // test
+        sd = (SavedDataManagerMock) getIntent().getSerializableExtra("SavedDataManager");
+
     }
 
 
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
         String friendId = this.listId.get(position);
-        String chatId = ((FriendFireBaseAdapter)(fireBaseAdapter)).generateIDChat(friendId);
+        String chatId = fireBaseAdapter.generateIDChat(friendId);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
         builder.setTitle(R.string.title_select_action)
@@ -66,6 +85,7 @@ public class FriendListActivity extends ListActivity implements Observer {
                         Intent intent = new Intent(self, FriendProgress.class);
                         intent.putExtra("userId", friendId);
                         intent.putExtra("chatId", chatId);
+                        intent.putExtra("SavedDataManager", sd);
                         startActivity(intent);
                     }
                 }).setNeutralButton(R.string.message_btn, new DialogInterface.OnClickListener() {
@@ -83,6 +103,9 @@ public class FriendListActivity extends ListActivity implements Observer {
         String friend = (String) arg;
         String idFriend = friend.split("_")[0];
         String nameFriend = friend.split("_")[1];
+        System.out.println("friend:" + friend);
+        System.out.println("idFriend:" + idFriend);
+        System.out.println("nameFriend:" + nameFriend);
         list.add(nameFriend);
         listName.add(nameFriend);
         listId.add(idFriend);
