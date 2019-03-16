@@ -39,7 +39,7 @@ public class SavedDataManagerTest implements SavedDataManager {
     }
 
     public List<IStatistics> getLastMonthStat(String day, SavedDataOperatorListIStat callback) {
-        return null;
+        return new ArrayList<>();
     }
     public int getStepsDaysBefore(int today, int days) {
         return -1;
