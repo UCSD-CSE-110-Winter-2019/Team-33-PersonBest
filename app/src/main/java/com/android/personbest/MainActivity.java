@@ -259,13 +259,15 @@ public class MainActivity extends AppCompatActivity implements Observer {
         hasFriend = true;
         fFireBaseAdapter.hasFriend(b -> {
             hasFriend = b;
-            if(b) return;
             // yesterday
             // only once since data of yesterday never changes today
             if(!sd.isCheckedYesterdayGoal(today)) {
                sd.setCheckedYesterdayGoal(today);
                 checkYesterdayGoalReach();
             }
+
+            if(b) return;
+
             // not show sub-goal if goal met yesterday
             if(!sd.isShownYesterdayGoal(today) && !sd.isCheckedYesterdaySubGoal(today)) {
                 sd.setCheckedYesterdaySubGoal(today);
@@ -374,7 +376,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     // check if goal reached yesterday
     // need to be called only once per day
     protected void checkYesterdayGoalReach() {
-        if(hasFriend) return;
         String yesterday = theTimer.getYesterdayString();
 
         if(test_mode == ExecMode.EMode.DEFAULT) {
@@ -445,7 +446,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     protected void goalReached(boolean isYesterday) {
-        if(hasFriend) return;
         Log.d(TAG,"Goal reached");
         Log.d(TAG,"Reached goal is yesterday's? " + isYesterday);
         String title = "You Reached the Goal";

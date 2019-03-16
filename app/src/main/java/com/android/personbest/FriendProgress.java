@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.Pair;
 import android.widget.Button;
 import com.android.personbest.Chart.*;
@@ -34,14 +35,10 @@ public class FriendProgress extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_progress);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
         // we testing?
         test_mode = ExecMode.getExecMode();
         if(test_mode == ExecMode.EMode.TEST_CLOUD) {
-            savedDataManager = new SavedDataManagerSharedPreference(this); // TODO a mock firestore adapter
-            SavedDataManager m = (SavedDataManager) getIntent().getSerializableExtra("SavedDataManager");
-            if (m != null) savedDataManager = m;
+            savedDataManager = new SavedDataManagerSharedPreference(this);
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
             savedDataManager = new SavedDataManagerSharedPreference(this);
         }
@@ -69,31 +66,22 @@ public class FriendProgress extends AppCompatActivity {
         quaryData(user);
     }
 
-    public void quaryData(String user) {
+    private void quaryData(String user) {
+        Log.i(TAG,"Quary data from firebase, friend=" + user);
         if(test_mode == ExecMode.EMode.DEFAULT) {
             savedDataManager.getFriendMonthlyStat(user, timer.getTodayString(), this::buildChart);
         }
-        else {
-            buildChart(savedDataManager.getFriendMonthlyStat(user, timer.getTodayString(), null));
-        }
     }
 
-    public void buildChart(List<IStatistics> stats) {
+    private void buildChart(List<IStatistics> stats) {
+        Log.i(TAG,"Build chart");
         ChartBuilder builder = new ChartBuilder(this);
         builder.setData(stats)
                 .setInterval(IntervalMode.MONTH, timer.getTodayString())
+                .buildChartData()
                 .buildTimeAxisLabel()
                 .buildWalkEntryLegends()
                 .useOptimalConfig()
                 .show();
-    }
-
-
-    public void setManager(SavedDataManager manager) {
-        savedDataManager = manager;
-    }
-
-    public void setTimer(ITimer tm) {
-        timer = tm;
     }
 }
