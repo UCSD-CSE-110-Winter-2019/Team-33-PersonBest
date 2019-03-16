@@ -31,6 +31,7 @@ public class EmailLookUper implements Email2Id {
                 .build();
         ff.setFirestoreSettings(settings);
         ffUserData = ff.collection("user_data");
+        System.out.println("Init a email look up er");
     }
 
     public void getIdByEmail(String email, SavedDataOperatorString callback) {

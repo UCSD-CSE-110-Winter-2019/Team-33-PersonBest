@@ -23,9 +23,11 @@ public class MockFirebaseAdapter extends Observable implements FFireBaseAdapter,
     public void getFriendlist() {
         System.out.println("Get Friend List");
         db.forEach((k,v)->{
+            System.out.println("one more listeners");
             setChanged();
             notifyObservers(v + "_" + k);
         });
+
     }
 
     public HashMap<String, String> getDb() {

@@ -1,7 +1,7 @@
 package com.android.personbest;
 
-final class ExecMode {
-    enum EMode {
+public final class ExecMode {
+    public enum EMode {
         DEFAULT,
         TEST_CLOUD,
         TEST_LOCAL
