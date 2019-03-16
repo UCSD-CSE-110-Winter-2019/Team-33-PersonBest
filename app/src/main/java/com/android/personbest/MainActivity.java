@@ -3,7 +3,6 @@ package com.android.personbest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -25,6 +24,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.personbest.FriendshipManager.*;
+import com.android.personbest.Notification.INotification;
+import com.android.personbest.Notification.NotificationManager;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -79,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String userId;
     private Boolean hasFriend;
 
+    private INotification iNotification;
+
 //    private FirebaseAuth mAuth;
 //    private GoogleSignInAccount curAccount;
 //    private FirebaseUser curFirebaseUser;
@@ -123,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
                 if(totalSoFar > goalNum && !pushed) {
                     pushed = true;
-                    sendNotification();
+                    iNotification.sendNotification(ACHIEVE_MSG);
                 }
                 else pushed = false;
             }
@@ -318,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
+        this.iNotification = new NotificationManager(this);
         //Intent intent = new Intent(this, GoalCheckService.class);
         //bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -666,26 +670,4 @@ public class MainActivity extends AppCompatActivity implements Observer {
         startActivity(intent);
     }
 
-    private void sendNotification() {
-        this.pushed = true;
-        Log.e(TAG,"SEND NOTIFICATION");
-        Intent intent = new Intent(this, SetGoalActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-        Intent snoozeIntent = new Intent(this, MainActivity.class);
-        PendingIntent snoozePendingIntent =
-                PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,"0")
-                .setSmallIcon(R.drawable.ham_2x)
-                .setContentTitle("Person Best Goal")
-                .setContentText(ACHIEVE_MSG)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .addAction(R.drawable.ham_2x, "Snooze",
-                        snoozePendingIntent);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, notificationBuilder.build());
-    }
 }
