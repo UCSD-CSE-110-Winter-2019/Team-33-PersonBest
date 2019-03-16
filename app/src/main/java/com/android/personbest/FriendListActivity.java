@@ -15,6 +15,8 @@ import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
 import com.android.personbest.FriendshipManager.MockFirebaseAdapter;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerMock;
+import com.android.personbest.FriendshipManager.FriendshipManager;
+import com.android.personbest.FriendshipManager.Relations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,5 +114,4 @@ public class FriendListActivity extends ListActivity implements Observer {
 
         setListAdapter(myAdapter);
     }
-
 }
