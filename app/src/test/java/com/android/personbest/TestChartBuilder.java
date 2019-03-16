@@ -1,26 +1,14 @@
 package com.android.personbest;
 
 
-import android.app.Activity;
-import android.content.Intent;
-
 import com.android.personbest.Chart.ChartBuilder;
 import com.android.personbest.Chart.IntervalMode;
-import com.android.personbest.SavedDataManager.SavedDataManager;
-import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
-import com.android.personbest.StepCounter.*;
-
-import com.android.personbest.Timer.ITimer;
-import com.android.personbest.Timer.TimerMock;
-import com.github.mikephil.charting.charts.CombinedChart;
+import com.android.personbest.StepCounter.DailyStat;
+import com.android.personbest.StepCounter.IStatistics;
 import com.github.mikephil.charting.data.*;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 
 import java.util.ArrayList;
 import java.util.List;
