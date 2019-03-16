@@ -7,9 +7,13 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.personbest.FriendshipManager.FirebaseMessagingAdapter;
+import com.android.personbest.FriendshipManager.IChat;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.*;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -17,20 +21,51 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
-public class ChatBoxActivity extends AppCompatActivity {
+public class ChatBoxActivity extends AppCompatActivity implements Observer {
     String TAG = MainActivity.class.getSimpleName();
 
     String COLLECTION_KEY = "chats";
     String CHAT_ID;
     String MESSAGES_KEY = "messages";
-    String FROM_KEY = "from";
-    String TEXT_KEY = "text";
+    public String FROM_KEY = "from";
+    public String TEXT_KEY = "text";
     String TIMESTAMP_KEY = "timestamp";
+    public EditText nameView;
 
     CollectionReference chat;
     String from;
 
+    IChat iChat;
+
+    public void update(Observable o, Object arg){
+        String msg = (String) arg;
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (msg.length() == 0) {
+                    EditText messageView = findViewById(R.id.text_message);
+                    messageView.setText(arg.toString());
+                }
+                else if (msg.equals("Success")){
+                    String msg = "Subscribed to notifications";
+                    Log.d(TAG, msg);
+                    Toast.makeText(ChatBoxActivity.this, msg, Toast.LENGTH_SHORT).show();
+                }
+                else if (msg.equals("Fail")){
+                    String msg =  "Subscribe to notifications failed";
+                    Log.d(TAG, msg);
+                    Toast.makeText(ChatBoxActivity.this, msg, Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    TextView chatView = findViewById(R.id.chat);
+                    chatView.append(msg);
+                }
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +76,15 @@ public class ChatBoxActivity extends AppCompatActivity {
         from = sharedpreferences.getString(FROM_KEY, null);
 
         CHAT_ID = getIntent().getStringExtra("chatId");
-        chat = FirebaseFirestore.getInstance()
-                .collection(COLLECTION_KEY)
-                .document(CHAT_ID)
-                .collection(MESSAGES_KEY);
+
+        iChat = new FirebaseMessagingAdapter(CHAT_ID);
+        ((FirebaseMessagingAdapter)iChat).addObserver(this);
 
         initMessageUpdateListener();
 
         findViewById(R.id.btn_send).setOnClickListener(view -> sendMessage());
 
-        EditText nameView = findViewById((R.id.user_name));
+        nameView = findViewById((R.id.user_name));
         nameView.setText(from);
         nameView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -67,7 +101,6 @@ public class ChatBoxActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-        this.subscribeToNotificationsTopic();
     }
 
     private void sendMessage() {
@@ -82,15 +115,24 @@ public class ChatBoxActivity extends AppCompatActivity {
         newMessage.put(FROM_KEY, from);
         newMessage.put(TEXT_KEY, messageView.getText().toString());
 
-        chat.add(newMessage).addOnSuccessListener(result -> {
-            messageView.setText("");
-        }).addOnFailureListener(error -> {
-            Log.e(TAG, error.getLocalizedMessage());
-        });
+        boolean result = iChat.add(newMessage);
+
+    }
+
+    public EditText getMessageView(){
+        return findViewById(R.id.text_message);
+    }
+
+    public Button getSendButton(){
+        return findViewById(R.id.btn_send);
+    }
+
+    public void setFireBase(IChat iChat){
+        this.iChat = iChat;
     }
 
     private void initMessageUpdateListener() {
-        chat.orderBy(TIMESTAMP_KEY, Query.Direction.ASCENDING).addSnapshotListener((newChatSnapShot, error) -> {
+        /*chat.orderBy(TIMESTAMP_KEY, Query.Direction.ASCENDING).addSnapshotListener((newChatSnapShot, error) -> {
             if (error != null) {
                 Log.e(TAG, error.getLocalizedMessage());
                 return;
@@ -112,13 +154,20 @@ public class ChatBoxActivity extends AppCompatActivity {
                 TextView chatView = findViewById(R.id.chat);
                 chatView.append(sb.toString());
             }
-        });
+        });*/
+
+
+        StringBuilder result = this.iChat.orderBy();
+        if (result != null){
+            TextView chatView = findViewById(R.id.chat);
+            chatView.append(result.toString());
+        }
     }
-    private void  subscribeToNotificationsTopic() {
+    /*private void  subscribeToNotificationsTopic() {
         FirebaseMessaging. getInstance ().subscribeToTopic( CHAT_ID ) .addOnCompleteListener(task -> {
             String msg =  "Subscribed to notifications" ;  if  (!task.isSuccessful()) {
                 msg =  "Subscribe to notifications failed" ; }
             Log. d ( TAG , msg);
             Toast. makeText(  ChatBoxActivity.this , msg, Toast.LENGTH_SHORT)  .show(); }
-        ); }
+        ); }*/
 }

@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import com.android.personbest.FriendshipManager.FFireBaseAdapter;
 import com.android.personbest.FriendshipManager.FriendFireBaseAdapter;
+import com.android.personbest.FriendshipManager.FriendshipManager;
+import com.android.personbest.FriendshipManager.Relations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,5 +91,4 @@ public class FriendListActivity extends ListActivity implements Observer {
 
         setListAdapter(myAdapter);
     }
-
 }

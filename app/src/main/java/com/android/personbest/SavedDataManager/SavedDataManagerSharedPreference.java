@@ -214,4 +214,7 @@ public class SavedDataManagerSharedPreference implements SavedDataManager {
         editor.putString("last_day_prompted_yesterday_sub_goal",today);
         editor.apply();
     }
+    public String getEmail(){
+        return sp.getString("Email", "");
+    }
 }

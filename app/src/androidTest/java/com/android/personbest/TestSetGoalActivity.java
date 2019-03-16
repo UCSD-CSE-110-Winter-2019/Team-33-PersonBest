@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class SetGoalActivityTest {
+public class TestSetGoalActivity {
     private static final boolean dummy = ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
     @Rule
     public ActivityTestRule<SetGoalActivity> setGoalActivityTestRule = new ActivityTestRule<SetGoalActivity>(SetGoalActivity.class);
