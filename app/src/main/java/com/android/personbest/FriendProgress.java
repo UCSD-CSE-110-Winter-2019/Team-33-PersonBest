@@ -45,7 +45,12 @@ public class FriendProgress extends AppCompatActivity {
                 savedDataManager = f;
             }
         } else if (test_mode == ExecMode.EMode.TEST_LOCAL) {
-            savedDataManager = new SavedDataManagerSharedPreference(this);
+            SavedDataManager f = (SavedDataManager) getIntent().getSerializableExtra("SavedDataManager");
+            if (f == null) {
+                savedDataManager = new SavedDataManagerSharedPreference(this);
+            } else {
+                savedDataManager = f;
+            }
         }
         else {
             // set saved data manager

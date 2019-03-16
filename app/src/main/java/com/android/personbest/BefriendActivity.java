@@ -8,7 +8,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.android.personbest.FriendshipManager.FriendshipManager;
+import com.android.personbest.FriendshipManager.MockRelations;
 import com.android.personbest.FriendshipManager.Relations;
+import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
+import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
+import com.google.firebase.FirebaseApp;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -17,6 +21,7 @@ public class BefriendActivity extends AppCompatActivity {
     private EditText nameInput;
     private EditText emailInput;
     private FriendshipManager relations;
+    private ExecMode.EMode test_mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +34,15 @@ public class BefriendActivity extends AppCompatActivity {
         /*Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();*/
         String userId = getIntent().getStringExtra("id");
-        relations = new Relations(userId);
+
+        test_mode = ExecMode.getExecMode();
+        if (test_mode == ExecMode.EMode.TEST_LOCAL) {
+            relations = new MockRelations();
+        }
+        else {
+            relations = new Relations(userId);
+        }
+
 
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
