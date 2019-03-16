@@ -7,19 +7,21 @@ import java.util.Observable;
 public class MockFirebaseAdapter extends Observable implements FFireBaseAdapter, Serializable {
     HashMap<String, String> db;
     private String user;
-    private String idFriend;
 
-    public MockFirebaseAdapter() {
+    public MockFirebaseAdapter(String user) {
+        this.user = user;
         this.db = new HashMap<>();
     }
 
     @Override
     public void addFriendById(String name, String id) {
+        System.out.println("Adding New Friend:" + name + " " + id);
         this.db.put(name, id);
     }
 
     @Override
     public void getFriendlist() {
+        System.out.println("Get Friend List");
         db.forEach((k,v)->{
             setChanged();
             notifyObservers(v + "_" + k);

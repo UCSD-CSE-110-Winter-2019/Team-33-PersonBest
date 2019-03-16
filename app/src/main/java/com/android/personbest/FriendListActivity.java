@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,11 +50,11 @@ public class FriendListActivity extends ListActivity implements Observer {
         if (f == null) {
             this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
         } else {
+            System.out.println("Testing mode, using passed F firebase adapter");
             fireBaseAdapter = f;
         }
         ((Observable)(this.fireBaseAdapter)).addObserver(this);
 
-        this.fireBaseAdapter.getFriendlist();
         list = new ArrayList<String>();
         listId = new ArrayList<String>();
         listName = new ArrayList<String>();
@@ -62,8 +63,10 @@ public class FriendListActivity extends ListActivity implements Observer {
         setListAdapter(myAdapter);
         self = this;
 
+        this.fireBaseAdapter.getFriendlist();
         // test
         sd = (SavedDataManagerMock) getIntent().getSerializableExtra("SavedDataManager");
+
     }
 
 
@@ -98,6 +101,9 @@ public class FriendListActivity extends ListActivity implements Observer {
         String friend = (String) arg;
         String idFriend = friend.split("_")[0];
         String nameFriend = friend.split("_")[1];
+        System.out.println("friend:" + friend);
+        System.out.println("idFriend:" + idFriend);
+        System.out.println("nameFriend:" + nameFriend);
         list.add(nameFriend);
         listName.add(nameFriend);
         listId.add(idFriend);
