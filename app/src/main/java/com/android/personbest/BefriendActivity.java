@@ -14,6 +14,8 @@ import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
 import com.google.firebase.FirebaseApp;
 
+import static android.app.Activity.RESULT_OK;
+
 public class BefriendActivity extends AppCompatActivity {
     private Button connect;
     private EditText nameInput;

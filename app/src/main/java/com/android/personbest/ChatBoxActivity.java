@@ -81,6 +81,7 @@ public class ChatBoxActivity extends AppCompatActivity implements Observer {
         ((FirebaseMessagingAdapter)iChat).addObserver(this);
 
         initMessageUpdateListener();
+        this.iChat.subscribeToTopic(CHAT_ID);
 
         findViewById(R.id.btn_send).setOnClickListener(view -> sendMessage());
 
@@ -163,4 +164,5 @@ public class ChatBoxActivity extends AppCompatActivity implements Observer {
             chatView.append(result.toString());
         }
     }
+
 }

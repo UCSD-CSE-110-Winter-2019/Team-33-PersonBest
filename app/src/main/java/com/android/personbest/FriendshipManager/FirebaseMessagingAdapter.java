@@ -9,10 +9,13 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
+
+import static android.content.ContentValues.TAG;
 
 public class FirebaseMessagingAdapter extends Observable implements IChat {
 
@@ -71,5 +74,16 @@ public class FirebaseMessagingAdapter extends Observable implements IChat {
                     }
                 });
         return stringBuilder;
+    }
+
+
+    public void subscribeToTopic(String topic){
+
+        FirebaseMessaging.getInstance ().subscribeToTopic( topic ) .addOnCompleteListener(task -> {
+            String msg =  "Subscribed to notifications";
+            if  (!task.isSuccessful()) {
+                msg =  "Subscribe to notifications failed" ; }
+            Log. d ( TAG , msg); }
+        );
     }
 }

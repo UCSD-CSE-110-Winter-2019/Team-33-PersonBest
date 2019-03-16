@@ -1,5 +1,7 @@
 package com.android.personbest.Notification;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
@@ -9,12 +11,29 @@ import com.android.personbest.MainActivity;
 import com.android.personbest.R;
 import com.android.personbest.SetGoalActivity;
 
-public class NotificationManager implements INotification {
+public class PBNotificationManager implements INotification {
     private final String TAG = "NotificationManager";
     private MainActivity activity;
 
-    public NotificationManager(MainActivity activity){
+    public PBNotificationManager(MainActivity activity){
         this.activity = activity;
+        this.createNotificationChannel();
+    }
+
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        CharSequence name = "Goal Push Notification";
+        String description = "Check Goal";
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel channel = new NotificationChannel("0", name, importance);
+        channel.setDescription(description);
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        NotificationManager notificationManager = this.activity.getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+        Log.i(TAG,"CHANNEL CREATED");
     }
     @Override
     public void sendNotification(String msg) {
