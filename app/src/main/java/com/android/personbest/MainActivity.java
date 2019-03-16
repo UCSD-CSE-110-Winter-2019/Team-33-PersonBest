@@ -3,7 +3,6 @@ package com.android.personbest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -25,6 +24,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.personbest.FriendshipManager.*;
+import com.android.personbest.Notification.INotification;
+import com.android.personbest.Notification.NotificationManager;
 import com.android.personbest.SavedDataManager.SavedDataManager;
 import com.android.personbest.SavedDataManager.SavedDataManagerFirestore;
 import com.android.personbest.SavedDataManager.SavedDataManagerSharedPreference;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     public static final String FITNESS_SERVICE_KEY = "FITNESS_SERVICE_KEY";
     private static final String TAG = "MainActivity";
     private static final String TEST_CUR_USR_ID = "test-uid";
+    private static final String ACHIEVE_MSG = "Achieve the Goal! Congrats! Click Here to set a new Goal!";
 
     private static ExecMode.EMode test_mode;
 
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private String userId;
     private Boolean hasFriend;
 
+    private INotification iNotification;
+
 //    private FirebaseAuth mAuth;
 //    private GoogleSignInAccount curAccount;
 //    private FirebaseUser curFirebaseUser;
@@ -97,8 +101,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
     private Button addFriend;
     private Button viewFriends;
 
-    public GoalCheckService goalCheckService;
-    private boolean isBound;
+    private boolean pushed;
 
     public void update(Observable o, Object arg) {
         runOnUiThread(new Runnable() {
@@ -121,7 +124,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 if(left > 0) stepsLeftVal.setText(String.valueOf(left));
                 else stepsLeftVal.setText("0");
 
-                if(goalCheckService != null) updateService();
+                if(totalSoFar > goalNum && !pushed) {
+                    pushed = true;
+                    iNotification.sendNotification(ACHIEVE_MSG);
+                }
+                else pushed = false;
             }
         });
     }
@@ -314,11 +321,12 @@ public class MainActivity extends AppCompatActivity implements Observer {
             }
         });
 
-        Intent intent = new Intent(this, GoalCheckService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        this.iNotification = new NotificationManager(this);
+        //Intent intent = new Intent(this, GoalCheckService.class);
+        //bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    /*private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             GoalCheckService.LocalService localService = (GoalCheckService.LocalService) iBinder;
@@ -352,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             isBound = false;
         }
         super.onDestroy();
-    }
+    }*/
 
     @Override
     protected void onResume() {
@@ -661,4 +669,5 @@ public class MainActivity extends AppCompatActivity implements Observer {
         intent.putExtra("id", this.userId);
         startActivity(intent);
     }
+
 }
