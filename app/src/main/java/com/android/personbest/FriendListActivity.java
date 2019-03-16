@@ -47,15 +47,19 @@ public class FriendListActivity extends ListActivity implements Observer {
 
         idCurrentUser = getIntent().getStringExtra("id");
 
+        System.out.println("before f init");
         // test
         FFireBaseAdapter f = (FFireBaseAdapter) getIntent().getSerializableExtra("FFireBaseAdapter");
         if (f == null) {
+            System.out.println("Production mode, using real firebase adapter");
             this.fireBaseAdapter = new FriendFireBaseAdapter(idCurrentUser);
         } else {
             System.out.println("Testing mode, using passed F firebase adapter");
-            fireBaseAdapter = f;
+            this.fireBaseAdapter = f;
         }
         ((Observable)(this.fireBaseAdapter)).addObserver(this);
+
+        System.out.println("after f init");
 
         list = new ArrayList<String>();
         listId = new ArrayList<String>();
@@ -75,7 +79,7 @@ public class FriendListActivity extends ListActivity implements Observer {
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
         String friendId = this.listId.get(position);
-        String chatId = fireBaseAdapter.generateIDChat(friendId);
+        String chatId = this.fireBaseAdapter.generateIDChat(friendId);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
         builder.setTitle(R.string.title_select_action)

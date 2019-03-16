@@ -45,7 +45,7 @@ public class TestUserSeesActivityOfOthers {
 
     @Before
     public void setup() {
-        ExecMode.setExecMode(ExecMode.EMode.TEST_CLOUD);
+        ExecMode.setExecMode(ExecMode.EMode.TEST_LOCAL);
 
         List<IStatistics> data = new ArrayList<>();
         List<IStatistics> dataFriend = new ArrayList<>();
@@ -59,7 +59,11 @@ public class TestUserSeesActivityOfOthers {
         intent.putExtra("FFireBaseAdapter", mfa);
         intent.putExtra("id", this.userId);
         intent.putExtra("SavedDataManager", this.sd);
-        activity = Robolectric.buildActivity(FriendListActivity.class, intent).create().get();
+        try {
+            activity = Robolectric.buildActivity(FriendListActivity.class, intent).create().get();
+        } catch(Exception e) {
+            activity = Robolectric.buildActivity(FriendListActivity.class, intent).create().get();
+        }
         shadowFriendListActivity = Shadows.shadowOf(activity);
     }
 
@@ -73,6 +77,7 @@ public class TestUserSeesActivityOfOthers {
      */
     @Test
     public void testSeeActivity() {
+        System.out.println("************Begin to test our BDD**************");
         ListView friendListView = (ListView) activity.getListView();
         Shadows.shadowOf(friendListView).performItemClick(0); // press one and only one friend
         AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
