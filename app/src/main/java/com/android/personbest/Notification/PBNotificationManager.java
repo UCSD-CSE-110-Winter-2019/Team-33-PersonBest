@@ -26,13 +26,14 @@ public class PBNotificationManager implements INotification {
         // the NotificationChannel class is new and not in the support library
         CharSequence name = "Goal Push Notification";
         String description = "Check Goal";
-        int importance = 0;
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
         NotificationChannel channel = new NotificationChannel("0", name, importance);
         channel.setDescription(description);
         // Register the channel with the system; you can't change the importance
         // or other notification behaviors after this
         NotificationManager notificationManager = this.activity.getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
+        Log.i(TAG,"CHANNEL CREATED");
     }
     @Override
     public void sendNotification(String msg) {
