@@ -32,6 +32,7 @@ public class MessagingServiceTest {
     public void testUserName(){
         Intent intent = new Intent(RuntimeEnvironment.application, ChatBoxActivity.class);
         intent.putExtra("chatId","test-atest-b");
+
         chatBoxActivity = Robolectric.buildActivity(ChatBoxActivity.class,intent).create().get();
         MockFireBase mockFireBase = new MockFireBase();
         mockFireBase.addObserver(chatBoxActivity);
