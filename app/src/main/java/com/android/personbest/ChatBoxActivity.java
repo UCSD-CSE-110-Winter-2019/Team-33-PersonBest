@@ -163,11 +163,4 @@ public class ChatBoxActivity extends AppCompatActivity implements Observer {
             chatView.append(result.toString());
         }
     }
-    /*private void  subscribeToNotificationsTopic() {
-        FirebaseMessaging. getInstance ().subscribeToTopic( CHAT_ID ) .addOnCompleteListener(task -> {
-            String msg =  "Subscribed to notifications" ;  if  (!task.isSuccessful()) {
-                msg =  "Subscribe to notifications failed" ; }
-            Log. d ( TAG , msg);
-            Toast. makeText(  ChatBoxActivity.this , msg, Toast.LENGTH_SHORT)  .show(); }
-        ); }*/
 }

@@ -3,7 +3,10 @@ package com.android.personbest.FriendshipManager;
 import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.personbest.ChatBoxActivity;
+import com.android.personbest.MainActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -179,9 +182,15 @@ public class FriendFireBaseAdapter extends Observable implements FFireBaseAdapte
     }
 
     public void subscribeToTopic(String topic){
-        FirebaseMessaging.getInstance().subscribeToTopic(topic)
+        /*FirebaseMessaging.getInstance().subscribeToTopic(topic)
                 .addOnCompleteListener(task -> {
                     Log.d(TAG, "Subscribe to " + topic); }
-                );
+                );*/
+
+        FirebaseMessaging. getInstance ().subscribeToTopic( topic ) .addOnCompleteListener(task -> {
+            String msg =  "Subscribed to notifications" ;  if  (!task.isSuccessful()) {
+                msg =  "Subscribe to notifications failed" ; }
+            Log. d ( TAG , msg); }
+        );
     }
 }
